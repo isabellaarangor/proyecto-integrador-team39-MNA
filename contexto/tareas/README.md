@@ -1,6 +1,6 @@
 # Tareas — Tesis PINN MEMS (plan v3)
 
-Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Un archivo = una tarea, dimensionada para ~medio día de trabajo. Marca la casilla aquí cuando la tarea completa esté cerrada; el avance interno se sigue dentro de cada archivo.
+Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos, las fuentes verificadas y las respuestas a preguntas de fondo están en la [base de conocimiento](../conocimiento/README.md). Un archivo = una tarea, dimensionada para ~medio día de trabajo. Marca la casilla aquí cuando la tarea completa esté cerrada; el avance interno se sigue dentro de cada archivo.
 
 **Responsables:** A = Física y referencia · B = PINN · C = Clásico y arnés · todos = equipo completo
 **Compuertas:** G0 datos utilizables · G1 eigensolver válido · G2 identificabilidad · G3 PINN válida + cronometrada · G4 baseline L0 · G5 escalera completa · G6 paro duro de experimentos
@@ -19,6 +19,7 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Un archivo = u
 - [ ] [T09 Eigensolver de referencia](T09-eigensolver-de-referencia.md) — A
 - [ ] [T10 Validación del eigensolver + pytest (G1)](T10-validacion-eigensolver-g1.md) — A
 - [ ] [T11 Registro de decisión G0](T11-registro-decision-g0.md) — todos
+- [ ] [T48 Alternativas si los datos reales no alcanzan](T48-alternativas-datos-reales.md) — todos (A dueño)
 
 ## Semana 3 — Avance 1, EDA (G2)
 - [ ] [T12 Generadores de datos M0 + M1](T12-generadores-m0-m1.md) — A

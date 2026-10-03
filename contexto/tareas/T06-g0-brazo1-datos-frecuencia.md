@@ -4,6 +4,8 @@
 
 **Objetivo:** Establecer si los datos reales del brazo de frecuencia son utilizables: E aparente versus longitud del voladizo, y cuántos datos de frecuencia/modo existen realmente por estructura.
 
+**Avance previo (2026-09-24):** las tablas YM7 y YM8 ya se localizaron y transcribieron (promedios por longitud). Muestran la deriva que predice A8, y el NIST aplica una corrección empírica de frecuencia por longitud (f_correction). Ver [datos del NIST en la base de conocimiento](../conocimiento/datos/nist-sp260-177-modulo-young.md). Falta el trabajo por voladizo individual y la CSV.
+
 ## Subtareas
 - [ ] Descargar SP 260-177 (DOI 10.6028/NIST.SP.260-177)
 - [ ] Localizar las figuras/tablas de E aparente vs. longitud del voladizo (serie YM). ¿Hay deriva, y ajusta plausiblemente `(L/(L+ΔL))⁴`?

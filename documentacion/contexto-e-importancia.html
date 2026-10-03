@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Contexto e importancia del problema</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; max-width: 800px; margin: 40px auto; padding: 0 16px; color: #000; background: #fff; }
+  h2 { font-size: 14pt; }
+  p { text-align: justify; }
+</style>
+</head>
+<body>
+
+<h2>Contexto e importancia del problema</h2>
+
+<p>Las propiedades de una película delgada dependen de su proceso de fabricación y no pueden medirse directamente en el dispositivo terminado. Por ello, en la misma oblea se fabrican estructuras de prueba, como voladizos y vigas, que comparten el material y el proceso del dispositivo y sirven como representantes de este. A partir de su frecuencia de resonancia o de su perfil se extraen, mediante métodos estandarizados, el módulo de Young y el esfuerzo residual de la película. Estas mediciones tienen tres usos principales: vigilar el proceso de fabricación, detectando variaciones entre obleas o lotes; proporcionar los valores de las propiedades que alimentan los modelos de diseño y simulación de resonadores, sensores y actuadores; y verificar la exactitud de las mediciones de cada laboratorio comparándolas contra los materiales de referencia del NIST (Cassard et al., 2013).</p>
+
+<p>Por ello, una estimación sesgada se propaga. Como la frecuencia de resonancia es proporcional a la raíz cuadrada del módulo de Young (Cassard et al., 2013), un error cercano al 10 %, similar a la variación que el NIST observa entre voladizos de distinta longitud, produce un error de aproximadamente 5 % en la frecuencia predicha. Esa diferencia basta para dejar fuera de especificación a un dispositivo diseñado para operar a una frecuencia concreta. Además, si el valor estimado depende de la geometría de la estructura de prueba, un cambio de diseño puede confundirse con un cambio en el material. Actualmente este efecto se compensa con una corrección empírica y se reporta un módulo de Young “efectivo” (Cassard et al., 2013), cuya validez es limitada cuando cambian la geometría o el proceso.</p>
+
+<p>Las PINNs ya se han aplicado a la caracterización de sistemas reales, como un microactuador piezoeléctrico (Nguyen et al., 2024) o una viga a partir de mediciones experimentales (Teloli et al., 2025). Su mayor potencial está en los gemelos digitales, es decir, modelos acoplados a un sistema físico que se actualizan con datos medidos y orientan decisiones sobre él (National Academies of Sciences, Engineering, and Medicine, 2024). Una PINN puede incorporar mediciones espacialmente densas, como formas de vibración completas (Xu et al., 2025), actualizarse al llegar nuevos datos y aplicarse donde no existe una fórmula cerrada. Por ejemplo, un gemelo digital del proceso de fabricación podría estimar las propiedades de cada lote de obleas, y uno del dispositivo podría seguir la evolución de su rigidez durante la operación.</p>
+
+<p>Sin embargo, este escenario vuelve más crítico el problema. La cuantificación de la incertidumbre, incluida la de un modelo imperfecto, es una de las brechas centrales de los gemelos digitales (National Academies of Sciences, Engineering, and Medicine, 2024). Si la restricción física se relaja para facilitar el entrenamiento, la PINN puede reproducir fielmente las mediciones mientras absorbe en silencio la discrepancia en los parámetros. En un gemelo digital, ese sesgo pasaría inadvertido a cada predicción y decisión posterior.</p>
+
+<p>Esta investigación contribuye a resolver ese problema de cuatro maneras. Primero, cuantifica cómo crece el sesgo de los parámetros identificados según la forma en que se trata la discrepancia y la magnitud de esta, lo que ofrece un criterio para elegir el tratamiento adecuado. Segundo, evalúa si relajar la restricción física, una práctica común pero poco estudiada, reduce el sesgo u oculta el error, y si los residuos del ajuste conservan la señal que permitiría detectarlo. Tercero, prueba si un modelo físico del anclaje puede sustituir la corrección empírica actual por parámetros con significado físico, de modo que el módulo de Young estimado deje de depender de la geometría. Por último, contrasta estos resultados con mediciones reales del NIST. En conjunto, el estudio busca establecer bajo qué condiciones los parámetros identificados, con métodos convencionales o con PINNs, pueden utilizarse con confianza en diseño, control de procesos y gemelos digitales.</p>
+
+</body>
+</html>

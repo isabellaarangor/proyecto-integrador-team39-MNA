@@ -22,6 +22,4 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 - Geometría: RM 8096 (NIST SP 260-177): L = 300 µm, b = 28 µm, h = 2.743 µm, ρ = 2200 kg/m³, E = 70 GPa.
 - Rigideces adimensionales: κ_θ = k_θ·L/EI, κ_u = k_u·L³/EI; `.inf` es empotramiento ideal.
 - Ruido: gaussiano, relativo a la amplitud pico de cada modo (2% por defecto). Las frecuencias van sin ruido.
-- Formato `.npz` y ejemplos de uso: `notebooks/01_datos_sinteticos.ipynb`.
-- Calibración y adimensionalización para la PINN (`pinn_mems.adimensional`): `notebooks/02_calibracion_y_adimensional.ipynb`.
-- Generadores M2 y M3, y la huella de cada mecanismo en las formas: `notebooks/03_generadores_m2_m3.ipynb`.
+- Explicación completa para personas externas al proyecto (qué son los datos, cómo se crean y cómo se usarán): `notebooks/01_datos_sinteticos.ipynb`. Su texto se edita en `scripts/construir_notebook.py`.

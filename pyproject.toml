@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "matplotlib>=3.8", "ipykernel", "nbformat", "nbconvert"]
+dev = ["pytest>=8", "matplotlib>=3.8", "pandas>=2", "ipykernel", "nbformat", "nbconvert"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

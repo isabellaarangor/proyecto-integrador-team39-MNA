@@ -263,8 +263,19 @@ Abre un archivo de RM 8096 en Excel o LibreOffice y sigue los pasos del NIST esc
 4. Escribe un CSV por traza en `datos/nist/trazas/` con las columnas `x_um, z_um, traza, estructura, L_um, chip, archivo_origen`.
 5. **Valida contra el NIST:** con las trazas calibradas, reproduce el valor intermedio de la hoja (por ejemplo `Rint` en gradiente o `f` en deformación). Debe coincidir.
 
-**Paso 3 — Ruido del instrumento**
-Las trazas b, c y d recorren la misma estructura en posiciones distintas. Su diferencia da una estimación empírica del ruido de medición, que sirve para la verosimilitud del MCMC.
+**Paso 3 — Ruido de medición** (replanteado el 2026-10-04, [T51](../contexto/tareas/T51-brazo2-ruido-del-instrumento.md))
+
+El plan original era comparar las trazas b, c y d de una misma estructura, pero **cada archivo trae una sola traza**, así que no hay dos trazas de la misma estructura. El ruido se estima dentro de cada traza con `src/pinn_mems/nist/ruido.py` (estimadores robustos, validados con perfiles sintéticos de ruido conocido):
+
+| Material | σ por segundas diferencias (mediana) | σ por suavizado (mediana) | Residuo contra el `zmodel` del NIST |
+|---|---|---|---|
+| RM 8096 (óxido, paso 0.39 µm) | 0.022 µm (0.010–0.036) | 0.037 µm | 0.08–0.09 µm |
+| RM 8097 (polisilicio, paso 1.96 µm) | 0.004 µm (0.003–0.006) | 0.008 µm | 0.05–0.07 µm |
+
+- En RM 8096 el valor coincide con la rugosidad que reporta el NIST, R_ave = 0.01733 µm ≈ 0.022 µm rms [F15, p. 188]; la resolución del interferómetro es mucho menor (z_res = 0.001 µm). Es decir, lo que se ve como "ruido" es sobre todo **rugosidad de la superficie**.
+- En RM 8096, las trazas a lo largo de la viga (b, d: 0.032–0.036 µm) tienen más ruido que las transversales (0.010–0.011 µm).
+- El estimador por suavizado da 1.7–2 veces más que el de segundas diferencias en los datos reales, aunque en datos sintéticos coinciden: el ruido real parece **correlacionado entre puntos vecinos**. Una verosimilitud con ruido blanco puede subestimar la incertidumbre; conviene probar un modelo de ruido correlacionado en el MCMC.
+- El residuo contra el modelo del NIST incluye el desajuste del modelo: es una cota superior, no el ruido.
 
 **Paso 4 — Correr la escalera** (T40)
 1. Incógnitas: σ₀ en las vigas biempotradas y κ₀ en los voladizos curvados.
@@ -303,7 +314,7 @@ No existen datos públicos del Brazo 1 en mejor formato que las tablas. Revisamo
 
 **Brazo 2**
 - [ ] Script de conversión de `crudos/*.xlsx` a `trazas/*.csv`, validado contra los valores intermedios del NIST
-- [ ] Ruido del instrumento estimado con las trazas b, c y d
+- [x] Ruido de medición estimado (replanteado: una traza por archivo; ver paso 3)
 - [ ] Decisión del brazo registrada en T11 y la pérdida anotada para T44
 
 **Ambos**

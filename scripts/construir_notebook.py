@@ -216,7 +216,7 @@ Los datos se generan con cuatro modelos, de M0 (perfecto) a M3. Los métodos que
 | Generador | Qué agrega | Situación real | Cuántos niveles |
 |---|---|---|---|
 | **M0** | Nada: viga ideal | Control: todos los métodos deberían acertar | 1 |
-| **M1** | El soporte **gira un poco**, como un resorte | El anclaje de una viga real nunca es perfectamente rígido | **6** (eje principal) |
+| **M1** | El soporte **gira y/o se desplaza un poco**, como un resorte, la viga se comporta como si fuera un poco más larga y vibra más lento | El anclaje de una viga real nunca es perfectamente rígido | **6** (eje principal) |
 | **M2** | **Cortante** e inercia de rotación (teoría de Timoshenko) | Vigas cortas y gruesas | 1 |
 | **M3** | El espesor **varía linealmente** a lo largo de la viga | El grabado químico no es uniforme en el chip | 1 |
 

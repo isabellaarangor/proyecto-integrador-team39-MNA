@@ -1,0 +1,10 @@
+# [F29, p. 316, Table 3] Marshall et al. (2010). Valores de ejemplo de incertidumbre de E (suponiendo E_init = 70 GPa). Copia sin modificar.
+componente,tipo,GPa,condiciones
+u_thick,Type B,2.8,t = 2.743 µm y σ_thick = 0.058 µm
+u_rho,Type B,1.5,ρ = 2.2 g/cm³ y σ_ρ = 0.05 g/cm³
+u_L,Type B,0.17,L_can = 300 µm y σ_L = 0.2 µm
+u_freq,Type B,0.027,f_meas1 = 26.82625 kHz; f_meas2 = 26.8351 kHz; f_meas3 = 26.8251 kHz
+u_fresol,Type B,0.0018,f_resol = 1.25 Hz
+u_damp,Type B,0.0004,W_can = 28 µm y σ_W = 0.1 µm; μ = 1.84e-5 N·s/m² y σ_μ = 0.01e-5 N·s/m²
+u_cE,,3.2,
+3u_cE,,9.5,graficada en la Fig. 6 con el primer voladizo de 300 µm de repetibilidad

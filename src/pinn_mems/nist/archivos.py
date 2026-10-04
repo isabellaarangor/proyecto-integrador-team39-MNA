@@ -1,4 +1,8 @@
-"""Ubicación e integridad de los archivos crudos del NIST (`datos/nist/crudos/`)."""
+"""Ubicación e integridad de los archivos del NIST.
+
+`datos/nist/crudos/` guarda los originales descargados del NIST, sin modificar;
+`datos/nist/tablas/` guarda las transcripciones de tablas publicadas, en CSV.
+"""
 
 from __future__ import annotations
 
@@ -7,6 +11,7 @@ from pathlib import Path
 
 RAIZ_REPO = Path(__file__).resolve().parents[3]
 CARPETA_CRUDOS = RAIZ_REPO / "datos" / "nist" / "crudos"
+CARPETA_TABLAS = RAIZ_REPO / "datos" / "nist" / "tablas"
 
 
 def ruta_cruda(nombre: str, carpeta: Path = CARPETA_CRUDOS) -> Path:

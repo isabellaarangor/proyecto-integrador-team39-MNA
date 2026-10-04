@@ -13,21 +13,25 @@ import pandas as pd
 from scipy.optimize import least_squares
 from scipy.stats import t
 
-from pinn_mems.nist.archivos import CARPETA_CRUDOS, ruta_cruda
+from pinn_mems.nist.archivos import CARPETA_TABLAS, ruta_cruda
 
-DATA_DIR = CARPETA_CRUDOS
+# Transcripciones en CSV; la primera línea de cada archivo cita su fuente
+DATA_DIR = CARPETA_TABLAS
 
 MARSHALL_FILES = {
-    "table1": "02-Aa-Marshall-part-01-table1.xlsx",
-    "table2": "02-Aa-Marshall-part-01-table2.xlsx",
-    "table3": "02-Aa-Marshall-part-01-table3.xlsx",
-    "table5": "02-Aa-Marshall-part-01-table5.xlsx",
-    "table6": "02-Aa-Marshall-part-01-table6.xlsx",
+    "table1": "marshall_T1_geometria.csv",
+    "table2": "marshall_T2_diseno_f_Q.csv",
+    "table3": "marshall_T3_incertidumbre.csv",
+    "table5": "marshall_T5_repetibilidad.csv",
+    "table6": "marshall_T6_reproducibilidad.csv",
 }
 
+# Las Tablas 3 (RM 8096) y 4 (RM 8097) del SP 260-177 comparten archivo
 SP260_FILES = {
-    "table3": "nist-sp260-177-table3.xlsx",
+    "table3": "sp260_T3_T4_f_correction.csv",
+    "table4": "sp260_T3_T4_f_correction.csv",
 }
+_SP260_MATERIAL = {"table3": "RM 8096", "table4": "RM 8097"}
 
 # Longitudes individuales de las Tablas 5 y 6; la columna agregada
 # "200 µm to 400 µm lengths" no es una cuarta longitud.
@@ -41,15 +45,18 @@ def load_marshall_table(table_name: str, data_dir: Path = DATA_DIR) -> pd.DataFr
     """Carga una tabla de Marshall desde la carpeta de datos crudos."""
     if table_name not in MARSHALL_FILES:
         raise ValueError(f"Tabla desconocida: {table_name}. Disponibles: {list(MARSHALL_FILES)}")
-    return pd.read_excel(ruta_cruda(MARSHALL_FILES[table_name], data_dir))
+    return pd.read_csv(ruta_cruda(MARSHALL_FILES[table_name], data_dir), comment="#")
 
 
 def load_sp260_table(table_name: str, data_dir: Path = DATA_DIR) -> pd.DataFrame:
     """Carga una tabla de NIST SP 260-177 desde la carpeta de datos crudos."""
     if table_name not in SP260_FILES:
         raise ValueError(f"Tabla desconocida: {table_name}. Disponibles: {list(SP260_FILES)}")
-    df = pd.read_excel(ruta_cruda(SP260_FILES[table_name], data_dir))
-    # Normaliza el signo menos Unicode si Excel lo leyó como texto.
+    df = pd.read_csv(ruta_cruda(SP260_FILES[table_name], data_dir), comment="#")
+    df = df[df["material"] == _SP260_MATERIAL[table_name]].reset_index(drop=True)
+    if table_name == "table3":
+        df = df.drop(columns=["material", "capa"])  # RM 8096 no distingue capas
+    # Normaliza el signo menos Unicode si se transcribió como texto.
     for col in df.columns:
         if df[col].dtype == "object":
             df[col] = df[col].map(lambda x: x.replace("−", "-") if isinstance(x, str) else x)

@@ -13,6 +13,7 @@ import pytest
 
 from pinn_mems import Viga, resolver_modos
 from pinn_mems.nist import brazo1
+from pinn_mems.nist.archivos import CARPETA_CRUDOS, CARPETA_TABLAS, verificar_integridad
 
 LONGITUDES = [200.0, 300.0, 400.0]
 
@@ -58,6 +59,31 @@ def test_tabla_3_sp260_es_numerica():
     t3 = brazo1.load_sp260_table("table3")
     f = pd.to_numeric(t3["f_correction (kHz)"], errors="raise")
     assert f.tolist() == pytest.approx([2.67, 0.0, -0.24])
+
+
+def test_tabla_4_sp260_trae_las_dos_capas_de_RM_8097():
+    t4 = brazo1.load_sp260_table("table4")
+    assert set(t4["capa"]) == {"P1", "P2"}
+    assert len(t4) == 6
+
+
+# --- Rastreabilidad ----------------------------------------------------------
+
+
+def test_cada_tabla_cita_su_fuente_en_la_primera_linea():
+    """Cada CSV de datos/nist/tablas/ empieza con la cita de su tabla y página."""
+    archivos = {*brazo1.MARSHALL_FILES.values(), *brazo1.SP260_FILES.values()}
+    for nombre in archivos:
+        primera = (CARPETA_TABLAS / nombre).read_text(encoding="utf-8").splitlines()[0]
+        assert primera.startswith("# [F"), nombre
+        assert "Table" in primera, nombre
+
+
+def test_crudos_solo_contiene_originales_del_nist():
+    """Las transcripciones no van en crudos/: ahí solo hay archivos listados en SHA256SUMS."""
+    listados = set(verificar_integridad())
+    presentes = {p.name for p in CARPETA_CRUDOS.iterdir() if p.name != "SHA256SUMS"}
+    assert presentes == listados
 
 
 # --- Reconstrucción de la incertidumbre --------------------------------------

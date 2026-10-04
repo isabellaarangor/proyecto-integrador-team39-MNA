@@ -9,7 +9,7 @@
 ## Subtareas
 - [x] Descargar SP 260-177 (DOI 10.6028/NIST.SP.260-177) — *citado con páginas en la base de conocimiento*
 - [x] Localizar las figuras/tablas de E aparente vs. longitud del voladizo (serie YM). ¿Hay deriva, y ajusta plausiblemente `(L/(L+ΔL))⁴`? — *sí: `notebooks/EDA_Brazo1_NIST.ipynb`, ΔL = 12.8 y 12.3 µm con las Tablas 5 y 6*
-- [ ] Transcribir las Tablas YM1, YM7, YM8 a CSV bajo `data/` — *hoy están como `.xlsx` en `datos/nist/crudos/`; ver [T49](T49-brazo1-tablas-csv-rastreables.md)*
+- [x] Transcribir las Tablas YM1, YM7, YM8 a CSV bajo `data/` — *en `datos/nist/tablas/` (Tablas 1, 5 y 6 de Marshall); ver [T49](T49-brazo1-tablas-csv-rastreables.md)*
 - [x] Confirmar si existen datos de forma modal o de frecuencia multi-modo. Si solo ω₁: anotar que el Brazo 1 corre débilmente supervisado y la identificabilidad de L3 descansa en el barrido de longitudes — señalar para G2 — *solo ω₁; declarado en el notebook del Brazo 1, §9*
 - [ ] Registrar hallazgos en la bitácora de decisiones
 

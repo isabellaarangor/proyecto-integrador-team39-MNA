@@ -1,0 +1,7 @@
+# [F29, p. 321, Table 6] Marshall et al. (2010). Reproducibilidad de E (8 participantes, 5 laboratorios, 7 instrumentos, 4 chips). Copia sin modificar.
+Variable,200 µm length,300 µm length,400 µm length,200 µm to 400 µm lengths
+n,8,8,8,24
+E_ave (GPa),58.7,63.7,66.0,62.8
+95% limits for E,± 4.4%,± 5.5%,± 4.4%,± 11.0%
+u_cave (GPa),2.8 (4.9%),3.1 (4.8%),3.2 (4.9%),3.0 (4.9%)
+95% limits for u_cE,± 4.4%,± 5.5%,± 4.5%,± 11.0%

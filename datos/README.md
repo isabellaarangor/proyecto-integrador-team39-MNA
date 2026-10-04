@@ -26,7 +26,7 @@ datos/
 ├── 01-datos-sinteticos.md
 ├── 02-datos-reales-nist-sp260-177.md
 ├── 03-fuentes-secundarias-y-respaldo.md
-├── sinteticos/                            ← configs + semillas de M0–M3
+├── sinteticos/                            ← configs/ (18 YAML), calibracion.csv y generados/ (.npz, no versionados)
 ├── nist/                                  ← crudos/ (.xlsx del NIST), tablas/, trazas/, digitalizados/
 └── secundarios/                           ← MEMS Calculator, Kobrinsky, Ochoa
 ```

@@ -9,7 +9,7 @@
 - [ ] Barrer la flexibilidad adimensional; tabular severidad vs (k_θ, k_u) — *tabulado contra κ_θ con κ_u = ∞ (`datos/sinteticos/calibracion.csv`); falta el barrido en κ_u, que depende de Kobrinsky*
 - [x] Elegir los 6 puntos de severidad M1 para la matriz experimental; asegurar que uno quede en ≈5% — *1, 2.5, 5, 10, 15 y 25% de sesgo en E; s5 equivale a ΔL = 12.4 µm, el orden del ajuste NIST*
 - [ ] Sanity-check de las magnitudes de resorte contra los valores publicados de Kobrinsky — *pendiente: el artículo requiere acceso institucional; ver [T53](T53-rigidez-soporte-fuentes.md) y la estimación con datos del NIST en [T54](T54-rigidez-soporte-desde-brazo1.md)*
-- [x] Documentar la calibración (va a la sección de métodos) — *`datos/01-datos-sinteticos.md` §4.5 y notebook `01_datos_sinteticos`*
+- [x] Documentar la calibración (va a la sección de métodos) — *`datos/01-datos-sinteticos.md` §4.5 y notebook `EDA_Datos_Sinteticos`*
 
 ## Terminada cuando
 - [x] 6 puntos de severidad elegidos, documentados y codificados en configs — *`datos/sinteticos/configs/m1_*`*

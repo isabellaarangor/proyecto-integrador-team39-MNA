@@ -2,7 +2,7 @@
 
 **Actualizado:** 2026-10-04 · **Estado:** implementado (solver, G1, M0–M3, calibración, formato, adimensionalización). Falta la matriz experimental completa; ver [§7](#7-pendientes). · **Tareas:** [T09](../contexto/tareas/T09-eigensolver-de-referencia.md), [T10](../contexto/tareas/T10-validacion-eigensolver-g1.md), [T12](../contexto/tareas/T12-generadores-m0-m1.md), [T13](../contexto/tareas/T13-calibracion-severidad.md), [T17](../contexto/tareas/T17-adimensionalizacion.md), [T37](../contexto/tareas/T37-generalizacion-m2-m3.md) · **Plan:** [§4.4](../contexto/plan-tesis-pinn-mems.md#44-la-física), [§4.5](../contexto/plan-tesis-pinn-mems.md#45-escalera-de-mala-especificación-generación-de-datos), [§4.8](../contexto/plan-tesis-pinn-mems.md#48-matriz-experimental), [Apéndice A](../contexto/plan-tesis-pinn-mems.md#apéndice-a-ecuaciones-de-gobierno)
 
-Archivos relacionados: [02 — Datos reales NIST](02-datos-reales-nist-sp260-177.md) · [03 — Fuentes secundarias](03-fuentes-secundarias-y-respaldo.md) · Explicación para personas externas: [`notebooks/01_datos_sinteticos.ipynb`](../notebooks/01_datos_sinteticos.ipynb)
+Archivos relacionados: [02 — Datos reales NIST](02-datos-reales-nist-sp260-177.md) · [03 — Fuentes secundarias](03-fuentes-secundarias-y-respaldo.md) · Explicación para personas externas: [`notebooks/EDA_Datos_Sinteticos.ipynb`](../notebooks/EDA_Datos_Sinteticos.ipynb)
 
 ---
 
@@ -95,7 +95,7 @@ datos/sinteticos/
 ├── configs/                ← 18 configs YAML (una por conjunto)
 ├── calibracion.csv         ← severidad de cada config
 └── generados/              ← .npz producidos (ignorados por git)
-notebooks/01_datos_sinteticos.ipynb   ← explicación completa, corre de principio a fin
+notebooks/EDA_Datos_Sinteticos.ipynb   ← explicación completa, corre de principio a fin
 ```
 
 ### 4.2 Eigensolver de referencia (T09)

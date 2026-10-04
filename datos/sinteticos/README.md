@@ -22,4 +22,4 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 - Geometría: RM 8096 (NIST SP 260-177): L = 300 µm, b = 28 µm, h = 2.743 µm, ρ = 2200 kg/m³, E = 70 GPa.
 - Rigideces adimensionales: κ_θ = k_θ·L/EI, κ_u = k_u·L³/EI; `.inf` es empotramiento ideal.
 - Ruido: gaussiano, relativo a la amplitud pico de cada modo (2% por defecto). Las frecuencias van sin ruido.
-- Explicación completa para personas externas al proyecto (qué son los datos, cómo se crean y cómo se usarán): `notebooks/01_datos_sinteticos.ipynb`. Se edita directamente en Jupyter.
+- Explicación completa para personas externas al proyecto (qué son los datos, cómo se crean y cómo se usarán): `notebooks/EDA_Datos_Sinteticos.ipynb`. Se edita directamente en Jupyter.

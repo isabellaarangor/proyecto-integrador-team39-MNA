@@ -49,12 +49,23 @@ A lo largo del notebook usamos algunos nombres cortos. Aquí están todos; cada 
 | **Viga en voladizo** | Viga sujeta de un solo extremo, como un trampolín |
 | **Viga biempotrada** | Viga sujeta de ambos extremos, como un puente |
 | **Módulo de Young, E** | Qué tan rígido es un material. Es el número que queremos medir |
-| **Tensión residual, σ₀** | Esfuerzo que queda "atrapado" en la viga al fabricarla; la estira o la comprime |
-| **Modo de vibración** | Cada una de las formas naturales en que vibra una viga, cada una con su frecuencia ω |
-| **Forma modal** | El perfil de la viga cuando vibra en un modo |
+| **Tensión residual, σ₀** | Esfuerzo que queda atrapado en la viga al fabricarla: la deja estirada o comprimida (ver abajo) |
+| **Modo de vibración** | Cada manera natural en que puede vibrar una viga, con su propia frecuencia ω (ver abajo) |
+| **Forma modal** | El dibujo que hace la viga al vibrar en un modo: qué puntos se mueven y cuánto (ver abajo) |
 | **ξ** (xi) | Posición a lo largo de la viga, de 0 (soporte) a 1 (punta) |
 | **Euler–Bernoulli** | La ecuación estándar de vibración de una viga delgada: el "modelo simple" |
 | **Timoshenko** | Una versión más completa que agrega la deformación por cortante; importa en vigas cortas y gruesas |
+
+
+### Tres conceptos clave, con ejemplos
+
+**Modo de vibración.** Piensa en una regla que sobresale del borde de una mesa. Si le das un golpecito, oscila de arriba abajo de la forma más sencilla posible: todo el tramo libre se mueve hacia el mismo lado. Ese es el **modo 1**, el más lento. Si la excitas con más energía y a la frecuencia adecuada, también puede vibrar en patrones más complejos, con una parte que sube mientras otra baja y con puntos intermedios que se quedan quietos (llamados **nodos**). Esos son el **modo 2**, el **modo 3**, etc., cada uno más rápido que el anterior. Es lo mismo que pasa con una cuerda de guitarra y sus armónicos. Cada modo tiene su propia **frecuencia natural** ω. En nuestra viga en voladizo de 300 µm, los tres primeros modos vibran a unos 28, 174 y 487 kHz: decenas de miles de veces por segundo, demasiado rápido para verlo, pero medible con un láser.
+
+**Forma modal.** Es el "dibujo" que hace la viga cuando vibra en un modo: si congeláramos la viga en el instante de máxima deformación, veríamos su forma modal. En el voladizo, la del modo 1 es una curva suave que va desde cero en el soporte hasta el máximo en la punta; la del modo 2 cruza una vez por cero (un nodo) y la del modo 3, dos veces. La gráfica de la sección 3 muestra las seis formas (tres por estructura). En el laboratorio se mide con un vibrómetro láser que apunta a N puntos a lo largo de la viga. Lo que importa es la **forma**, no el tamaño: la misma viga puede vibrar con más o menos amplitud según qué tan fuerte se la excite, por eso normalizamos todas las formas a un máximo de 1.
+
+**Tensión residual σ₀.** Las vigas MEMS se fabrican depositando una película delgada de material (aquí, óxido de silicio) sobre una oblea de silicio, a temperaturas altas. Al enfriarse, la película y la oblea se contraen de manera distinta, y cuando la viga se libera queda con un esfuerzo "atrapado" que nadie le aplicó a propósito: la **tensión residual**. Es como el parche de un tambor: si está estirado (**tensión**, σ₀ > 0) suena más agudo; si está flojo o comprimido (**compresión**, σ₀ < 0) suena más grave.
+
+En una viga **biempotrada** el efecto es fuerte porque sus dos extremos están fijos y no puede acomodarse. Por ejemplo, en nuestra viga biempotrada de 300 µm, la frecuencia del modo 1 es de 177 kHz sin tensión residual; con una tensión de apenas 20 MPa sube a 249 kHz (+41%), y con una compresión de 10 MPa baja a 124 kHz. Si la compresión pasa de unos 19 MPa, la viga ya no aguanta recta y se **pandea**: se arquea hacia arriba o hacia abajo. En una viga en **voladizo** la tensión residual casi no importa, porque su extremo libre deja que el material se relaje. Por eso, si no se toma en cuenta σ₀, un método puede confundir su efecto con un cambio en E.
 
 **Los generadores de datos (M0–M3).** Cada uno es una forma distinta de fabricar datos de una viga; M0 es perfecta y M1–M3 tienen una imperfección que el modelo simple ignora:
 

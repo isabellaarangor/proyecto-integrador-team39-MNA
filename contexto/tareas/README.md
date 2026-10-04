@@ -16,14 +16,14 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 - [ ] [T06 G0 Brazo 1: verificación de datos de frecuencia](T06-g0-brazo1-datos-frecuencia.md) — todos
 - [ ] [T07 G0 Brazo 2: verificación de trazas de forma](T07-g0-brazo2-datos-forma.md) — todos
 - [ ] [T08 Reproducir una hoja del MEMS Calculator (Método 1)](T08-reproduccion-mems-calculator.md) — C
-- [ ] [T09 Eigensolver de referencia](T09-eigensolver-de-referencia.md) — A
-- [ ] [T10 Validación del eigensolver + pytest (G1)](T10-validacion-eigensolver-g1.md) — A
+- [x] [T09 Eigensolver de referencia](T09-eigensolver-de-referencia.md) — A
+- [x] [T10 Validación del eigensolver + pytest (G1)](T10-validacion-eigensolver-g1.md) — A
 - [ ] [T11 Registro de decisión G0](T11-registro-decision-g0.md) — todos
 - [ ] [T48 Alternativas si los datos reales no alcanzan](T48-alternativas-datos-reales.md) — todos (A dueño)
 
 ## Semana 3 — Avance 1, EDA (G2)
-- [ ] [T12 Generadores de datos M0 + M1](T12-generadores-m0-m1.md) — A
-- [ ] [T13 Calibración de severidad](T13-calibracion-severidad.md) — A
+- [x] [T12 Generadores de datos M0 + M1](T12-generadores-m0-m1.md) — A
+- [x] [T13 Calibración de severidad](T13-calibracion-severidad.md) — A
 - [ ] [T14 Verificación de identificabilidad + superficie de desajuste (G2)](T14-identificabilidad-g2.md) — C
 - [ ] [T15 Redacción del EDA (Avance 1)](T15-redaccion-eda.md) — C
 - [ ] [T16 Andamiaje de la PINN + viabilidad de DeepXDE](T16-andamiaje-pinn.md) — B

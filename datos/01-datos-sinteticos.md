@@ -90,7 +90,7 @@ src/pinn_mems/
 scripts/
 ├── calibrar_severidad.py   ← calcula los niveles y escribe configs + calibracion.csv
 └── generar_sinteticos.py   ← genera los .npz a partir de las configs
-tests/                      ← 85 pruebas (pytest)
+tests/                      ← pruebas (pytest): sintéticos, brazos 1 y 2, y ejecución de los notebooks
 datos/sinteticos/
 ├── configs/                ← 18 configs YAML (una por conjunto)
 ├── calibracion.csv         ← severidad de cada config

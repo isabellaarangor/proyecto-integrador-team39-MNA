@@ -11,13 +11,16 @@ dependencies = [
     "numpy>=1.26",
     "scipy>=1.11",
     "pyyaml>=6.0",
+    "pandas>=2",
+    "openpyxl>=3.1",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "matplotlib>=3.8", "pandas>=2", "ipykernel", "nbformat", "nbconvert"]
+dev = ["pytest>=8", "matplotlib>=3.8", "ipykernel", "nbformat", "nbconvert", "nbclient"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["notebooks: ejecuta los notebooks completos (lento; omitir con -m 'not notebooks')"]

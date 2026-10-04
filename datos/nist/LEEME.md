@@ -28,3 +28,13 @@ Vacías por ahora. Agregar un renglón por archivo: nombre, fuente (`[F29, p. 32
 | Archivo | Fuente | Hizo | Revisó | Fecha |
 |---|---|---|---|---|
 | | | | | |
+
+## Código
+
+Las funciones que leen estos archivos están en `src/pinn_mems/nist/`:
+
+- `archivos.py`: ubicación de `crudos/` y `verificar_integridad()`, que compara cada archivo con `SHA256SUMS`.
+- `brazo1.py`: carga de las tablas de Marshall y de SP 260-177, reconstrucción de incertidumbres y ajuste de la curva de anclaje (notebook `EDA_Brazo1_NIST`).
+- `brazo2.py`: carga de las trazas de deformación en µm, con los factores de calibración `calx` y `calz` cuando la hoja los trae, y detección de atípicos por traza (notebook `EDA_Brazo2_NIST`).
+
+Las pruebas (`tests/test_brazo1.py` y `tests/test_brazo2.py`) verifican lo que deben lograr los notebooks: que los datos coincidan con las fuentes publicadas, que las unidades y la calibración sean correctas y que el ajuste reproduzca los valores documentados.

@@ -27,6 +27,9 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 - [ ] [T14 Verificación de identificabilidad + superficie de desajuste (G2)](T14-identificabilidad-g2.md) — C
 - [ ] [T15 Redacción del EDA (Avance 1)](T15-redaccion-eda.md) — C
 - [ ] [T16 Andamiaje de la PINN + viabilidad de DeepXDE](T16-andamiaje-pinn.md) — B
+- [ ] [T49 Brazo 1: tablas de Marshall y SP 260-177 a CSV rastreables](T49-brazo1-tablas-csv-rastreables.md) — C (revisa A)
+- [ ] [T50 Brazo 2: trazas calibradas en CSV, validadas contra el NIST](T50-brazo2-conversion-trazas-validada.md) — A
+- [ ] [T53 Rigidez del soporte: conseguir las fuentes publicadas](T53-rigidez-soporte-fuentes.md) — A
 
 ## Semana 4 — Avance 2, ingeniería de características (G3)
 - [ ] [T17 Adimensionalización](T17-adimensionalizacion.md) — A
@@ -34,6 +37,9 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 - [ ] [T19 Validación directa de la PINN + ablación de CF (G3)](T19-validacion-pinn-g3.md) — B
 - [ ] [T20 Cronometraje de una corrida + decisión de recortes](T20-cronometraje-recortes.md) — B
 - [ ] [T21 Análisis de colocación de sensores (RQ4)](T21-analisis-colocacion-rq4.md) — C
+- [ ] [T51 Brazo 2: ruido del instrumento (replanteo)](T51-brazo2-ruido-del-instrumento.md) — A
+- [ ] [T52 Brazo 2: EDA por perfil, orientado a la escalera](T52-brazo2-eda-por-perfil.md) — C (con A)
+- [ ] [T54 Rigidez del soporte desde el Brazo 1 + recalibración de M1](T54-rigidez-soporte-desde-brazo1.md) — A
 
 ## Semana 5 — Avance 3, baseline (G4)
 - [ ] [T22 Inversa clásica anidada](T22-inversa-clasica-anidada.md) — C

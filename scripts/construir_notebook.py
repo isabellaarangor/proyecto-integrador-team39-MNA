@@ -357,22 +357,70 @@ eje.set_ylabel("w")
 eje.legend(frameon=False)
 fig.tight_layout()
 print("Frecuencias (kHz):", np.round(conjunto.omega / (2 * np.pi * 1e3), 2))"""),
-    md("""El resultado se guarda en un archivo `.npz` (formato estándar de NumPy) que leen igual todos los métodos del proyecto:
+    md("""### Estructura de los datos sintéticos
 
-| Campo | Contenido |
-|---|---|
-| `xi` | Posiciones de medición, de 0 a 1 |
-| `w` | Formas modales **con ruido** (lo que "mide" el método) |
-| `w_limpia` | Formas modales sin ruido (solo para análisis) |
-| `omega` | Frecuencias de los modos 1–3, en rad/s |
-| `estructura`, `generador` | Voladizo o biempotrada; M0–M3 |
-| `params` | Todos los parámetros físicos, incluido el E verdadero |
-| `ruido`, `config`, `version` | Nivel de ruido y semilla, configuración original y versión del código |"""),
+**Organización en el repositorio.** Lo que se guarda en git son las *recetas* (configuraciones) y la tabla de calibración; los datos se fabrican a partir de ellas:
+
+```
+datos/sinteticos/
+├── configs/                 ← una receta YAML por conjunto de datos (18 archivos)
+│   ├── m0_voladizo.yaml
+│   ├── m1_voladizo_s1.yaml … m1_voladizo_s6.yaml
+│   ├── m2_voladizo.yaml
+│   ├── m3_voladizo.yaml
+│   └── … (lo mismo para biempotrada)
+├── calibracion.csv          ← severidad de cada receta (error en E, cambio de forma, …)
+└── generados/               ← archivos .npz producidos (no se guardan en git)
+    └── m1_voladizo_s3.npz …
+```
+
+**Nombres.** Cada conjunto se llama `m<generador>_<estructura>[_s<nivel>]`. Por ejemplo, `m1_biempotrada_s5` es una viga biempotrada con soporte flexible (M1) en el nivel de severidad 5, y `m3_voladizo` es un voladizo con espesor variable (M3).
+
+**Catálogo.** Hay 9 casos (M0, M1 en 6 niveles, M2 y M3) para cada una de las 2 estructuras, es decir, 18 conjuntos:"""),
+    code("""catalogo = []
+for ruta in sorted(CONFIGS.glob("*.yaml")):
+    cfg = cargar_config(ruta)
+    p = cfg["params"]
+    detalle = {
+        "M0": "viga perfecta",
+        "M1": f"soporte flexible, κ_θ = {cfg.get('soporte', {}).get('kappa_theta', 0):.1f}",
+        "M2": f"cortante, viga de {float(p['L']) * 1e6:.1f} µm",
+        "M3": f"espesor variable, α = {cfg.get('conicidad', {}).get('alpha', 0):.3f}",
+    }[cfg["generador"]]
+    catalogo.append({"conjunto": cfg["nombre"], "generador": cfg["generador"],
+                     "estructura": cfg["estructura"], "qué simula": detalle,
+                     "puntos N": cfg["muestreo"]["n_puntos"], "modos": cfg["muestreo"]["n_modos"],
+                     "ruido": f"{100 * cfg['ruido']['nivel']:.0f}%", "semilla": cfg["ruido"]["semilla"]})
+pd.DataFrame(catalogo).set_index("conjunto")"""),
+    md("""**Contenido de cada conjunto.** Cada archivo `.npz` (formato estándar de NumPy) tiene los mismos campos, así que todos los métodos del proyecto lo leen igual. Con N puntos de medición y 3 modos:
+
+| Campo | Forma | Unidades | Contenido |
+|---|---|---|---|
+| `xi` | (N,) | sin unidades | Posiciones de medición, de 0 (soporte) a 1 (punta), igualmente espaciadas |
+| `w` | (3, N) | sin unidades | Formas modales **con ruido**: lo que "mide" el método. Fila i = modo i + 1 |
+| `w_limpia` | (3, N) | sin unidades | Las mismas formas sin ruido; solo para analizar resultados, nunca como entrada de un método |
+| `omega` | (3,) | rad/s | Frecuencias naturales de los modos 1–3 (sin ruido) |
+| `nombre` | texto | — | Nombre del conjunto, p. ej. `m1_voladizo_s3` |
+| `estructura` | texto | — | `voladizo` o `biempotrada` |
+| `generador` | texto | — | `M0`, `M1`, `M2` o `M3` |
+| `params` | texto JSON | SI | Parámetros físicos: E (la respuesta correcta), L, b, h, ρ, σ₀ y los del generador (κ_θ, κ_u, ν, α…) |
+| `ruido` | texto JSON | — | Nivel de ruido y semilla usados |
+| `config` | texto JSON | — | La receta YAML completa con la que se generó |
+| `version` | texto | — | Versión del código (commit de git) que lo generó |
+
+La siguiente celda guarda el conjunto del ejemplo, lo vuelve a leer directamente con NumPy y muestra lo que contiene:"""),
     code("""with tempfile.TemporaryDirectory() as carpeta:
-    ruta = conjunto.guardar(Path(carpeta) / "ejemplo.npz")
+    ruta = conjunto.guardar(Path(carpeta) / "m1_voladizo_s3.npz")
+    with np.load(ruta) as archivo:
+        contenido = pd.DataFrame(
+            [{"campo": k, "forma": str(archivo[k].shape) if archivo[k].ndim else "texto",
+              "tipo": str(archivo[k].dtype)} for k in archivo.files]
+        ).set_index("campo")
     copia = Conjunto.cargar(ruta)
+
 print("Se guarda y se lee sin cambios:", np.array_equal(copia.w, conjunto.w) and copia.params == conjunto.params)
-print("E verdadero guardado en el archivo:", copia.params["E"] / 1e9, "GPa")"""),
+print("E verdadero guardado en el archivo:", copia.params["E"] / 1e9, "GPa")
+contenido"""),
     # ------------------------------------------------------------------ 7
     md("""## 8. Cómo se usarán los datos
 

@@ -139,3 +139,137 @@ def iqr_outlier_mask(df: pd.DataFrame, column: str = "z", by=TRACE_KEYS) -> pd.S
         return (group < lower) | (group > upper)
 
     return df.groupby(by)[column].transform(mask).astype(bool)
+
+
+# --- Valores de la hoja del NIST y validación -----------------------------------
+
+
+def read_sheet_parameters(file_path) -> dict:
+    """Parámetros que la hoja del NIST trae en su encabezado.
+
+    Siempre que existan: calx, calz, f (offset x1ave·calx del eje v, en µm) y
+    alpha (ángulo de desalineación, rad). En gradiente de deformación además
+    Rint, m, n (círculo del modelo, µm) y s (signo de la curvatura).
+    """
+    import openpyxl
+
+    hoja = openpyxl.load_workbook(file_path, data_only=True).active
+    etiquetas = {
+        "calx": ("calx",), "calz": ("calz",), "f": ("f=", "f ="), "alpha": ("α",),
+        "Rint": ("rint",), "m": ("m",), "n": ("n",), "s": ("s",),
+    }
+    params = {}
+    for fila in hoja.iter_rows(min_row=1, max_row=12):
+        for celda in fila:
+            if not isinstance(celda.value, str):
+                continue
+            texto = celda.value.strip().lower()
+            for clave, prefijos in etiquetas.items():
+                if clave in params:
+                    continue
+                exacta = clave in ("m", "n", "s")
+                if (texto in prefijos) if exacta else texto.startswith(prefijos):
+                    # calx y calz llevan el valor debajo; el resto, a la derecha
+                    fila_v, col_v = (celda.row + 1, celda.column) if clave in ("calx", "calz") else (celda.row, celda.column + 1)
+                    valor = hoja.cell(row=fila_v, column=col_v).value
+                    if isinstance(valor, (int, float)):
+                        params[clave] = float(valor)
+    # m, n y s solo tienen este significado junto al círculo (hojas de gradiente)
+    if "Rint" not in params:
+        for clave in ("m", "n", "s"):
+            params.pop(clave, None)
+    return params
+
+
+def v_axis(x_uncal, calx: float, alpha: float, f: float):
+    """Posición a lo largo de la viga (Ecs. RS10–RS14 / SG del SP 260-177):
+    v = (x·calx − f)·cos α + f."""
+    import numpy as np
+
+    return (np.asarray(x_uncal, dtype=float) * calx - f) * np.cos(alpha) + f
+
+
+def read_nist_columns(file_path) -> pd.DataFrame:
+    """Columnas que calcula la propia hoja del NIST: v, z calibrada y modelo(s)."""
+    import openpyxl
+
+    hoja = openpyxl.load_workbook(file_path, data_only=True).active
+    # Puede haber más de un rótulo "v-axis data": vale el que tiene z a su derecha
+    inicio = next(
+        (c for fila in hoja.iter_rows(max_row=12) for c in fila
+         if isinstance(c.value, str) and c.value.strip().startswith("v-axis")
+         and str(hoja.cell(row=c.row, column=c.column + 1).value).strip().lower().startswith("z")),
+        None,
+    )
+    if inicio is None:
+        raise ValueError(f"La hoja no trae columnas calculadas por el NIST: {Path(file_path).name}")
+    nombres = []
+    for k in range(4):
+        valor = hoja.cell(row=inicio.row, column=inicio.column + k).value
+        if not isinstance(valor, str):
+            break
+        nombres.append(valor.strip())
+    filas = []
+    for r in range(inicio.row + 1, hoja.max_row + 1):
+        valores = [hoja.cell(row=r, column=inicio.column + k).value for k in range(len(nombres))]
+        if isinstance(valores[0], (int, float)) and isinstance(valores[1], (int, float)):
+            filas.append([v if isinstance(v, (int, float)) else float("nan") for v in valores])
+    return pd.DataFrame(filas, columns=nombres)
+
+
+def circle_through_points(points) -> tuple[float, float, float]:
+    """Círculo que pasa por tres puntos (v, z): devuelve (Rint, m, n)."""
+    import numpy as np
+
+    (x1, y1), (x2, y2), (x3, y3) = points
+    A = 2 * np.array([[x2 - x1, y2 - y1], [x3 - x1, y3 - y1]], dtype=float)
+    b = np.array([x2**2 - x1**2 + y2**2 - y1**2, x3**2 - x1**2 + y3**2 - y1**2])
+    m, n = np.linalg.solve(A, b)
+    return float(np.hypot(x1 - m, y1 - n)), float(m), float(n)
+
+
+def strain_gradient(Rint_um: float, s: float) -> float:
+    """Gradiente de deformación en m⁻¹ a partir del radio Rint (µm).
+
+    Convención del SP 260-177: s = −1 para voladizos que se curvan hacia
+    arriba, con gradiente positivo (ejemplo resuelto, p. 190).
+    """
+    return -s / (Rint_um * 1e-6)
+
+
+# --- Exportación a CSV -----------------------------------------------------------
+
+_ESTRUCTURA_ES = {"fixed-fixed": "biempotrada", "cantilever": "voladizo"}
+
+
+def trace_csv_name(file_path) -> str:
+    """p. ej. biempotrada_RM8096-0009_L200_traza_b.csv"""
+    meta = get_trace_metadata(file_path)
+    material = meta["material"].replace(" ", "")
+    return f"{_ESTRUCTURA_ES[meta['structure']]}_{material}-{meta['chip']}_L{meta['length_um']}_traza_{meta['trace']}.csv"
+
+
+def trace_for_export(file_path) -> pd.DataFrame:
+    """Tabla de una traza con las columnas de datos/nist/trazas/."""
+    import numpy as np
+
+    trace = load_trace(file_path)
+    crudo = load_trace(file_path, calibrate=False)
+    params = read_sheet_parameters(file_path)
+    if {"calx", "alpha", "f"} <= params.keys():
+        v = v_axis(crudo["x"], params["calx"], params["alpha"], params["f"])
+    else:
+        v = np.full(len(trace), np.nan)
+    meta = get_trace_metadata(file_path)
+    return pd.DataFrame({
+        "x_um": trace["x"],
+        "z_um": trace["z"],
+        "v_um": v,
+        "traza": meta["trace"],
+        "estructura": _ESTRUCTURA_ES[meta["structure"]],
+        "material": meta["material"],
+        "chip": meta["chip"],
+        "L_um": meta["length_um"],
+        "calibrada": trace["calibrated"],
+        "archivo_origen": meta["file"],
+    })

@@ -134,3 +134,68 @@ def test_atipicos_estan_fuera_de_los_limites_iqr_de_su_traza(trazas):
 def test_resumen_de_atipicos_cuenta_lo_mismo_que_las_marcas(trazas):
     resumen = trazas.groupby(brazo2.TRACE_KEYS).apply(brazo2.detect_iqr_outliers, include_groups=False)
     assert resumen["outliers"].sum() == brazo2.iqr_outlier_mask(trazas).sum()
+
+
+# --- Validación contra la hoja y el ejemplo resuelto del NIST (T50) ------------
+
+HOJAS_CON_COLUMNAS_NIST = [
+    "RESIDUAL.STRAIN.Sample.Data.Trace.b.RM.8096.0009.L200.Ins3.xlsx",
+    "RESIDUAL.STRAIN.Sample.Data.Trace.b.RM.8097.0108.P2.0deg.L500.Ins3.xlsx",
+    "STRAIN.GRADIENT.Sample.Data.Trace.c.RM.8097.0103.P2.180deg.L650.Ins3.xlsx",
+    "STRAIN.GRADIENT.Sample.Data.Trace.d.RM.8096.0001.L200.Ins3.xlsx",
+]
+
+
+@pytest.mark.parametrize("nombre", HOJAS_CON_COLUMNAS_NIST)
+def test_eje_v_y_z_calibrada_coinciden_con_las_columnas_del_nist(nombre):
+    """La hoja trae su propia conversión ("v-axis data", "zdata (cal)"): la nuestra coincide."""
+    ruta = CARPETA_CRUDOS / nombre
+    nist = brazo2.read_nist_columns(ruta)
+    exportada = brazo2.trace_for_export(ruta)
+    z_nist = nist.iloc[:, 1].to_numpy()
+    z = exportada["z_um"].to_numpy()
+    inicio = next(i for i in range(len(z) - len(z_nist) + 1) if np.allclose(z[i:i + 5], z_nist[:5], atol=1e-9))
+    tramo = exportada.iloc[inicio:inicio + len(nist)]
+    assert np.allclose(tramo["z_um"], z_nist, atol=1e-9)
+    assert np.allclose(tramo["v_um"], nist.iloc[:, 0], atol=1e-9)
+
+
+def test_reproduce_el_ejemplo_resuelto_de_gradiente_de_deformacion():
+    """SP 260-177, pp. 189–190: voladizo RM 8096, traza d. Con sus tres puntos sin
+    calibrar, f = 8.3146 µm y α = 0, el NIST obtiene Rint = 1171.99 µm,
+    (m, n) = (5.36, 1171.14) µm y sg = 853.2464 m⁻¹."""
+    nombre = "STRAIN.GRADIENT.Sample.Data.Trace.d.RM.8096.0001.L200.Ins3.xlsx"
+    crudo = brazo2.load_trace(CARPETA_CRUDOS / nombre, calibrate=False)
+    params = brazo2.read_sheet_parameters(CARPETA_CRUDOS / nombre)
+    puntos = []
+    for x in (51.7155, 99.0884, 150.014):
+        fila = crudo.iloc[np.argmin(np.abs(crudo["x"] - x))]
+        assert fila["x"] == pytest.approx(x)  # el punto del ejemplo está en nuestra traza
+        puntos.append((brazo2.v_axis(fila["x"], params["calx"], 0.0, 8.3146), fila["z"] * params["calz"]))
+    Rint, m, n = brazo2.circle_through_points(puntos)
+    assert Rint == pytest.approx(1171.99, abs=0.01)
+    assert (m, n) == pytest.approx((5.36, 1171.14), abs=0.01)
+    assert brazo2.strain_gradient(Rint, s=-1) == pytest.approx(853.2464, abs=1e-3)
+
+
+def test_modelo_de_circulo_de_la_hoja_es_consistente_con_sus_parametros():
+    """La columna "zmodel" de la hoja es el círculo (m, n, Rint, s) que reporta."""
+    ruta = CARPETA_CRUDOS / "STRAIN.GRADIENT.Sample.Data.Trace.d.RM.8096.0001.L200.Ins3.xlsx"
+    p = brazo2.read_sheet_parameters(ruta)
+    nist = brazo2.read_nist_columns(ruta)
+    v = nist.iloc[:, 0].to_numpy()
+    modelo = p["n"] + p["s"] * np.sqrt(p["Rint"] ** 2 - (v - p["m"]) ** 2)
+    assert np.allclose(modelo, nist["zmodel"], atol=1e-6)
+
+
+def test_csv_de_trazas_estan_al_dia_con_los_crudos():
+    """datos/nist/trazas/ se regenera exactamente a partir de crudos/."""
+    from pinn_mems.nist.archivos import RAIZ_REPO
+
+    carpeta = RAIZ_REPO / "datos" / "nist" / "trazas"
+    for ruta in sorted(CARPETA_CRUDOS.glob("*STRAIN*.xlsx")):
+        guardada = pd.read_csv(carpeta / brazo2.trace_csv_name(ruta), comment="#", dtype={"chip": str})
+        nueva = brazo2.trace_for_export(ruta)
+        assert list(guardada.columns) == list(nueva.columns)
+        assert np.allclose(guardada["x_um"], nueva["x_um"]) and np.allclose(guardada["z_um"], nueva["z_um"])
+        assert np.allclose(guardada["v_um"], nueva["v_um"], equal_nan=True)

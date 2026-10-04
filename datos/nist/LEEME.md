@@ -19,7 +19,7 @@ Descargados el 2026-10-03 de `https://pml.nist.gov/test-structures/10-FilesToDow
 | STRAIN.GRADIENT.Sample.Data.Trace.e.RM.8097.0103.P2.180deg.L650.Ins3.y.757.511.xlsx | Voladizo 180°, L = 650 µm | RM 8097 poly2 / 0103 | e |
 | STRAIN.GRADIENT.Sample.Data.Trace.c.RM.8097.0103.P2.180deg.L650.Ins3.xlsx | Voladizo 180°, L = 650 µm | RM 8097 poly2 / 0103 | b, c, d |
 
-TODO(equipo): confirmar en cada hoja qué trazas contiene exactamente. La columna "Trazas" se dedujo del nombre del archivo y de la lista de la página del NIST.
+La columna "Trazas" es la lista de la página del NIST; **cada archivo contiene solo la traza de su nombre** (revisado el 2026-10-04, ver `trazas/`).
 
 ## tablas/
 
@@ -43,9 +43,17 @@ TODO(equipo): que una persona del equipo repita la revisión contra el PDF y se 
 | Marshall et al. (2010) [F29] | https://nvlpubs.nist.gov/nistpubs/jres/115/5/02-j115-5-marsh.pdf | `b024b13ae39ef25b6e75ae5790e5c75f8d117119151bd506491cf4fb5f2f44ff` |
 | NIST SP 260-177 [F15] | https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.260-177.pdf | `30777b2199ac023b0838a1c78e763bb477279698b2692d41fdde3c4679c92e7e` |
 
-## trazas/, digitalizados/
+## trazas/
 
-Vacías por ahora. Agregar un renglón por archivo: nombre, fuente, quién lo hizo, quién lo revisó y la fecha.
+Un CSV por traza, generado con `python scripts/exportar_trazas_nist.py` a partir de `crudos/` (no se edita a mano). Nombre: `<estructura>_<material>-<chip>_L<longitud>_traza_<id>.csv`. Columnas: `x_um, z_um` (calibrados con `calx` y `calz` cuando la hoja los trae), `v_um` (posición a lo largo de la viga, (x·calx − f)·cos α + f, con α y f de la hoja; vacío en las trazas transversales), `traza, estructura, material, chip, L_um, calibrada, archivo_origen`.
+
+**Cada archivo de `crudos/` contiene una sola traza** (revisado el 2026-10-04): la segunda columna z de algunas hojas es una copia o un valor derivado. En orientación de 180° la hoja ya entrega x negado, y el eje v del NIST se calcula con la misma fórmula; no se vuelve a negar.
+
+**Validación** (`tests/test_brazo2.py`): `v_um` y `z_um` coinciden exactamente con las columnas "v-axis data" y "zdata (cal)" que calcula cada hoja del NIST (trazas b de RM 8096 y RM 8097, c y d), y con la traza d se reproduce el ejemplo resuelto del SP 260-177 (pp. 189–190): Rint = 1171.99 µm y sg = 853.2464 m⁻¹.
+
+## digitalizados/
+
+Vacía por ahora. Agregar un renglón por archivo: nombre, fuente, quién lo hizo, quién lo revisó y la fecha.
 
 | Archivo | Fuente | Hizo | Revisó | Fecha |
 |---|---|---|---|---|

@@ -78,9 +78,28 @@ def test_guardar_y_cargar_ida_y_vuelta(tmp_path):
         assert getattr(copia, campo) == getattr(original, campo)
 
 
-def test_m2_m3_pendientes():
-    with pytest.raises(NotImplementedError):
-        generar(config("M2"))
+@pytest.mark.parametrize("estructura", ["voladizo", "biempotrada"])
+def test_m2_baja_las_frecuencias_y_mas_en_modos_altos(estructura):
+    """El cortante y la inercia rotatoria ablandan la viga, sobre todo en modos altos."""
+    corta = {**PARAMS, "L": 40e-6}
+    m0 = generar({**config("M0", estructura), "params": corta})
+    m2 = generar({**config("M2", estructura), "params": corta, "timoshenko": {"nu": 0.17}})
+    razon = m2.omega / m0.omega
+    assert np.all(razon < 1)
+    assert np.all(np.diff(razon) < 0)
+    assert m2.params["kappa_s"] == pytest.approx(10 * 1.17 / (12 + 11 * 0.17))
+
+
+def test_m3_guarda_alpha_y_cambia_la_forma():
+    m0 = generar(config("M0", "biempotrada"))
+    m3 = generar({**config("M3", "biempotrada"), "conicidad": {"alpha": 0.3}})
+    assert m3.params["alpha"] == 0.3
+    assert not np.allclose(m3.w_limpia, m0.w_limpia, atol=1e-2)
+
+
+def test_generador_desconocido():
+    with pytest.raises(ValueError):
+        generar(config("M4"))
 
 
 @pytest.mark.parametrize("ruta", sorted(CONFIGS.glob("*.yaml")), ids=lambda p: p.stem)

@@ -11,7 +11,7 @@ params:
   rho: 2200.0
   sigma0: 0.0
 soporte:
-  kappa_theta: 310.3437
+  kappa_theta: 310.3436
   kappa_u: .inf
 muestreo:
   n_puntos: 100

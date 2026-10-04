@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Metodología</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; max-width: 800px; margin: 40px auto; padding: 0 16px; color: #000; background: #fff; }
+  h2 { font-size: 14pt; }
+  table { border-collapse: collapse; margin: 12px 0; }
+  th, td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; text-align: left; }
+  th { background: #d9d9d9; }
+  p { text-align: justify; }
+  .caption { font-style: italic; text-align: left; }
+</style>
+</head>
+<body>
+
+<h2>Metodología</h2>
+
+<p>El proyecto sigue la metodología CRISP-ML(Q), que organiza el ciclo de vida de una aplicación de aprendizaje automático en seis fases: entendimiento del negocio y de los datos, ingeniería de datos, ingeniería del modelo, aseguramiento de la calidad, despliegue, y monitoreo y mantenimiento. Además de las actividades de cada fase, la metodología exige definir en cada una sus requisitos y restricciones de calidad y los riesgos que podrían impedir alcanzarlos (Visengeriyeva et al., 2023). En este proyecto, esos requisitos se formalizan como puntos de control: criterios verificables al final de ciertas etapas que determinan si se continúa según lo planeado o si se aplica una alternativa definida de antemano.</p>
+
+<p>La Tabla 4 describe cómo se aplica cada fase al proyecto, a lo largo de las once semanas del curso.</p>
+
+<table>
+  <tr><th>Fase</th><th>Semanas</th><th>Actividades en el proyecto</th><th>Punto de control de calidad</th></tr>
+  <tr><td>1. Entendimiento del negocio y de los datos</td><td>1–3</td><td>Formulación del problema, objetivos y preguntas de investigación. Revisión de la guía del NIST para verificar qué datos son utilizables. Análisis exploratorio de las mediciones publicadas, incluida la dependencia del módulo de Young con la longitud.</td><td>Al menos un conjunto de datos reales utilizable; de lo contrario, se traslada el diseño a otro fenómeno MEMS con discrepancia documentada. Verificación de que el módulo de Young y el esfuerzo residual pueden estimarse por separado con las mediciones disponibles.</td></tr>
+  <tr><td>2. Ingeniería de datos</td><td>2–4</td><td>Transcripción y digitalización de las tablas y figuras del NIST. Implementación y validación de un solucionador de referencia para la vibración de vigas. Generación de datos sintéticos con distintos niveles de discrepancia y ruido controlado. Adimensionalización de las variables y definición de los puntos de medición.</td><td>Solucionador de referencia con error menor a 0.1 % frente a soluciones analíticas conocidas.</td></tr>
+  <tr><td>3. Ingeniería del modelo</td><td>4–7</td><td>Implementación de las líneas base: método estandarizado SEMI MS4, mínimos cuadrados no lineales e inferencia bayesiana. Implementación de la PINN y de los cuatro tratamientos de la discrepancia, junto con la red sin física de referencia.</td><td>PINN con error menor a 1 % en el problema directo y tiempo por corrida medido. La línea base recupera los parámetros exactos cuando no hay discrepancia ni ruido.</td></tr>
+  <tr><td>4. Aseguramiento de la calidad</td><td>5–8</td><td>Evaluación de todos los métodos con los mismos datos y diez semillas aleatorias. Medición por separado del sesgo y la variabilidad de los parámetros, de la tasa de éxito y del costo computacional. Análisis de residuos para detectar discrepancias no modeladas. Validación con las mediciones del NIST.</td><td>Comparación completa entre tratamientos. Al final de la semana 8 se detienen los experimentos para asegurar el tiempo de análisis y redacción.</td></tr>
+  <tr><td>5. Despliegue</td><td>8–11</td><td>Producto de difusión, repositorio reproducible con código, configuraciones y datos, resumen ejecutivo y presentación final. El entregable principal es una recomendación metodológica sobre el tratamiento de la discrepancia, más que un sistema en producción.</td><td>Reproducción de los resultados principales a partir del repositorio.</td></tr>
+  <tr><td>6. Monitoreo y mantenimiento</td><td>Fuera del alcance</td><td>No se opera un modelo en producción durante el curso. Se documentan los diagnósticos de residuos como mecanismo para detectar discrepancias en una aplicación futura, por ejemplo en un gemelo digital.</td><td>—</td></tr>
+</table>
+<p class="caption">Tabla 4. Fases de la metodología CRISP-ML(Q) aplicadas al proyecto.</p>
+
+<p>Las fases no se ejecutan de forma estrictamente secuencial. Si un punto de control no se cumple, el alcance se ajusta según un orden acordado de antemano. Por ejemplo, se reduce el número de configuraciones experimentales si el entrenamiento de la PINN resulta demasiado costoso, o se limita el estudio al módulo de Young si el esfuerzo residual no puede identificarse. Así, cada ajuste queda documentado y justificado, en lugar de improvisarse durante la ejecución.</p>
+
+</body>
+</html>

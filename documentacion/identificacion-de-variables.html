@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Identificación de las variables</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; max-width: 800px; margin: 40px auto; padding: 0 16px; color: #000; background: #fff; }
+  h2 { font-size: 14pt; }
+  table { border-collapse: collapse; margin: 12px 0; }
+  th, td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; text-align: left; }
+  th { background: #d9d9d9; }
+  p { text-align: justify; }
+  .caption { font-style: italic; text-align: left; }
+</style>
+</head>
+<body>
+
+<h2>Identificación de las variables</h2>
+
+<p>Al tratarse de un problema inverso, la relación habitual entre entradas y salidas se invierte: las entradas son las mediciones de la respuesta de la estructura y las condiciones conocidas del experimento, y las salidas son los parámetros físicos que dieron origen a esa respuesta. La Tabla 5 resume las variables del problema.</p>
+
+<table>
+  <tr><th>Rol</th><th>Variable</th><th>Descripción</th></tr>
+  <tr><td rowspan="3">Entradas conocidas</td><td>L, b, h</td><td>Longitud, ancho y espesor de la estructura</td></tr>
+  <tr><td>ρ</td><td>Densidad del material (valor supuesto)</td></tr>
+  <tr><td>Condiciones de frontera</td><td>Tipo de estructura: voladizo (empotrado-libre) o viga biempotrada</td></tr>
+  <tr><td rowspan="2">Entradas medidas</td><td>f (ω)</td><td>Frecuencia de resonancia de la estructura</td></tr>
+  <tr><td>w(x<sub>i</sub>)</td><td>Forma o perfil de la viga medido en N posiciones x<sub>i</sub> a lo largo de su longitud</td></tr>
+  <tr><td rowspan="2">Salidas (parámetros a identificar)</td><td>E</td><td>Módulo de Young de la película</td></tr>
+  <tr><td>σ₀</td><td>Esfuerzo residual de la película</td></tr>
+  <tr><td>Salidas auxiliares</td><td>k<sub>θ</sub>, k<sub>u</sub></td><td>Rigideces del anclaje; solo en la estrategia que incorpora explícitamente el mecanismo físico adicional</td></tr>
+</table>
+<p class="caption">Tabla 5. Entradas y salidas del problema de identificación.</p>
+
+<p>Dentro de la PINN, estas variables cumplen papeles distintos. La red recibe como entrada la posición x a lo largo de la viga y produce como salida la forma de la viga w(x). Las mediciones w(x<sub>i</sub>) se utilizan como objetivo en el término de ajuste a datos, mientras que la frecuencia, la geometría y la densidad intervienen como constantes conocidas en la ecuación de la viga. El módulo de Young y el esfuerzo residual no son salidas de la red, sino variables entrenables que se ajustan junto con sus pesos (Raissi et al., 2019).</p>
+
+<p>En los datos sintéticos, los valores verdaderos de E y σ₀ se conocen y sirven para evaluar el error de cada estrategia. Además, se controlan variables experimentales que no forman parte del modelo, como la severidad de la discrepancia introducida, el número de puntos de medición y el nivel de ruido, con el fin de analizar su efecto sobre la identificación. En los datos del NIST, en cambio, solo se dispone de las entradas, con una densidad supuesta y no medida, y de los valores de E reportados por el método estandarizado (Cassard et al., 2013).</p>
+
+</body>
+</html>

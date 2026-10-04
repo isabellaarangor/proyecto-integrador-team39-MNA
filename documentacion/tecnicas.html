@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Técnicas</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; max-width: 800px; margin: 40px auto; padding: 0 16px; color: #000; background: #fff; }
+  h2 { font-size: 14pt; }
+  table { border-collapse: collapse; margin: 12px 0; }
+  th, td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; text-align: left; }
+  th { background: #d9d9d9; }
+  p { text-align: justify; }
+  .caption { font-style: italic; text-align: left; }
+</style>
+</head>
+<body>
+
+<h2>Técnicas</h2>
+
+<p>El proyecto aborda un problema de <b>regresión</b>: estimar parámetros continuos, el módulo de Young y el esfuerzo residual, a partir de mediciones. Para ello emplea <b>aprendizaje profundo</b> mediante redes neuronales informadas por física (PINNs). La PINN combina una pérdida supervisada sobre las mediciones con un término físico evaluado en puntos sin etiqueta. Como los valores verdaderos de los parámetros nunca se observan, el entrenamiento se entiende mejor como un ajuste de parámetros regularizado por la física que como aprendizaje supervisado clásico. No se emplean técnicas de clasificación, pues no hay categorías que predecir, ni no supervisadas, pues el objetivo no es descubrir estructura en los datos sino estimar parámetros físicos concretos.</p>
+
+<p>A diferencia de una regresión convencional, la PINN no aprende una relación directa entre entradas y parámetros. La red aproxima la respuesta de la viga a lo largo de su longitud, mientras que el módulo de Young y el esfuerzo residual se incluyen como variables entrenables. La función de pérdida combina el ajuste a las mediciones con el residual de la ecuación de la viga y sus condiciones de frontera, de modo que la física actúa como regularización (Raissi et al., 2019).</p>
+
+<p>Esta técnica se justifica por tres razones. Primero, los datos experimentales son escasos, y el conocimiento físico compensa esa escasez al restringir las soluciones posibles (Karniadakis et al., 2021). Segundo, el objetivo es recuperar parámetros con significado físico, no solo predecir la respuesta; una red puramente basada en datos no produciría esos parámetros. Tercero, la PINN permite controlar dónde se absorbe la discrepancia de modelo, que es el objeto de estudio: ajustando el peso de la restricción física, agregando una red de discrepancia o incorporando un mecanismo físico adicional.</p>
+
+<p>Para evaluar la PINN de forma justa, se compara con cuatro referencias (Tabla 4).</p>
+
+<table>
+  <tr><th>Método</th><th>Tipo</th><th>Función en el proyecto</th></tr>
+  <tr><td>PINN</td><td>Aprendizaje profundo, regresión</td><td>Técnica principal bajo estudio. Se evalúa con distintas formas de manejar el error de modelo: sin tratarlo, relajando la restricción física, agregando una red de discrepancia o incorporando un mecanismo físico adicional</td></tr>
+  <tr><td>Fórmula cerrada de la norma SEMI MS4 (NIST MEMS Calculator)</td><td>Método estandarizado</td><td>Procedimiento que utiliza actualmente la industria; línea base de referencia</td></tr>
+  <tr><td>Mínimos cuadrados no lineales con el modelo físico</td><td>Optimización clásica</td><td>Método convencional de identificación</td></tr>
+  <tr><td>Red neuronal sin física (perceptrón multicapa)</td><td>Aprendizaje profundo, regresión</td><td>Mide el aporte del conocimiento físico</td></tr>
+  <tr><td>Inferencia bayesiana (MCMC)</td><td>Estadística bayesiana</td><td>Referencia para separar el error del método del error del modelo</td></tr>
+</table>
+<p class="caption">Tabla 4. Métodos comparados en el proyecto.</p>
+
+</body>
+</html>

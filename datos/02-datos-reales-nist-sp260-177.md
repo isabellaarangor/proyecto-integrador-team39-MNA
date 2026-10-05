@@ -308,18 +308,18 @@ No existen datos públicos del Brazo 1 en mejor formato que las tablas. Revisamo
 ## 8. Cómo saber que terminaste
 
 **Brazo 1**
-- [ ] Tablas 1, 2, 3, 5 y 6 de Marshall y Tablas 3 y 4 del SP 260-177 en CSV, con revisión doble
-- [ ] Notebook con el ajuste de ΔL ± IC (Tablas 5 y 6), su gráfica y la nota de 1 grado de libertad
+- [ ] Tablas 1, 2, 3, 5 y 6 de Marshall y Tablas 3 y 4 del SP 260-177 en CSV, con revisión doble — *CSV en `tablas/` y revisión del agente contra los PDF; falta la revisión de una persona ([T49](../contexto/tareas/T49-brazo1-tablas-csv-rastreables.md))*
+- [x] Notebook con el ajuste de ΔL ± IC (Tablas 5 y 6), su gráfica y la nota de 1 grado de libertad — *`notebooks/EDA_Brazo1_NIST.ipynb`*
 - [ ] (Opcional) 24 puntos de reproducibilidad digitalizados, con chip e instrumento, y el modelo mixto
 - [ ] Veredicto registrado en la bitácora (T11)
 
 **Brazo 2**
-- [ ] Script de conversión de `crudos/*.xlsx` a `trazas/*.csv`, validado contra los valores intermedios del NIST
+- [x] Script de conversión de `crudos/*.xlsx` a `trazas/*.csv`, validado contra los valores intermedios del NIST — *coincide con las columnas del NIST y reproduce Rint del ejemplo resuelto; falta ε_r de las vigas biempotradas ([T50](../contexto/tareas/T50-brazo2-conversion-trazas-validada.md))*
 - [x] Ruido de medición estimado (replanteado: una traza por archivo; ver paso 3)
 - [ ] Decisión del brazo registrada en T11 y la pérdida anotada para T44
 
 **Ambos**
-- [ ] `datos/nist/LEEME.md` con el origen de cada archivo y los hashes de los PDF
+- [x] `datos/nist/LEEME.md` con el origen de cada archivo y los hashes de los PDF
 - [ ] Correo al NIST enviado (sección 7)
 
 ## 9. Si los datos no alcanzan

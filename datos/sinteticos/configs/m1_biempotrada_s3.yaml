@@ -1,4 +1,4 @@
-# M1, severidad s3 de 6: sesgo en E = -5.0%, ΔL = 2.57 µm.
+# M1, severidad s3 de 6: sesgo en E = -5.0%, ΔL = 5.26 µm.
 # Generado por scripts/calibrar_severidad.py; no editar a mano.
 nombre: m1_biempotrada_s3
 generador: M1
@@ -9,9 +9,9 @@ params:
   b: 2.8e-05
   h: 2.743e-06
   rho: 2200.0
-  sigma0: 10000000.0
+  sigma0: -5000000.0
 soporte:
-  kappa_theta: 188.3177
+  kappa_theta: 130.5838
   kappa_u: .inf
 muestreo:
   n_puntos: 100

@@ -16,13 +16,13 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 
 | `configs/m1_<estructura>_s5_ku_<soporte>.yaml` | M1 | Sensibilidad al desplazamiento del soporte: κ_θ de s5 y κ_u de tres soportes de Deutsch (2002) (anillo, pilares apilados, pilares laterales). No forman parte del eje principal |
 | `configs/m2_<estructura>.yaml` | M2 | Timoshenko, una severidad: viga corta con el mismo sesgo en E que M1 s3 (5%). Voladizo L = 14.4 µm (L/h = 5.2), biempotrada L = 42.2 µm (L/h = 15.4) |
-| `configs/m3_<estructura>.yaml` | M3 | Conicidad h(ξ) = h̄·(1 + α·(ξ − ½)), una severidad igualada a M1 s3: por sesgo en E en el voladizo (α = 0.042) y por diferencia de forma en la biempotrada (α = 0.044, con σ₀ = +10 MPa) |
+| `configs/m3_<estructura>.yaml` | M3 | Conicidad h(ξ) = h̄·(1 + α·(ξ − ½)), una severidad igualada a M1 s3: por sesgo en E en el voladizo (α = 0.042) y por diferencia de forma en la biempotrada (α = 0.053, con σ₀ = −5 MPa) |
 
 `calibracion.csv` guarda, por config, el parámetro del generador (κ_θ, κ_u, L o α), el sesgo en E, los corrimientos de ω₁ y ω₃, la diferencia L2 de forma y el ΔL equivalente. s5 (15%) equivale a ΔL ≈ 12.4 µm, el orden del ajuste exploratorio del NIST. Pendiente: fijar κ_u con Kobrinsky et al. (2000); hoy κ_u = ∞.
 
 - Geometría: RM 8096 (NIST SP 260-177): L = 300 µm, b = 28 µm, h = 2.743 µm, ρ = 2200 kg/m³, E = 70 GPa.
 - Rigideces adimensionales: κ_θ = k_θ·L/EI, κ_u = k_u·L³/EI; `.inf` es empotramiento ideal.
 - Ruido: gaussiano, 2% relativo a la amplitud pico de cada modo en las formas y 0.03% en las frecuencias (`omega_limpia` guarda las frecuencias sin ruido).
-- Tensión residual: σ₀ = +10 MPa en la viga biempotrada; 0 en los voladizos.
+- Tensión residual: σ₀ = −5 MPa (compresión leve, sin pandeo) en la viga biempotrada; 0 en los voladizos.
 - **Matriz experimental:** `matriz.yaml` la define (9 casos × N = 5/15/40 × k = 1/3 × 10 semillas; M2 solo con k = 1) y `python scripts/generar_matriz.py` genera las 510 corridas en `generados/matriz/` con su `manifiesto.csv`, las frecuencias de las longitudes reservadas (`reservadas.csv`) y las 60 corridas del subestudio de colocación (`colocacion/`). Detalle en `datos/01-datos-sinteticos.md` §4.8.
 - Explicación completa para personas externas al proyecto (qué son los datos, cómo se crean y cómo se usarán): `notebooks/EDA_Datos_Sinteticos.ipynb`. Se edita directamente en Jupyter.

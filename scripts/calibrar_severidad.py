@@ -56,9 +56,11 @@ SOPORTES_DEUTSCH = {  # tipo en la Tabla 2.1 → sufijo de la config
 NU = 0.17  # Poisson del óxido de silicio
 
 PARAMS_BASE = {"E": 70.0e9, "L": 300.0e-6, "b": 28.0e-6, "h": 2.743e-6, "rho": 2200.0}
-# σ₀ = +10 MPa en la viga biempotrada; el voladizo no conserva tensión axial
-# (extremo libre), así que σ₀ = 0. Decisión del 2026-10-04 (contexto/bitacora-decisiones.md).
-SIGMA0 = {"voladizo": 0.0, "biempotrada": 10.0e6}
+# σ₀ = −5 MPa (compresión leve, sin pandeo: la biempotrada de 300 µm pandea con
+# ≈ −19 MPa) en la viga biempotrada, con el signo de los chips reales; el voladizo
+# no conserva tensión axial (extremo libre), así que σ₀ = 0. Decisión del
+# 2026-10-04, revisada (contexto/bitacora-decisiones.md).
+SIGMA0 = {"voladizo": 0.0, "biempotrada": -5.0e6}
 RUIDO = {"nivel": 0.02, "nivel_omega": 0.0003, "semilla": 0}  # 2 % en formas, 0.03 % en ω
 ESTRUCTURAS = ["voladizo", "biempotrada"]
 COLUMNAS_MODELO = ["kappa_theta", "kappa_u", "L", "alpha"]

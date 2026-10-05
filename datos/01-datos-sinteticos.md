@@ -140,7 +140,7 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 | M3 | `conicidad: {alpha}` | α del perfil centrado; `params.h` es el espesor medio h̄ |
 
 - **Ruido:** gaussiano. En las formas es **relativo a la amplitud pico de cada modo** (2%); no es relativo punto a punto, porque eso dejaría sin ruido la zona del soporte. En las frecuencias es relativo a cada frecuencia (`nivel_omega` = 0.03%, la dispersión de las tres mediciones de la Tabla 3 de Marshall). `omega_limpia` guarda las frecuencias sin ruido.
-- **Tensión residual:** σ₀ = +10 MPa en la viga biempotrada y 0 en los voladizos, cuyo extremo libre no conserva tensión axial (decisión del 2026-10-04).
+- **Tensión residual:** σ₀ = −5 MPa (compresión leve, con el signo de los chips reales y sin pandeo: la biempotrada de 300 µm pandea con ≈ −19 MPa) en la viga biempotrada, y 0 en los voladizos, cuyo extremo libre no conserva tensión axial (decisión del 2026-10-04, revisada).
 - **Semilla:** la misma config y semilla producen exactamente los mismos datos.
 - **Crimen inverso:** los generadores usan 200 elementos; los métodos de inversión deben usar una discretización distinta (más gruesa).
 
@@ -164,13 +164,13 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 | Config | Parámetro | Sesgo en E | Δω₃ | Dif. de forma | ΔL equivalente |
 |---|---|---|---|---|---|
 | m1_voladizo_s1 … s6 | κ_θ = 396.1, 156.1, 76.1, 36.1, 22.8, 12.1 | −1 … −25% | −0.5 … −9.1% | 0.6 … 11.8% | 0.75 … 22.4 µm |
-| m1_biempotrada_s1 … s6 (σ₀ = +10 MPa) | κ_θ = 985.3, 387.6, 188.3, 88.7, 55.5, 28.9 | −1 … −25% | −0.4 … −8.5% | 0.4 … 8.4% | — (con tensión ΔL no aplica) |
+| m1_biempotrada_s1 … s6 (σ₀ = −5 MPa) | κ_θ = 689, 270.2, 130.6, 60.8, 37.5, 18.8 | −1 … −25% | −0.6 … −12.6% | 0.5 … 11.0% | — (con carga axial ΔL no aplica) |
 | m2_voladizo | L = 14.4 µm (L/h = 5.2) | −5% | −26.1% | 12.5% | — |
-| m2_biempotrada | L = 42.2 µm (L/h = 15.4) | −5% | −9.2% | 2.6% | — |
+| m2_biempotrada | L = 42.1 µm (L/h = 15.4) | −5% | −9.3% | 2.6% | — |
 | m3_voladizo | α = 0.0415 | −5% | −0.3% | 1.5% | — |
-| m3_biempotrada | α = 0.0440 | −0.01% | −0.01% | 1.8% | — |
+| m3_biempotrada | α = 0.0529 | −0.04% | −0.02% | 2.5% | — |
 | m1_voladizo_s5_ku_* | κ_θ = 22.8; κ_u = 188 / 659 / 1318 | −18.0 / −15.9 / −15.4% | −39.5 / −21.7 / −14.2% | 58.9 / 35.3 / 22.3% | — |
-| m1_biempotrada_s5_ku_* | κ_θ = 55.5; κ_u = 188 / 659 / 1318 | −94.4 / −53.8 / −36.9% | −56.5 / −43.6 / −32.5% | 70.3 / 54.6 / 42.8% | — |
+| m1_biempotrada_s5_ku_* | κ_θ = 37.5; κ_u = 188 / 659 / 1318 | −38.5 / −23.7 / −19.6% | −61.8 / −44.5 / −32.1% | 65.2 / 49.8 / 38.2% | — |
 
 **Observaciones:**
 - En s1 y s2 la diferencia de forma (< 2%) queda por debajo del ruido (2%): un método que solo use formas casi no distingue esos niveles de M0.
@@ -223,7 +223,7 @@ Definida en `datos/sinteticos/matriz.yaml` (plan §4.8, decisiones del 2026-10-0
 |---|---|
 | Caso | M0, M1 s1–s6, M2, M3 (9) |
 | N (puntos por estructura) | 5, 15, 40 |
-| k (estructuras) | 1: voladizo de 300 µm · 3: voladizo de 300 µm + biempotrada de 300 µm (σ₀ = +10 MPa) + voladizo de 200 µm |
+| k (estructuras) | 1: voladizo de 300 µm · 3: voladizo de 300 µm + biempotrada de 300 µm (σ₀ = −5 MPa) + voladizo de 200 µm |
 | Semillas | 0 … 9 |
 | Modos | se guardan 3; el método usa 1 o 3 |
 
@@ -277,7 +277,7 @@ Las configs `m1_*`, `m2_*` y `m3_*` las escribe `calibrar_severidad.py`; no se e
 
 1. **Kobrinsky et al. (2000):** sigue sin conseguirse ([T53](../contexto/tareas/T53-rigidez-soporte-fuentes.md)). κ_u se estudia como sensibilidad con valores de la tesis de Deutsch.
 2. **Verificar la cifra de 5%** de M-TEST contra la fuente original (nivel s3).
-3. **σ₀ contra los datos reales:** la deformación residual medida es compresiva: −42×10⁻⁶ en el round robin (Tabla RS9) y −2656×10⁻⁶ en la biempotrada de óxido de RM 8096 (ejemplo resuelto del SP 260-177), con vigas pandeadas. El σ₀ = +10 MPa elegido es una idealización que evita el pandeo, que el modelo de vibración no cubre; decisión a revisar en la bitácora.
+3. **σ₀ y vigas pandeadas:** la deformación residual real es compresiva (−42×10⁻⁶ en el round robin, Tabla RS9; −2656×10⁻⁶ en la biempotrada de óxido de RM 8096, que está pandeada). Se usa σ₀ = −5 MPa: el mismo signo, pero sin pandeo, porque el modelo de vibración describe vigas rectas. Las vigas pandeadas quedan fuera del alcance; declararlo en T44.
 4. **CI** que corra las pruebas automáticamente ([T10](../contexto/tareas/T10-validacion-eigensolver-g1.md)).
 
 ---

@@ -83,7 +83,11 @@ def _raiz(f: Callable[[float], float], a: float, b: float, que: str) -> float:
 
 def E_aparente(viga: Viga, estructura: str, omega1: float) -> float:
     """El E con el que el modelo ideal (empotramiento perfecto, misma geometría,
-    densidad y σ₀) da la frecuencia `omega1`."""
+    densidad y σ₀) da la frecuencia `omega1`.
+
+    Devuelve NaN si con compresión la frecuencia es tan baja que el modelo ideal
+    solo la alcanzaría pandeado.
+    """
     w0 = resolver_modos(viga, estructura, n_modos=1).omega[0]
     if viga.sigma0 == 0:
         return float(viga.E * (omega1 / w0) ** 2)  # ω² ∝ E
@@ -93,12 +97,32 @@ def E_aparente(viga: Viga, estructura: str, omega1: float) -> float:
         return resolver_modos(v, estructura, n_modos=1).omega[0] - omega1
 
     log_E = math.log10(viga.E)
-    return float(10.0 ** brentq(f, log_E - 1.5, log_E + 1.5, xtol=1e-12))
+    abajo, arriba = log_E - 1.5, log_E + 1.5
+    if viga.sigma0 < 0:
+        # Con compresión, un E muy bajo hace pandear la viga ideal: n = N·L²/(E·I)
+        # no puede bajar de la carga crítica (−4π² biempotrada, −π²/4 voladizo)
+        n_critica = 4 * math.pi**2 if estructura == "biempotrada" else math.pi**2 / 4
+        E_min = abs(viga.sigma0) * viga.A * viga.L**2 / (viga.I * n_critica)
+        abajo = max(abajo, math.log10(E_min) + 1e-6)
+    if f(abajo) > 0:
+        # Ni con el E mínimo sin pandeo se alcanza una frecuencia tan baja
+        return float("nan")
+    return float(10.0 ** brentq(f, abajo, arriba, xtol=1e-12))
 
 
 def _sesgo_E(viga: Viga, estructura: str, **modelo) -> float:
-    wg = resolver_modos(viga, estructura, n_modos=1, **modelo).omega[0]
-    return E_aparente(viga, estructura, wg) / viga.E - 1
+    """Sesgo en E para las búsquedas de calibración.
+
+    Con compresión, un soporte muy flexible puede hacer pandear la viga, o dejar
+    una frecuencia que el modelo ideal no alcanza sin pandear: ese caso se toma
+    como el límite físico, −100 %.
+    """
+    try:
+        wg = resolver_modos(viga, estructura, n_modos=1, **modelo).omega[0]
+    except ValueError:
+        return -1.0
+    E_ap = E_aparente(viga, estructura, wg)
+    return -1.0 if math.isnan(E_ap) else E_ap / viga.E - 1
 
 
 def _validar_sesgo(sesgo_objetivo: float) -> None:
@@ -167,6 +191,11 @@ def alpha_para_forma_m3(viga: Viga, estructura: str, forma_objetivo: float) -> f
         raise ValueError("forma_objetivo debe ser > 0, p. ej. 0.022")
 
     def f(alpha: float) -> float:
-        return severidad(viga, estructura, alpha=alpha).diferencia_forma - forma_objetivo
+        try:
+            return severidad(viga, estructura, alpha=alpha).diferencia_forma - forma_objetivo
+        except ValueError:
+            # Con compresión, una conicidad extrema hace pandear el extremo delgado:
+            # la diferencia de forma solo puede ser mayor que en el rango estable
+            return 1.0
 
     return _raiz(f, 0.0, _ALPHA_MAX, f"una diferencia de forma de {forma_objetivo:.1%}")

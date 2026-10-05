@@ -141,3 +141,16 @@ def test_E_aparente_con_tension_reproduce_la_frecuencia():
     # la tensión no escala con E, así que el error en E supera al de (ω/ω₀)²
     w0 = resolver_modos(tensa, "biempotrada").omega[0]
     assert E_ap / tensa.E - 1 < (w_obs / w0) ** 2 - 1
+
+
+def test_E_aparente_con_compresion_y_limite_de_pandeo():
+    """Con compresión el E aparente se invierte igual; si la frecuencia es tan baja
+    que el modelo ideal solo la daría pandeado, el resultado es NaN."""
+    from pinn_mems.severidad import E_aparente
+
+    comprimida = Viga(**{**VIGA.__dict__, "sigma0": -5e6})
+    w_obs = resolver_modos(comprimida, "biempotrada", Soporte(kappa_theta=60.0)).omega[0]
+    E_ap = E_aparente(comprimida, "biempotrada", w_obs)
+    w_ideal = resolver_modos(Viga(**{**comprimida.__dict__, "E": E_ap}), "biempotrada").omega[0]
+    assert w_ideal == pytest.approx(w_obs, rel=1e-9)
+    assert math.isnan(E_aparente(comprimida, "biempotrada", 1.0))

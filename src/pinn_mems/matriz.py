@@ -4,7 +4,7 @@ Una corrida es una combinación de caso (M0, M1 s1–s6, M2, M3), N puntos por
 estructura, k estructuras y semilla. Con k = 1 se mide un voladizo de 300 µm;
 con k = 3, un voladizo de 300 µm, una viga biempotrada de 300 µm y un segundo
 voladizo más corto, **todos con el mismo anclaje físico**: el k_θ (o la
-conicidad α) del voladizo de 300 µm del caso. La biempotrada lleva σ₀ = +10 MPa;
+conicidad α) del voladizo de 300 µm del caso. La biempotrada lleva σ₀ = −5 MPa;
 los voladizos, σ₀ = 0 (decisiones en contexto/bitacora-decisiones.md).
 """
 

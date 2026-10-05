@@ -1,4 +1,4 @@
-# M1 s5 + sensibilidad a κ_u: soporte 'pilares_apilados' de Deutsch (2002), k_u = 82.3 N/m → κ_u = 658.79; sesgo en E = -53.8%.
+# M1 s5 + sensibilidad a κ_u: soporte 'pilares_apilados' de Deutsch (2002), k_u = 82.3 N/m → κ_u = 658.79; sesgo en E = -23.7%.
 # Generado por scripts/calibrar_severidad.py; no editar a mano.
 nombre: m1_biempotrada_s5_ku_pilares_apilados
 generador: M1
@@ -9,9 +9,9 @@ params:
   b: 2.8e-05
   h: 2.743e-06
   rho: 2200.0
-  sigma0: 10000000.0
+  sigma0: -5000000.0
 soporte:
-  kappa_theta: 55.4534
+  kappa_theta: 37.475
   kappa_u: 658.79
 muestreo:
   n_puntos: 100

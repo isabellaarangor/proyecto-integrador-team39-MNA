@@ -1,4 +1,4 @@
-# M0: empotramiento ideal (control). Geometría de RM 8096, NIST SP 260-177; σ₀ = 10 MPa.
+# M0: empotramiento ideal (control). Geometría de RM 8096, NIST SP 260-177; σ₀ = -5 MPa.
 # Generado por scripts/calibrar_severidad.py; no editar a mano.
 nombre: m0_biempotrada
 generador: M0
@@ -9,7 +9,7 @@ params:
   b: 2.8e-05
   h: 2.743e-06
   rho: 2200.0
-  sigma0: 10000000.0
+  sigma0: -5000000.0
 muestreo:
   n_puntos: 100
   n_modos: 3

@@ -38,7 +38,7 @@ def test_grupo_de_tres_geometria_y_tension():
     cfgs = configs_de_corrida(Corrida("m1_s5", 15, 3, 0))
     assert float(cfgs["voladizo"]["params"]["L"]) == pytest.approx(300e-6)
     assert float(cfgs["voladizo_corto"]["params"]["L"]) == pytest.approx(cargar_matriz()["segundo_voladizo_L"])
-    assert float(cfgs["biempotrada"]["params"]["sigma0"]) == pytest.approx(10e6)
+    assert float(cfgs["biempotrada"]["params"]["sigma0"]) == pytest.approx(-5e6)
     assert float(cfgs["voladizo"]["params"]["sigma0"]) == 0.0
     assert float(cfgs["voladizo_corto"]["params"]["sigma0"]) == 0.0
 

@@ -1,4 +1,4 @@
-# M3 (conicidad): h(ξ) = h̄·(1 + α·(ξ − ½)), α = 0.0440, para una diferencia de forma de 1.82% como M1 s3.
+# M3 (conicidad): h(ξ) = h̄·(1 + α·(ξ − ½)), α = 0.0529, para una diferencia de forma de 2.50% como M1 s3.
 # Generado por scripts/calibrar_severidad.py; no editar a mano.
 nombre: m3_biempotrada
 generador: M3
@@ -9,9 +9,9 @@ params:
   b: 2.8e-05
   h: 2.743e-06
   rho: 2200.0
-  sigma0: 10000000.0
+  sigma0: -5000000.0
 conicidad:
-  alpha: 0.044033
+  alpha: 0.052871
 muestreo:
   n_puntos: 100
   n_modos: 3

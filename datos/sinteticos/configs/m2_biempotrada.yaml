@@ -1,15 +1,15 @@
-# M2 (Timoshenko): viga corta, L = 42.2 µm (L/h = 15.4), para un sesgo en E de -5.0% como M1 s3.
+# M2 (Timoshenko): viga corta, L = 42.1 µm (L/h = 15.4), para un sesgo en E de -5.0% como M1 s3.
 # Generado por scripts/calibrar_severidad.py; no editar a mano.
 nombre: m2_biempotrada
 generador: M2
 estructura: biempotrada
 params:
   E: 70000000000.0
-  L: 4.224e-05
+  L: 4.2106e-05
   b: 2.8e-05
   h: 2.743e-06
   rho: 2200.0
-  sigma0: 10000000.0
+  sigma0: -5000000.0
 timoshenko:
   nu: 0.17
   kappa_s: null

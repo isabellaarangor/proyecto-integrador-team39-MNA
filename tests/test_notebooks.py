@@ -29,3 +29,23 @@ def test_corren_de_principio_a_fin(ruta):
                             resources={"metadata": {"path": str(ruta.parent)}}).execute()
     errores = [o for c in nb.cells for o in c.get("outputs", []) if o.get("output_type") == "error"]
     assert not errores
+
+
+@pytest.mark.parametrize("ruta", NOTEBOOKS, ids=lambda p: p.stem)
+def test_formulas_se_muestran_en_jupyter_vscode_y_github(ruta):
+    """Fórmulas con $…$ o $$…$$ (no \\( \\) ni \\[ \\]), emparejadas en cada línea y
+    sin caracteres Unicode dentro, que algunos renderizadores no aceptan."""
+    import re
+
+    for i, celda in enumerate(nbformat.read(ruta, 4).cells):
+        if celda.cell_type != "markdown":
+            continue
+        texto = re.sub(r"`[^`\n]*`", "", celda.source)  # el código en línea no es fórmula
+        assert "\\(" not in texto and "\\[" not in texto, f"celda {i}"
+        bloques = re.findall(r"\$\$(.*?)\$\$", texto, re.S)
+        resto = re.sub(r"\$\$.*?\$\$", "", texto, flags=re.S)
+        for linea in resto.splitlines():
+            assert linea.count("$") % 2 == 0, f"celda {i}: {linea[:80]}"
+        en_linea = re.findall(r"\$(.+?)\$", resto)
+        for formula in bloques + en_linea:
+            assert all(ord(ch) < 128 for ch in formula), f"celda {i}: {formula[:80]}"

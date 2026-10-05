@@ -346,3 +346,70 @@ def residual_by_zone(profile: pd.DataFrame, edge: float = 0.15) -> dict:
         "rms_end_um": rms(xi >= 1 - edge),
         "lag1_autocorrelation": float(np.corrcoef(r[:-1], r[1:])[0, 1]),
     }
+
+
+# --- Deformación residual de vigas biempotradas (ASTM E2245, SP 260-177 §RS) ---
+
+
+def fixed_fixed_length(x1upper, x2upper, calx: float, alpha: float, L_offset: float) -> dict:
+    """Longitud en el plano y extremos sobre el eje v (Ecs. RS9 y RS15–RS18).
+
+    `x1upper` y `x2upper` son los bordes sin calibrar (esquina superior de los
+    bordes 1 y 2) medidos en las trazas a', a, e y e'.
+    """
+    import numpy as np
+
+    x1ave, x2ave = float(np.mean(x1upper)), float(np.mean(x2upper))
+    f = x1ave * calx
+    l = (x2ave * calx - f) * np.cos(alpha) + f
+    return {
+        "x1ave": x1ave, "x2ave": x2ave, "f": f, "l": float(l),
+        "L_aligned": float(l - f), "L": float(l - f + L_offset),
+        "v1end": f - L_offset / 2, "v2end": float(l + L_offset / 2),
+    }
+
+
+def _cosine_half(extreme, inflection, peak):
+    """z = D + A·cos(B·(v − v_pico)) por tres puntos, con el pico en v_pico."""
+    import numpy as np
+    from scipy.optimize import brentq
+
+    (ve, ze), (vh, zh), (vi, zi) = extreme, inflection, peak
+    g = lambda B: (zi - zh) * (1 - np.cos(B * (ve - vi))) - (zi - ze) * (1 - np.cos(B * (vh - vi)))  # noqa: E731
+    B = brentq(g, 1e-6, 0.999 * np.pi / abs(ve - vi))
+    A = (zi - ze) / (1 - np.cos(B * (ve - vi)))
+    return A, B, zi - A
+
+
+def residual_strain(points, L: float, v1end: float, v2end: float, thickness: float) -> dict:
+    """Deformación residual de una traza de viga biempotrada (Ecs. RS19–RS21).
+
+    `points` son los cinco puntos calibrados (v, z): (g, z1F), (h, z2F),
+    (i, z3F) = pico, (j, z2S), (k, z3S). Cada mitad se modela con un coseno que
+    pasa por sus tres puntos con el máximo en i; la longitud curva Lc es la
+    longitud de arco entre v1end y v2end. La longitud efectiva Le es la distancia
+    entre los puntos de inflexión, veS − veF. Validado contra el ejemplo resuelto
+    del SP 260-177 (pp. 173–180).
+    """
+    import numpy as np
+    from scipy.integrate import quad
+
+    g, h, i, j, k = points
+    AF, BF, DF = _cosine_half(g, h, i)
+    AS, BS, DS = _cosine_half(k, j, i)
+    vi = i[0]
+    veF, veS = vi - np.pi / (2 * BF), vi + np.pi / (2 * BS)
+
+    def pendiente(v):
+        return -AF * BF * np.sin(BF * (v - vi)) if v < vi else -AS * BS * np.sin(BS * (v - vi))
+
+    arco = lambda a, b: quad(lambda v: np.sqrt(1 + pendiente(v) ** 2), a, b, limit=200)[0]  # noqa: E731
+    Lc = arco(v1end, vi) + arco(vi, v2end)
+    Le = veS - veF
+    Lce = Lc * Le / L
+    L0 = 12 * Lc * Lce**2 / (12 * Lce**2 - np.pi**2 * thickness**2)
+    return {
+        "AF": AF, "AS": AS, "veF": float(veF), "veS": float(veS), "Lc": Lc, "Le": float(Le), "L0": float(L0),
+        "eps_r0": (L - Lc) / Lc,   # sin fuerza crítica de compresión
+        "eps_rt": (L - L0) / L0,   # con fuerza crítica (el valor que reporta el NIST)
+    }

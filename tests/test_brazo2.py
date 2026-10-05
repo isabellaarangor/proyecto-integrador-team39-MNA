@@ -244,3 +244,45 @@ def test_residuo_por_zona_distingue_estructura_de_ruido_blanco():
     assert abs(zb["lag1_autocorrelation"]) < 0.2
     assert ze["lag1_autocorrelation"] > 0.8
     assert ze["rms_start_um"] > 5 * ze["rms_center_um"]
+
+
+# --- Deformación residual: ejemplo resuelto del SP 260-177 (pp. 173–180) --------
+
+EJEMPLO_RS = {
+    "calx": 1.00293, "calz": 0.99266, "alpha": 0.00777, "L_offset": 2.632, "t": 2.5846,
+    "x1upper": [23.6865, 23.6865, 22.5022, 22.8969], "x2upper": [228.969, 229.364, 226.601, 226.601],
+    "trazas": {
+        "b": [(30.0029, -0.30069), (68.296, 2.31704), (119.222, 5.47039), (175.28, 1.904), (210.02, -0.5755)],
+        "c": [(40.267, 0.232907), (68.296, 2.51054), (121.985, 5.54831), (175.28, 2.33986), (210.02, -0.40949)],
+        "d": [(40.267, 0.309133), (68.296, 2.57527), (122.38, 5.59466), (175.28, 2.11337), (215.152, -0.57715)],
+    },
+    # AF, AS, veF, veS, ε_r0 y ε_rt que reporta el NIST (×10⁻⁶ las deformaciones)
+    "resultados": {
+        "b": (2.91287, 3.10592, 70.81270, 171.17945, -2135.6822, -2677.6072),
+        "c": (3.09912, 3.19376, 67.55319, 175.88337, -2158.3993, -2623.5465),
+        "d": (3.10434, 3.08741, 67.27628, 172.03560, -2169.5800, -2666.9612),
+    },
+}
+
+
+def test_longitud_en_el_plano_del_ejemplo():
+    e = EJEMPLO_RS
+    r = brazo2.fixed_fixed_length(e["x1upper"], e["x2upper"], e["calx"], e["alpha"], e["L_offset"])
+    assert r["x1ave"] == pytest.approx(23.1930, abs=1e-4) and r["x2ave"] == pytest.approx(227.8838, abs=1e-4)
+    assert r["f"] == pytest.approx(23.26, abs=0.005) and r["l"] == pytest.approx(228.55, abs=0.005)
+    assert r["L"] == pytest.approx(207.92, abs=0.005)
+    assert (r["v1end"], r["v2end"]) == pytest.approx((21.94, 229.86), abs=0.005)
+
+
+@pytest.mark.parametrize("traza", ["b", "c", "d"])
+def test_reproduce_la_deformacion_residual_del_ejemplo(traza):
+    e = EJEMPLO_RS
+    largo = brazo2.fixed_fixed_length(e["x1upper"], e["x2upper"], e["calx"], e["alpha"], e["L_offset"])
+    puntos = [(brazo2.v_axis(x, e["calx"], e["alpha"], largo["f"]), z * e["calz"]) for x, z in e["trazas"][traza]]
+    r = brazo2.residual_strain(puntos, largo["L"], largo["v1end"], largo["v2end"], e["t"])
+    AF, AS, veF, veS, eps0, epst = e["resultados"][traza]
+    assert (r["AF"], r["AS"]) == pytest.approx((AF, AS), abs=1e-4)
+    assert (r["veF"], r["veS"]) == pytest.approx((veF, veS), abs=0.01)
+    # el ejemplo redondea L y los extremos a 0.01 µm: tolerancia de 1×10⁻⁶
+    assert r["eps_r0"] * 1e6 == pytest.approx(eps0, abs=1.0)
+    assert r["eps_rt"] * 1e6 == pytest.approx(epst, abs=1.0)

@@ -223,3 +223,32 @@ def test_el_brazo_1_no_distingue_giro_de_desplazamiento_del_anclaje(reproducibil
     desplazamiento = brazo1.fit_anchoring_stiffness(reproducibilidad, spring="u")
     assert giro["weighted_rss"] < CHI2_95_1GL and desplazamiento["weighted_rss"] < CHI2_95_1GL
     assert abs(giro["E_real_GPa"] - desplazamiento["E_real_GPa"]) > 5.0
+
+
+# --- Fig. 6 digitalizada (reproducibilidad por voladizo) -----------------------
+
+
+def test_fig6_digitalizada_coincide_con_la_tabla_6():
+    """Criterio de la guía: promedios por longitud a menos de 0.5 GPa de la Tabla 6;
+    además, la dispersión coincide con sus límites del 95 % (= 2s)."""
+    d = brazo1.load_fig6_reproducibility()
+    assert len(d) == 24 and d["participant"].nunique() == 8
+    tabla6 = brazo1.add_uncertainties(brazo1.prepare_young_modulus_data(brazo1.load_marshall_table("table6")))
+    for _, fila in tabla6.iterrows():
+        valores = d.loc[d["L_um"] == fila["L_um"], "E_GPa"]
+        assert valores.mean() == pytest.approx(fila["E_mean_GPa"], abs=0.5)
+        assert valores.std() == pytest.approx(fila["std_GPa"], rel=0.15)
+
+
+def test_el_efecto_de_chip_acota_mucho_mejor_delta_L():
+    """Con 24 puntos y un factor por chip, ΔL queda en ≈12.2 µm con un intervalo
+    mucho más estrecho que el ajuste de 3 promedios (1 grado de libertad)."""
+    d = brazo1.load_fig6_reproducibility()
+    con_chip = brazo1.fit_anchoring_curve_with_chip(d)
+    promedios = brazo1.fit_anchoring_curve(
+        brazo1.add_uncertainties(brazo1.prepare_young_modulus_data(brazo1.load_marshall_table("table6"))))
+    assert con_chip["delta_L_um"] == pytest.approx(12.2, abs=0.5)
+    ancho = lambda ic: ic[1] - ic[0]  # noqa: E731
+    assert ancho(con_chip["delta_L_ci95"]) < 0.3 * ancho(promedios["delta_L_ci95"])
+    assert con_chip["dof"] == 19
+    assert sum(con_chip["chip_factors"].values()) == pytest.approx(4.0)

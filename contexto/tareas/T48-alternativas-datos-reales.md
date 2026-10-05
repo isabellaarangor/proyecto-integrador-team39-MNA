@@ -8,10 +8,10 @@ Las alternativas van de menor a mayor costo. Se avanzan en paralelo la 1, 2 y 3;
 
 ## Alternativa 1 — Brazo 1 principal + Brazo 2 reducido (recomendada)
 
-- [ ] Digitalizar la Fig. YM6 [F15, p. 48] con WebPlotDigitizer: 48 puntos de repetibilidad y 24 de reproducibilidad → CSV en `datos/`
-- [ ] Revisar la digitalización contra los promedios de YM7/YM8 (diferencia < 0.5 GPa por longitud)
-- [ ] Repetir el ajuste `E(L) = E_real·(L/(L+ΔL))⁴` con los 72 puntos y reportar ΔL con intervalo de confianza
-- [ ] Veredicto del Brazo 1: ¿la tendencia con la longitud se mantiene con datos por voladizo?
+- [ ] Digitalizar la Fig. YM6 [F15, p. 48] con WebPlotDigitizer: 48 puntos de repetibilidad y 24 de reproducibilidad → CSV en `datos/` — *24 de reproducibilidad hechos de la Fig. 6 de Marshall (misma figura), con detección automática; los 48 de repetibilidad se enciman y no se digitalizaron*
+- [x] Revisar la digitalización contra los promedios de YM7/YM8 (diferencia < 0.5 GPa por longitud) — *< 0.06 GPa contra YM8*
+- [ ] Repetir el ajuste `E(L) = E_real·(L/(L+ΔL))⁴` con los 72 puntos y reportar ΔL con intervalo de confianza — *con los 24 de reproducibilidad y un factor por chip: ΔL = 12.2 µm (IC 95 % 11.1–13.3), E_real = 74.4 GPa*
+- [x] Veredicto del Brazo 1: ¿la tendencia con la longitud se mantiene con datos por voladizo? — *sí: los 8 participantes muestran E creciente con L, y el chip explica buena parte de la dispersión (residuo 1.5 → 0.6 GPa)*
 - [ ] Brazo 2 reducido: describir la tendencia de SG10 [F15, p. 92] como indicio secundario y reportar RS10 como resultado nulo
 - [ ] Digitalizar una traza de ejemplo (RS3c o SG3c) para usarla como caso ilustrativo de diagnóstico de residuos
 - [ ] Documentar la pérdida en la bitácora de decisiones y en la sección de limitaciones (T44)

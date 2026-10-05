@@ -231,6 +231,8 @@ Definida en `datos/sinteticos/matriz.yaml` (plan §4.8, decisiones del 2026-10-0
 - **M2 solo con k = 1**, porque sus vigas cortas no forman un grupo realista.
 - **Semillas:** cada estructura de una corrida usa una semilla distinta (1000·semilla + índice), para que el ruido no se repita.
 - **Total:** 510 corridas y 990 archivos `.npz` (≈ 5 MB) en `datos/sinteticos/generados/matriz/<id>/<rol>.npz`, con `manifiesto.csv` (id, caso, N, k, semilla, rol, archivo). Se regeneran en ≈ 40 s y no se versionan.
+- **Longitudes reservadas** (plan §4.9): `reservadas.csv` con las frecuencias verdaderas de voladizos de 248 y 348 µm de cada caso (mismo anclaje físico), que ningún método ve al ajustar. En M2 se usan las mismas proporciones.
+- **Subestudio de colocación (RQ4, [T21](../contexto/tareas/T21-analisis-colocacion-rq4.md)):** 60 corridas en `colocacion/` (esquemas uniforme, anclaje y punta × s3 y s5 × 10 semillas, voladizo, N = 15). La información de Fisher (`src/pinn_mems/colocacion.py`) anticipa que con 3 modos la colocación casi no importa y que con 1 modo el esquema uniforme acota E ≈ 20 % mejor que concentrar los puntos en la punta.
 
 ---
 
@@ -275,7 +277,7 @@ Las configs `m1_*`, `m2_*` y `m3_*` las escribe `calibrar_severidad.py`; no se e
 
 1. **Kobrinsky et al. (2000):** sigue sin conseguirse ([T53](../contexto/tareas/T53-rigidez-soporte-fuentes.md)). κ_u se estudia como sensibilidad con valores de la tesis de Deutsch.
 2. **Verificar la cifra de 5%** de M-TEST contra la fuente original (nivel s3).
-3. **Rango de ε_r** con las tablas RS1/RS9 del NIST, para contrastar el σ₀ = +10 MPa elegido (la biempotrada de 300 µm pandea con σ₀ ≈ −19 MPa).
+3. **σ₀ contra los datos reales:** la deformación residual medida es compresiva: −42×10⁻⁶ en el round robin (Tabla RS9) y −2656×10⁻⁶ en la biempotrada de óxido de RM 8096 (ejemplo resuelto del SP 260-177), con vigas pandeadas. El σ₀ = +10 MPa elegido es una idealización que evita el pandeo, que el modelo de vibración no cubre; decisión a revisar en la bitácora.
 4. **CI** que corra las pruebas automáticamente ([T10](../contexto/tareas/T10-validacion-eigensolver-g1.md)).
 
 ---

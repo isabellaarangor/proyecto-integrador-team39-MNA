@@ -34,9 +34,17 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 
 - **Decisión propuesta:** seguir con **ambos brazos**. El Brazo 1 (frecuencia) es la validación principal; el Brazo 2 (forma) se mantiene como demostración con residuos espaciales reales.
 - **Motivo y evidencia:**
-  - Brazo 1 viable: ajuste ΔL ≈ 12–13 µm con las Tablas 5 y 6 de Marshall ([notebook](../notebooks/EDA_Brazo1_NIST.ipynb)). Limitaciones: 1 grado de libertad, solo ω₁ (débilmente supervisado) y no distingue giro de desplazamiento del anclaje ([T54](tareas/T54-rigidez-soporte-desde-brazo1.md)).
+  - Brazo 1 viable: ajuste ΔL ≈ 12–13 µm con las Tablas 5 y 6 de Marshall ([notebook](../notebooks/EDA_Brazo1_NIST.ipynb)). Con los 24 puntos de reproducibilidad digitalizados de la Fig. 6 y un factor por chip, ΔL = 12.2 µm (IC 95 % 11.1–13.3) con 19 grados de libertad, en lugar de 1. Limitaciones: solo ω₁ (débilmente supervisado) y no distingue giro de desplazamiento del anclaje ([T54](tareas/T54-rigidez-soporte-desde-brazo1.md)).
   - Brazo 2 útil pero reducido: 4 estructuras de ejemplo, una traza por archivo, sin barrido de longitudes ni cruce de ΔL con el Brazo 1. Las trazas están validadas contra la hoja del NIST y sus residuos son sistemáticos ([T50](tareas/T50-brazo2-conversion-trazas-validada.md), [T52](tareas/T52-brazo2-eda-por-perfil.md)).
   - Diferenciador frente a Zou et al. escrito ([T03](tareas/T03-leer-zou-diferenciador.md)).
 - **Pérdidas para T44:** sin cruce de ΔL entre brazos; ruido del Brazo 2 estimado dentro de cada traza, no con trazas repetidas; sin valores de Kobrinsky.
 - **Quién:** pendiente de la firma de los tres integrantes.
+- **Estado:** propuesta.
+
+## 2026-10-04 — Hallazgo que afecta la decisión de σ₀ (pendiente de revisar)
+
+- **Hallazgo:** la deformación residual real es compresiva. El round robin de ASTM da ε_r = −41.65×10⁻⁶ y −44.0×10⁻⁶ (Tabla RS9 del SP 260-177), y el ejemplo resuelto de RM 8096 da ε_r = −2656×10⁻⁶ en una viga de óxido de 200 µm, que está pandeada (arco de ≈5 µm), equivalente a unos −186 MPa.
+- **Implicación:** el σ₀ = +10 MPa (tensión) de la matriz sintética tiene el signo contrario al de los chips reales. Se eligió para evitar el pandeo, porque el modelo de vibración describe vigas rectas y no vibraciones alrededor de una viga pandeada.
+- **Opciones:** mantener la tensión como idealización y declararlo en T44; usar una compresión leve sin pandeo (p. ej. −5 MPa en 300 µm); o extender el modelo a vigas pandeadas (fuera del alcance actual).
+- **Quién:** pendiente del equipo.
 - **Estado:** propuesta.

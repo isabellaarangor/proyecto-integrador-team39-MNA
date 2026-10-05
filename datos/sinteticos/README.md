@@ -24,5 +24,5 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 - Rigideces adimensionales: κ_θ = k_θ·L/EI, κ_u = k_u·L³/EI; `.inf` es empotramiento ideal.
 - Ruido: gaussiano, 2% relativo a la amplitud pico de cada modo en las formas y 0.03% en las frecuencias (`omega_limpia` guarda las frecuencias sin ruido).
 - Tensión residual: σ₀ = +10 MPa en la viga biempotrada; 0 en los voladizos.
-- **Matriz experimental:** `matriz.yaml` la define (9 casos × N = 5/15/40 × k = 1/3 × 10 semillas; M2 solo con k = 1) y `python scripts/generar_matriz.py` genera las 510 corridas en `generados/matriz/` con su `manifiesto.csv`. Detalle en `datos/01-datos-sinteticos.md` §4.8.
+- **Matriz experimental:** `matriz.yaml` la define (9 casos × N = 5/15/40 × k = 1/3 × 10 semillas; M2 solo con k = 1) y `python scripts/generar_matriz.py` genera las 510 corridas en `generados/matriz/` con su `manifiesto.csv`, las frecuencias de las longitudes reservadas (`reservadas.csv`) y las 60 corridas del subestudio de colocación (`colocacion/`). Detalle en `datos/01-datos-sinteticos.md` §4.8.
 - Explicación completa para personas externas al proyecto (qué son los datos, cómo se crean y cómo se usarán): `notebooks/EDA_Datos_Sinteticos.ipynb`. Se edita directamente en Jupyter.

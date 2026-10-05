@@ -310,7 +310,7 @@ No existen datos públicos del Brazo 1 en mejor formato que las tablas. Revisamo
 **Brazo 1**
 - [ ] Tablas 1, 2, 3, 5 y 6 de Marshall y Tablas 3 y 4 del SP 260-177 en CSV, con revisión doble — *CSV en `tablas/` y revisión del agente contra los PDF; falta la revisión de una persona ([T49](../contexto/tareas/T49-brazo1-tablas-csv-rastreables.md))*
 - [x] Notebook con el ajuste de ΔL ± IC (Tablas 5 y 6), su gráfica y la nota de 1 grado de libertad — *`notebooks/EDA_Brazo1_NIST.ipynb`*
-- [ ] (Opcional) 24 puntos de reproducibilidad digitalizados, con chip e instrumento, y el modelo mixto
+- [x] (Opcional) 24 puntos de reproducibilidad digitalizados, con chip e instrumento, y el modelo mixto — *`datos/nist/digitalizados/marshall_F6_reproducibilidad.csv`; con un factor por chip (efecto fijo) ΔL = 12.2 µm, IC 95 % 11.1–13.3 µm, 19 grados de libertad (`brazo1.fit_anchoring_curve_with_chip`)*
 - [ ] Veredicto registrado en la bitácora (T11)
 
 **Brazo 2**

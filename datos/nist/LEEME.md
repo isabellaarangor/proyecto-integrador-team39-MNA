@@ -57,11 +57,11 @@ Un CSV por traza, generado con `python scripts/exportar_trazas_nist.py` a partir
 
 ## digitalizados/
 
-Vacía por ahora. Agregar un renglón por archivo: nombre, fuente, quién lo hizo, quién lo revisó y la fecha.
-
 | Archivo | Fuente | Hizo | Revisó | Fecha |
 |---|---|---|---|---|
-| | | | | |
+| `marshall_F6_reproducibilidad.csv` | [F29, p. 322, Fig. 6]: 24 puntos de reproducibilidad (8 participantes × 3 longitudes), con chip e instrumento | Claude (agente), con `scripts/digitalizar_marshall_fig6.py` (detección automática de los puntos; eje calibrado con las líneas 64.2 ± 9.3 GPa) | Validado contra la Tabla 6: promedios por longitud a menos de 0.06 GPa y desviaciones dentro del 15 %; falta una segunda digitalización independiente | 2026-10-04 |
+
+Los 48 puntos de repetibilidad no se digitalizaron: se enciman y las tablas ya los resumen (guía 02-datos-reales, §5). |
 
 ## Código
 

@@ -294,3 +294,47 @@ def fit_anchoring_stiffness(df: pd.DataFrame, uncertainty: str = "se_GPa", sprin
         "weighted_rss": float(np.sum(result.fun**2)),
         "E_pred_GPa": _apparent_modulus_tabulated(L, E_real, 10.0**log_k, spring),
     }
+
+
+# --- Puntos individuales de reproducibilidad (Fig. 6 digitalizada) -------------
+
+FIG6_FILE = CARPETA_TABLAS.parent / "digitalizados" / "marshall_F6_reproducibilidad.csv"
+
+
+def load_fig6_reproducibility(path: Path = FIG6_FILE) -> pd.DataFrame:
+    """24 valores de E (8 participantes × 3 longitudes) digitalizados de la Fig. 6."""
+    return pd.read_csv(path, comment="#")
+
+
+def fit_anchoring_curve_with_chip(df: pd.DataFrame, initial_guess=(75.0, 12.0)) -> dict:
+    """Curva de anclaje con un factor multiplicativo por chip (efecto fijo).
+
+    E_ij = E_real · c_chip · (L/(L + ΔL))⁴, con la media de los factores c
+    igual a 1 para que E_real sea identificable. Separa la variación entre chips
+    de la dependencia con la longitud (guía 02-datos-reales, §5, paso 3).
+    """
+    L = df["L_um"].to_numpy(dtype=float)
+    E = df["E_GPa"].to_numpy(dtype=float)
+    chips = sorted(df["chip"].unique())
+    idx = df["chip"].map({c: i for i, c in enumerate(chips)}).to_numpy()
+
+    def factores(p):
+        c = np.concatenate([[1.0], p[2:]])
+        return c / c.mean()
+
+    def residuos(p):
+        return E - p[0] * factores(p)[idx] * (L / (L + p[1])) ** 4
+
+    x0 = [*initial_guess, *([1.0] * (len(chips) - 1))]
+    result = least_squares(residuos, x0, xtol=1e-12, ftol=1e-12, gtol=1e-12)
+    dof = len(E) - len(x0)
+    s2 = np.sum(result.fun**2) / dof
+    cov = np.linalg.inv(result.jac.T @ result.jac) * s2
+    se = np.sqrt(np.diag(cov))
+    t_crit = t.ppf(0.975, df=dof)
+    return {
+        "E_real_GPa": result.x[0], "E_real_ci95": (result.x[0] - t_crit * se[0], result.x[0] + t_crit * se[0]),
+        "delta_L_um": result.x[1], "delta_L_ci95": (result.x[1] - t_crit * se[1], result.x[1] + t_crit * se[1]),
+        "chip_factors": dict(zip(chips, factores(result.x))),
+        "residual_sd_GPa": float(np.sqrt(s2)), "dof": dof,
+    }

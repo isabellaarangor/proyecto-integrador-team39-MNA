@@ -8,3 +8,8 @@ casos_solo_k1: [m2]                  # M2 usa vigas cortas: no forma grupo de 3
 segundo_voladizo_L: 200.0e-6         # el voladizo extra de k = 3 (m)
 # Se guardan 3 modos; cada método usa 1 o 3 (eje "modos medidos" del plan).
 n_modos: 3
+# Longitudes reservadas (plan §4.9): voladizos que ningún método ve al ajustar;
+# se comparan sus frecuencias predichas con las verdaderas. Existen en el chip del
+# NIST (Tabla 1 de Marshall) pero el round robin no las midió. En M2 (vigas cortas)
+# se usan las mismas proporciones respecto del voladizo de referencia.
+longitudes_reservadas: [248.0e-6, 348.0e-6]

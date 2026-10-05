@@ -68,3 +68,31 @@ def test_generar_matriz_escribe_archivos_y_manifiesto(tmp_path):
     assert len(manifiesto) == 5
     assert all((tmp_path / a).exists() for a in manifiesto["archivo"])
     assert not math.isnan(manifiesto["semilla"].iloc[0])
+
+
+# --- Longitudes reservadas ----------------------------------------------------
+
+from pinn_mems.matriz import configs_reservadas, frecuencias_reservadas  # noqa: E402
+
+
+@pytest.mark.parametrize("caso", ["m1_s2", "m1_s6"])
+def test_reservadas_comparten_el_anclaje_fisico(caso):
+    base = configs_de_corrida(Corrida(caso, 5, 1, 0))["voladizo"]
+    k_base = _k_theta_fisico(base)
+    reservadas = configs_reservadas(caso)
+    assert sorted(reservadas) == [248.0, 348.0]
+    for cfg in reservadas.values():
+        assert _k_theta_fisico(cfg) == pytest.approx(k_base, rel=1e-9)
+
+
+def test_reservadas_m0_siguen_la_escala_ideal():
+    """Con empotramiento ideal ω ∝ 1/L²."""
+    filas = [f for f in frecuencias_reservadas({**cargar_matriz(), "casos": ["m0"]})]
+    w = {f["L_um"]: f["omega1_rad_s"] for f in filas}
+    assert w[248.0] / w[348.0] == pytest.approx((348 / 248) ** 2, rel=1e-6)
+
+
+def test_reservadas_m1_dan_frecuencias_menores_que_el_ideal():
+    m0 = {f["L_um"]: f["omega1_rad_s"] for f in frecuencias_reservadas({**cargar_matriz(), "casos": ["m0"]})}
+    m1 = {f["L_um"]: f["omega1_rad_s"] for f in frecuencias_reservadas({**cargar_matriz(), "casos": ["m1_s5"]})}
+    assert all(m1[L] < m0[L] for L in m0)

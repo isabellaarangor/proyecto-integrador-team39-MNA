@@ -94,7 +94,8 @@ def generar_corrida(corrida: Corrida, matriz: dict | None = None) -> dict[str, C
 
 
 def generar_matriz(salida: Path, matriz: dict | None = None) -> Path:
-    """Genera todas las corridas en `salida/<id>/<rol>.npz` y un manifiesto CSV."""
+    """Genera todas las corridas en `salida/<id>/<rol>.npz`, un manifiesto CSV y
+    `reservadas.csv` con las frecuencias verdaderas de las longitudes reservadas."""
     matriz = matriz or cargar_matriz()
     salida = Path(salida)
     filas = []
@@ -104,9 +105,50 @@ def generar_matriz(salida: Path, matriz: dict | None = None) -> Path:
             ruta = conjunto.guardar(carpeta / f"{rol}.npz")
             filas.append({"id": corrida.id, "caso": corrida.caso, "N": corrida.N, "k": corrida.k,
                           "semilla": corrida.semilla, "rol": rol, "archivo": ruta.relative_to(salida).as_posix()})
+    reservadas = frecuencias_reservadas(matriz)
+    with open(salida / "reservadas.csv", "w", newline="", encoding="utf-8") as f:
+        escritor = csv.DictWriter(f, fieldnames=list(reservadas[0]))
+        escritor.writeheader()
+        escritor.writerows(reservadas)
     manifiesto = salida / "manifiesto.csv"
     with open(manifiesto, "w", newline="", encoding="utf-8") as f:
         escritor = csv.DictWriter(f, fieldnames=list(filas[0]))
         escritor.writeheader()
         escritor.writerows(filas)
     return manifiesto
+
+
+# --- Longitudes reservadas (validación) -----------------------------------------
+
+
+def configs_reservadas(caso: str, matriz: dict | None = None) -> dict[float, dict]:
+    """Voladizos de las longitudes reservadas con el mismo anclaje físico del caso.
+
+    Devuelve {L_um: config}. En M2 las longitudes se escalan con la misma
+    proporción respecto del voladizo de 300 µm.
+    """
+    matriz = matriz or cargar_matriz()
+    base = _config_base(caso, "voladizo")
+    L_base = float(base["params"]["L"])
+    resultado = {}
+    for L_nist in matriz["longitudes_reservadas"]:
+        L = float(L_nist) * (L_base / 300e-6)
+        cfg = copy.deepcopy(base)
+        cfg["params"] = {**cfg["params"], "L": L}
+        if "soporte" in cfg:
+            cfg["soporte"] = {k: float(v) * L / L_base if k == "kappa_theta" else v for k, v in cfg["soporte"].items()}
+        cfg["nombre"] = f"{base['nombre']}_reservada_L{L * 1e6:.1f}"
+        cfg["ruido"] = {**cfg["ruido"], "nivel": 0.0, "nivel_omega": 0.0}
+        resultado[round(L * 1e6, 3)] = cfg
+    return resultado
+
+
+def frecuencias_reservadas(matriz: dict | None = None) -> list[dict]:
+    """Frecuencias verdaderas (sin ruido) de los voladizos reservados de cada caso."""
+    matriz = matriz or cargar_matriz()
+    filas = []
+    for caso in matriz["casos"]:
+        for L_um, cfg in configs_reservadas(caso, matriz).items():
+            omega = generar(cfg).omega_limpia
+            filas.append({"caso": caso, "L_um": L_um, **{f"omega{i + 1}_rad_s": float(w) for i, w in enumerate(omega)}})
+    return filas

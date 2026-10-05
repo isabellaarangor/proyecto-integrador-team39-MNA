@@ -6,11 +6,11 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 **Compuertas:** G0 datos utilizables · G1 eigensolver válido · G2 identificabilidad · G3 PINN válida + cronometrada · G4 baseline L0 · G5 escalera completa · G6 paro duro de experimentos
 
 ## Semana 1 — Planteamiento
-- [ ] [T01 Redactar el planteamiento](T01-redactar-planteamiento.md) — todos
-- [ ] [T02 Preguntas al asesor + división de la semana 8](T02-preguntas-al-asesor.md) — todos
-- [ ] [T03 Leer Zou y B-O'H, escribir el diferenciador](T03-leer-zou-diferenciador.md) — B/C
-- [ ] [T04 Leer arXiv:2509.20191, verificar A5](T04-verificar-a5-jekic.md) — C
-- [ ] [T05 Esqueleto del repo + interfaz de resultados](T05-esqueleto-del-repo.md) — C
+- [x] [T01 Redactar el planteamiento](T01-redactar-planteamiento.md) — todos
+- [x] [T02 Preguntas al asesor + división de la semana 8](T02-preguntas-al-asesor.md) — todos
+- [x] [T03 Leer Zou y B-O'H, escribir el diferenciador](T03-leer-zou-diferenciador.md) — B/C
+- [x] [T04 Leer arXiv:2509.20191, verificar A5](T04-verificar-a5-jekic.md) — C
+- [x] [T05 Esqueleto del repo + interfaz de resultados](T05-esqueleto-del-repo.md) — C
 
 ## Semana 2 — Avance 0 + verificación (G0, G1)
 - [ ] [T06 G0 Brazo 1: verificación de datos de frecuencia](T06-g0-brazo1-datos-frecuencia.md) — todos

@@ -199,3 +199,48 @@ def test_csv_de_trazas_estan_al_dia_con_los_crudos():
         assert list(guardada.columns) == list(nueva.columns)
         assert np.allclose(guardada["x_um"], nueva["x_um"]) and np.allclose(guardada["z_um"], nueva["z_um"])
         assert np.allclose(guardada["v_um"], nueva["v_um"], equal_nan=True)
+
+
+# --- Perfil sobre la viga y residuos por zona (T52) ----------------------------
+
+
+@pytest.mark.parametrize("nombre", HOJAS_CON_COLUMNAS_NIST)
+def test_perfil_de_la_viga_es_el_tramo_que_modela_el_nist(nombre):
+    perfil = brazo2.beam_profile(CARPETA_CRUDOS / nombre)
+    nist = brazo2.read_nist_columns(CARPETA_CRUDOS / nombre)
+    assert len(perfil) == len(nist)
+    assert np.allclose(perfil["residual_um"], perfil["z_um"] - perfil["z_model_um"])
+    assert not perfil["z_model_um"].isna().any()
+    # xi recorre el tramo de 0 (borde del anclaje, v más cercano a f = x1ave·calx) a 1
+    f = brazo2.read_sheet_parameters(CARPETA_CRUDOS / nombre)["f"]
+    assert perfil["xi"].min() == 0 and perfil["xi"].max() == 1
+    assert perfil.loc[perfil["xi"].idxmin(), "v_um"] == perfil.loc[(perfil["v_um"] - f).abs().idxmin(), "v_um"]
+
+
+@pytest.mark.parametrize("nombre, extremos_fuera", [
+    ("RESIDUAL.STRAIN.Sample.Data.Trace.b.RM.8096.0009.L200.Ins3.xlsx", set()),
+    ("RESIDUAL.STRAIN.Sample.Data.Trace.b.RM.8097.0108.P2.0deg.L500.Ins3.xlsx", {"anclaje", "otro"}),
+    ("STRAIN.GRADIENT.Sample.Data.Trace.c.RM.8097.0103.P2.180deg.L650.Ins3.xlsx", {"anclaje"}),
+    ("STRAIN.GRADIENT.Sample.Data.Trace.d.RM.8096.0001.L200.Ins3.xlsx", set()),
+])
+def test_residuos_solo_sobre_la_viga_no_sobre_el_soporte(nombre, extremos_fuera):
+    """En RM 8097 el tramo del NIST incluye puntos sobre la meseta del soporte
+    (≈0.9 µm más arriba); esos puntos no son la viga y se excluyen. Los picos
+    aislados de ruido del óxido (RM 8096) no deben confundirse con una meseta."""
+    perfil = brazo2.beam_profile(CARPETA_CRUDOS / nombre)
+    fuera = perfil.loc[~perfil["on_beam"], "xi"]
+    encontrados = ({"anclaje"} if (fuera < 0.5).any() else set()) | ({"otro"} if (fuera >= 0.5).any() else set())
+    assert encontrados == extremos_fuera
+    assert len(fuera) < 0.15 * len(perfil)
+
+
+def test_residuo_por_zona_distingue_estructura_de_ruido_blanco():
+    rng = np.random.default_rng(3)
+    xi = np.linspace(0, 1, 500)
+    blanco = pd.DataFrame({"xi": xi, "residual_um": rng.normal(0, 0.01, xi.size)})
+    con_estructura = pd.DataFrame({"xi": xi, "residual_um": 0.2 * np.exp(-xi / 0.05) + rng.normal(0, 0.01, xi.size)})
+    zb = brazo2.residual_by_zone(blanco)
+    ze = brazo2.residual_by_zone(con_estructura)
+    assert abs(zb["lag1_autocorrelation"]) < 0.2
+    assert ze["lag1_autocorrelation"] > 0.8
+    assert ze["rms_start_um"] > 5 * ze["rms_center_um"]

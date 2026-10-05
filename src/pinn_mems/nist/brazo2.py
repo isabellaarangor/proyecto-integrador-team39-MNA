@@ -273,3 +273,76 @@ def trace_for_export(file_path) -> pd.DataFrame:
         "calibrada": trace["calibrated"],
         "archivo_origen": meta["file"],
     })
+
+
+# --- Perfil sobre la viga contra el modelo del NIST (T52) ----------------------
+
+
+def beam_profile(file_path, edge_fraction: float = 0.2, jump_um: float = 0.3) -> pd.DataFrame:
+    """Tramo de la viga que modela el NIST: v, z calibrada, modelo y residuo (µm).
+
+    Solo existe en las trazas a lo largo de la viga (b, c, d). En deformación
+    residual el modelo son dos cosenos (zmodel1 y zmodel2, unidos en el pico);
+    en gradiente de deformación, un círculo.
+
+    - `xi` va de 0 a 1 a lo largo del tramo, medido desde el borde del anclaje,
+      que la hoja da como f = x1ave·calx (en orientación de 180° está en |v| grande).
+    - `on_beam` es False en las mesetas de los extremos que quedan sobre el soporte:
+      se detectan por un cambio de nivel sostenido de z mayor que `jump_um` en la
+      fracción `edge_fraction` de cada extremo. El modelo no aplica ahí.
+    """
+    import numpy as np
+
+    nist = read_nist_columns(file_path)
+    v = nist.iloc[:, 0].to_numpy()
+    z = nist.iloc[:, 1].to_numpy()
+    modelo = nist.iloc[:, 2:].bfill(axis=1).iloc[:, 0].to_numpy()
+    f = read_sheet_parameters(file_path)["f"]
+    distancia = np.abs(v - f)
+    xi = (distancia - distancia.min()) / np.ptp(distancia)
+
+    # Salto sostenido: cambio de nivel entre las medianas de `ventana` puntos a cada
+    # lado (un pico aislado de ruido no cuenta)
+    on_beam = np.ones(len(z), dtype=bool)
+    ventana = 6
+    saltos = [
+        k for k in range(ventana, len(z) - ventana)
+        if abs(np.median(z[k + 1:k + 1 + ventana]) - np.median(z[k + 1 - ventana:k + 1])) > jump_um
+        and abs(z[k + 1] - z[k]) > jump_um
+    ]
+    for k in saltos:
+        if k < edge_fraction * len(z):
+            on_beam[: k + 1] = False
+        elif k >= (1 - edge_fraction) * len(z):
+            on_beam[k + 1:] = False
+
+    meta = get_trace_metadata(file_path)
+    return pd.DataFrame({
+        "v_um": v, "xi": xi, "z_um": z, "z_model_um": modelo, "residual_um": z - modelo,
+        "on_beam": on_beam,
+        "structure": meta["structure"], "material": meta["material"], "length_um": meta["length_um"],
+        "trace": meta["trace"], "file": meta["file"],
+    })
+
+
+def residual_by_zone(profile: pd.DataFrame, edge: float = 0.15) -> dict:
+    """RMS del residuo cerca de cada extremo del tramo y en el centro, y su autocorrelación.
+
+    Usa solo los puntos sobre la viga (`on_beam`) cuando la columna existe.
+
+    Una autocorrelación de un paso cercana a 1 indica residuos con estructura
+    (desajuste del modelo o ruido correlacionado), no ruido blanco.
+    """
+    import numpy as np
+
+    if "on_beam" in profile:
+        profile = profile[profile["on_beam"]]
+    r = profile["residual_um"].to_numpy()
+    xi = profile["xi"].to_numpy()
+    rms = lambda m: float(np.sqrt(np.mean(r[m] ** 2)))  # noqa: E731
+    return {
+        "rms_start_um": rms(xi <= edge),
+        "rms_center_um": rms((xi > edge) & (xi < 1 - edge)),
+        "rms_end_um": rms(xi >= 1 - edge),
+        "lag1_autocorrelation": float(np.corrcoef(r[:-1], r[1:])[0, 1]),
+    }

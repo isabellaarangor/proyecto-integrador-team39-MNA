@@ -33,6 +33,10 @@ Transcripciones de tablas publicadas, copiadas sin modificar. La primera línea 
 | `marshall_T5_repetibilidad.csv` | [F29, p. 321, Table 5] | equipo (Brazo 1) | Claude (agente), contra el PDF | 2026-10-04 |
 | `marshall_T6_reproducibilidad.csv` | [F29, p. 321, Table 6] | equipo (Brazo 1) | Claude (agente), contra el PDF | 2026-10-04 |
 | `sp260_T3_T4_f_correction.csv` | [F15, pp. 26–27 (PDF 55–56), Tables 3 y 4] | equipo (Tabla 3); Claude (Tabla 4) | Claude (agente), contra el PDF | 2026-10-04 |
+| `sp260_RS1_vigas_biempotradas.csv` | [F15, p. 54 (PDF 83), Table RS1] | Claude (agente), del PDF | pendiente | 2026-10-04 |
+| `sp260_RS9_deformacion_residual.csv` | [F15, p. 72 (PDF 101), Table RS9] | Claude (agente), del PDF; signos verificados en la imagen de la página | pendiente | 2026-10-04 |
+| `sp260_SG1_voladizos.csv` | [F15, p. 79 (PDF 108), Table SG1] | Claude (agente), del PDF | pendiente | 2026-10-04 |
+| `sp260_SG8_gradiente_deformacion.csv` | [F15, p. 92 (PDF 121), Table SG8] | Claude (agente), del PDF | pendiente | 2026-10-04 |
 
 TODO(equipo): que una persona del equipo repita la revisión contra el PDF y se anote aquí.
 

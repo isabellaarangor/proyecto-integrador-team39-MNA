@@ -151,7 +151,8 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 - `delta_L`: alargamiento de una viga ideal con el mismo ω₁.
 
 **Decisiones:**
-- **M1:** sesgos objetivo en E de **1, 2.5, 5, 10, 15 y 25%**. s3 es el 5% de M-TEST y **s5 equivale a ΔL = 12.4 µm**, el orden del ajuste exploratorio del NIST. Solo se ablanda el giro (κ_u = ∞) hasta tener los valores de Kobrinsky.
+- **M1:** sesgos objetivo en E de **1, 2.5, 5, 10, 15 y 25%**. s3 es el 5% de M-TEST y **s5 equivale a ΔL = 12.4 µm**, el orden del ajuste exploratorio del NIST. El eje principal solo ablanda el giro (κ_u = ∞).
+- **Sensibilidad a κ_u** (decisión del 2026-10-04): 6 configs extra `m1_<estructura>_s5_ku_<soporte>` con el κ_θ de s5 y el k_u de tres soportes de la Tabla 2.1 de Deutsch (2002) [F30] (anillo, pilares apilados y pilares laterales), llevado a la geometría del NIST: κ_u ≈ 188, 659 y 1318. Son soportes de polisilicio distintos al anclaje del NIST, probablemente más blandos: sirven como cota.
 - **M2:** en la geometría del NIST (L/h ≈ 110) el cortante es despreciable (0.01% en E). Se acorta la viga, con el mismo b y h, hasta llegar al 5% de s3.
 - **M3:** se iguala a s3 por **sesgo en E en el voladizo** y por **diferencia de forma en la biempotrada**, porque en esta la frecuencia casi no reacciona a la conicidad.
 
@@ -165,6 +166,8 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 | m2_biempotrada | L = 42.2 µm (L/h = 15.4) | −5% | −9.2% | 2.6% | — |
 | m3_voladizo | α = 0.0415 | −5% | −0.3% | 1.5% | — |
 | m3_biempotrada | α = 0.0491 | −0.03% | −0.01% | 2.2% | — |
+| m1_voladizo_s5_ku_* | κ_θ = 22.8; κ_u = 188 / 659 / 1318 | −18.0 / −15.9 / −15.4% | −39.5 / −21.7 / −14.2% | 58.9 / 35.3 / 22.3% | — |
+| m1_biempotrada_s5_ku_* | κ_θ = 43.6; κ_u = 188 / 659 / 1318 | −56.8 / −32.0 / −24.1% | −59.8 / −44.2 / −32.2% | 67.3 / 51.6 / 39.9% | — |
 
 **Observaciones:**
 - En s1 y s2 la diferencia de forma (< 2%) queda por debajo del ruido (2%): un método que solo use formas casi no distingue esos niveles de M0.
@@ -172,6 +175,7 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 - **La rigidez del chip real corresponde a s5.** Ajustando E_real y k_θ con el solver M1 a las Tablas 5 y 6 de Marshall se obtiene k_θ ≈ 2.6×10⁻⁷ N·m/rad, es decir κ_θ ≈ 23 en L = 300 µm, prácticamente el κ_θ = 22.8 de s5 ([T54](../contexto/tareas/T54-rigidez-soporte-desde-brazo1.md)). Pero los mismos datos se explican igual de bien con un anclaje que se desplaza en lugar de girar, así que κ_u sigue sin fijarse.
 - En la biempotrada, **M1 y M2 dejan huellas de forma muy parecidas**. Un método L3 con resortes podría absorber el cortante como si fuera flexibilidad del anclaje.
 - El voladizo de M2 (L/h ≈ 5) está al límite de la teoría de vigas: es un caso de estrés más que un dispositivo típico.
+- Un soporte que se desplaza casi no cambia ω₁ del voladizo (lo único que mide el Brazo 1), pero transforma los modos altos: con κ_u ≈ 188 el modo 3 del voladizo es casi un movimiento del soporte. Medir varios modos o formas ayudaría a distinguir giro de desplazamiento.
 
 ### 4.6 Formato estándar de salida
 

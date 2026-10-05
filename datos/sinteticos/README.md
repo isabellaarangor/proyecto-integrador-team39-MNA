@@ -14,6 +14,7 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 | `configs/m0_voladizo.yaml`, `configs/m0_biempotrada.yaml` | M0 | Empotramiento ideal (control) |
 | `configs/m1_<estructura>_s1…s6.yaml` | M1 | 6 severidades calibradas (T13): sesgo en E de 1, 2.5, 5, 10, 15 y 25%. Las escribe `scripts/calibrar_severidad.py`; no editar a mano |
 
+| `configs/m1_<estructura>_s5_ku_<soporte>.yaml` | M1 | Sensibilidad al desplazamiento del soporte: κ_θ de s5 y κ_u de tres soportes de Deutsch (2002) (anillo, pilares apilados, pilares laterales). No forman parte del eje principal |
 | `configs/m2_<estructura>.yaml` | M2 | Timoshenko, una severidad: viga corta con el mismo sesgo en E que M1 s3 (5%). Voladizo L = 14.4 µm (L/h = 5.2), biempotrada L = 42.1 µm (L/h = 15.4) |
 | `configs/m3_<estructura>.yaml` | M3 | Conicidad h(ξ) = h̄·(1 + α·(ξ − ½)), una severidad igualada a M1 s3: por sesgo en E en el voladizo (α = 0.042) y por diferencia de forma en la biempotrada (α = 0.049) |
 

@@ -95,3 +95,24 @@ def test_alpha_para_forma_m3_biempotrada():
     s = severidad(VIGA, "biempotrada", alpha=alpha)
     assert s.diferencia_forma == pytest.approx(0.022, rel=1e-6)
     assert abs(s.sesgo_E) < 0.01  # en la biempotrada, la conicidad casi no mueve la frecuencia
+
+
+# --- Sensibilidad a κ_u (T54) -----------------------------------------------
+
+
+@pytest.mark.parametrize("estructura", ["voladizo", "biempotrada"])
+def test_configs_de_sensibilidad_a_kappa_u(estructura):
+    """Mismo κ_θ que s5 y κ_u finito; un soporte más blando aumenta el sesgo en E."""
+    from pinn_mems import cargar_config
+    from pinn_mems.nist.archivos import RAIZ_REPO
+
+    carpeta = RAIZ_REPO / "datos" / "sinteticos" / "configs"
+    s5 = cargar_config(carpeta / f"m1_{estructura}_s5.yaml")["soporte"]["kappa_theta"]
+    sesgos = {}
+    for sufijo in ("anillo", "pilares_apilados", "pilares_laterales"):
+        soporte = cargar_config(carpeta / f"m1_{estructura}_s5_ku_{sufijo}.yaml")["soporte"]
+        assert soporte["kappa_theta"] == s5
+        assert math.isfinite(soporte["kappa_u"])
+        sesgos[sufijo] = severidad(VIGA, estructura, Soporte(**soporte)).sesgo_E
+    # anillo (el más blando) < pilares apilados < pilares laterales < solo giro (−15 %)
+    assert sesgos["anillo"] < sesgos["pilares_apilados"] < sesgos["pilares_laterales"] < -0.15

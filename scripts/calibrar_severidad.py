@@ -6,6 +6,11 @@
 - M3: el α de la conicidad. En el voladizo, el mismo sesgo que M1 s3; en la
   biempotrada, cuya frecuencia casi no reacciona, la misma diferencia de forma
   que M1 s3.
+- Sensibilidad a κ_u: el eje principal usa κ_u = ∞. Para estudiar el efecto del
+  desplazamiento del soporte se agregan configs de M1 s5 (el nivel del chip real)
+  con el k_u de tres soportes de la Tabla 2.1 de Deutsch (2002) [F30], llevado
+  a la geometría del NIST. Son soportes de polisilicio distintos al anclaje del
+  NIST, probablemente más flexibles: sirven como cota de sensibilidad.
 
 Escribe `datos/sinteticos/configs/m{1,2,3}_<estructura>*.yaml` y la tabla
 `datos/sinteticos/calibracion.csv`.
@@ -22,6 +27,7 @@ import yaml
 
 from pinn_mems import Soporte, Viga
 from pinn_mems.eigensolver import Timoshenko
+from pinn_mems.soportes import k_u_desde_razon_de_deflexion
 from pinn_mems.severidad import (
     L_para_sesgo_m2,
     alpha_para_forma_m3,
@@ -39,12 +45,33 @@ TABLA = RAIZ / "datos" / "sinteticos" / "calibracion.csv"
 # el orden del ajuste exploratorio del NIST (12–13 µm).
 SESGOS_M1 = [-0.01, -0.025, -0.05, -0.10, -0.15, -0.25]
 NIVEL_REFERENCIA = 3  # M2 y M3 se igualan a M1 s3
-KAPPA_U = math.inf  # pendiente: fijar con los valores de Kobrinsky et al. (2000)
+KAPPA_U = math.inf  # eje principal: el soporte solo gira; κ_u se estudia como sensibilidad
+NIVEL_SENSIBILIDAD_KU = 5  # s5 equivale a la rigidez rotacional del chip del NIST (T54)
+TABLA_DEUTSCH = RAIZ / "datos" / "secundarios" / "deutsch2002_T2-1_soportes.csv"
+SOPORTES_DEUTSCH = {  # tipo en la Tabla 2.1 → sufijo de la config
+    "Conformal Ring": "anillo",
+    "Stacked Support Pillars": "pilares_apilados",
+    "Lateral Support Pillars": "pilares_laterales",
+}
 NU = 0.17  # Poisson del óxido de silicio
 
 PARAMS = {"E": 70.0e9, "L": 300.0e-6, "b": 28.0e-6, "h": 2.743e-6, "rho": 2200.0, "sigma0": 0.0}
 ESTRUCTURAS = ["voladizo", "biempotrada"]
 COLUMNAS_MODELO = ["kappa_theta", "kappa_u", "L", "alpha"]
+
+
+def kappa_u_de_deutsch(viga_nist: Viga) -> dict:
+    """κ_u en la geometría del NIST para cada soporte de la Tabla 2.1 de Deutsch."""
+    import pandas as pd
+
+    deutsch = Viga(E=160e9, L=608e-6, b=20e-6, h=1e-6, rho=2330.0, sigma0=15e6)
+    tabla = pd.read_csv(TABLA_DEUTSCH, comment="#").set_index("support_type")["beam_displacement_um"]
+    ideal = tabla["Ideal doubly clamped"]
+    resultado = {}
+    for tipo, sufijo in SOPORTES_DEUTSCH.items():
+        k_u = k_u_desde_razon_de_deflexion(deutsch, tabla[tipo] / ideal)
+        resultado[sufijo] = (k_u, Soporte.desde_rigideces(viga_nist, 1.0, k_u).kappa_u)
+    return resultado
 
 
 def escribir_config(nombre, generador, estructura, params, bloque, comentario):
@@ -90,6 +117,21 @@ def main() -> None:
                 f"M1, severidad s{i} de 6: sesgo en E = {objetivo:.1%}, ΔL = {sev.delta_L * 1e6:.2f} µm.",
             )
             filas.append(fila(nombre, "M1", estructura, f"s{i}", sev, kappa_theta=kappa, kappa_u=KAPPA_U))
+
+        # Sensibilidad a κ_u sobre M1 s5
+        kappa_s5 = next(f["kappa_theta"] for f in filas if f["nombre"] == f"m1_{estructura}_s{NIVEL_SENSIBILIDAD_KU}")
+        for sufijo, (k_u, kappa_u) in kappa_u_de_deutsch(viga).items():
+            kappa_u = round(kappa_u, 2)
+            sev = severidad(viga, estructura, Soporte(kappa_theta=kappa_s5, kappa_u=kappa_u))
+            nombre = f"m1_{estructura}_s{NIVEL_SENSIBILIDAD_KU}_ku_{sufijo}"
+            escribir_config(
+                nombre, "M1", estructura, PARAMS,
+                {"soporte": {"kappa_theta": kappa_s5, "kappa_u": kappa_u}},
+                f"M1 s{NIVEL_SENSIBILIDAD_KU} + sensibilidad a κ_u: soporte '{sufijo}' de Deutsch (2002), "
+                f"k_u = {k_u:.1f} N/m → κ_u = {kappa_u}; sesgo en E = {sev.sesgo_E:.1%}.",
+            )
+            filas.append(fila(nombre, "M1", estructura, f"s{NIVEL_SENSIBILIDAD_KU}_ku_{sufijo}", sev,
+                              kappa_theta=kappa_s5, kappa_u=kappa_u))
 
         # M2: viga corta con el sesgo de M1 s3
         objetivo = SESGOS_M1[NIVEL_REFERENCIA - 1]

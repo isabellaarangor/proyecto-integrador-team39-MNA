@@ -1,0 +1,23 @@
+# M1 s5 + sensibilidad a κ_u: soporte 'anillo' de Deutsch (2002), k_u = 23.5 N/m → κ_u = 188.23; sesgo en E = -18.0%.
+# Generado por scripts/calibrar_severidad.py; no editar a mano.
+nombre: m1_voladizo_s5_ku_anillo
+generador: M1
+estructura: voladizo
+params:
+  E: 70000000000.0
+  L: 0.0003
+  b: 2.8e-05
+  h: 2.743e-06
+  rho: 2200.0
+  sigma0: 0.0
+soporte:
+  kappa_theta: 22.7713
+  kappa_u: 188.23
+muestreo:
+  n_puntos: 100
+  n_modos: 3
+ruido:
+  nivel: 0.02
+  semilla: 0
+malla:
+  n_elem: 200

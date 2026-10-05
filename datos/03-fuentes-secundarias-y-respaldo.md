@@ -74,6 +74,8 @@ Este archivo reúne esas fuentes de apoyo: qué sacar de cada una, cómo procesa
 
 **Listo cuando:** el CSV está en el repo y el rango de k de M1 está justificado con estos valores.
 
+**Avance (2026-10-04):** el artículo no se ha conseguido. Se leyó la tesis de E. R. Deutsch (MIT, 2002) [F30], coautor del artículo: no da k_θ ni k_u, pero su Tabla 2.1 compara la deflexión de una viga con cinco tipos de soporte. De ahí sale k_u = 0.57 a 165 N/m para soportes de polisilicio (`datos/secundarios/deutsch2002_T2-1_soportes.csv` y `src/pinn_mems/soportes.py`; detalle en [T53](../contexto/tareas/T53-rigidez-soporte-fuentes.md)).
+
 ---
 
 ### 3.3 Literatura de M-TEST y Gupta/Senturia — nivel de severidad objetivo

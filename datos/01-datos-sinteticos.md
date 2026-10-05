@@ -1,6 +1,6 @@
 # Datos sintéticos (generadores M0–M3)
 
-**Actualizado:** 2026-10-04 · **Estado:** implementado (solver, G1, M0–M3, calibración, formato, adimensionalización). Falta la matriz experimental completa; ver [§7](#7-pendientes). · **Tareas:** [T09](../contexto/tareas/T09-eigensolver-de-referencia.md), [T10](../contexto/tareas/T10-validacion-eigensolver-g1.md), [T12](../contexto/tareas/T12-generadores-m0-m1.md), [T13](../contexto/tareas/T13-calibracion-severidad.md), [T17](../contexto/tareas/T17-adimensionalizacion.md), [T37](../contexto/tareas/T37-generalizacion-m2-m3.md) · **Plan:** [§4.4](../contexto/plan-tesis-pinn-mems.md#44-la-física), [§4.5](../contexto/plan-tesis-pinn-mems.md#45-escalera-de-mala-especificación-generación-de-datos), [§4.8](../contexto/plan-tesis-pinn-mems.md#48-matriz-experimental), [Apéndice A](../contexto/plan-tesis-pinn-mems.md#apéndice-a-ecuaciones-de-gobierno)
+**Actualizado:** 2026-10-04 · **Estado:** implementado (solver, G1, M0–M3, calibración, sensibilidad a κ_u, formato, adimensionalización y matriz experimental completa). Pendientes menores en [§7](#7-pendientes). · **Tareas:** [T09](../contexto/tareas/T09-eigensolver-de-referencia.md), [T10](../contexto/tareas/T10-validacion-eigensolver-g1.md), [T12](../contexto/tareas/T12-generadores-m0-m1.md), [T13](../contexto/tareas/T13-calibracion-severidad.md), [T17](../contexto/tareas/T17-adimensionalizacion.md), [T37](../contexto/tareas/T37-generalizacion-m2-m3.md) · **Plan:** [§4.4](../contexto/plan-tesis-pinn-mems.md#44-la-física), [§4.5](../contexto/plan-tesis-pinn-mems.md#45-escalera-de-mala-especificación-generación-de-datos), [§4.8](../contexto/plan-tesis-pinn-mems.md#48-matriz-experimental), [Apéndice A](../contexto/plan-tesis-pinn-mems.md#apéndice-a-ecuaciones-de-gobierno)
 
 Archivos relacionados: [02 — Datos reales NIST](02-datos-reales-nist-sp260-177.md) · [03 — Fuentes secundarias](03-fuentes-secundarias-y-respaldo.md) · Explicación para personas externas: [`notebooks/EDA_Datos_Sinteticos.ipynb`](../notebooks/EDA_Datos_Sinteticos.ipynb)
 
@@ -89,11 +89,13 @@ src/pinn_mems/
 └── adimensional.py    ← Escalas, escalar(), desescalar() para la PINN
 scripts/
 ├── calibrar_severidad.py   ← calcula los niveles y escribe configs + calibracion.csv
-└── generar_sinteticos.py   ← genera los .npz a partir de las configs
+├── generar_sinteticos.py   ← genera los .npz a partir de las configs
+└── generar_matriz.py       ← genera las 510 corridas de la matriz experimental
 tests/                      ← pruebas (pytest): sintéticos, brazos 1 y 2, y ejecución de los notebooks
 datos/sinteticos/
 ├── configs/                ← 18 configs YAML (una por conjunto)
 ├── calibracion.csv         ← severidad de cada config
+├── matriz.yaml             ← definición de la matriz experimental
 └── generados/              ← .npz producidos (ignorados por git)
 notebooks/EDA_Datos_Sinteticos.ipynb   ← explicación completa, corre de principio a fin
 ```
@@ -137,7 +139,8 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 | M2 | `timoshenko: {nu, kappa_s}` | ν = 0.17 (óxido de silicio); `kappa_s: null` usa el coeficiente de Cowper para sección rectangular, 10(1+ν)/(12+11ν) ≈ 0.844 |
 | M3 | `conicidad: {alpha}` | α del perfil centrado; `params.h` es el espesor medio h̄ |
 
-- **Ruido:** gaussiano y **relativo a la amplitud pico de cada modo** (2% por defecto). No es relativo punto a punto, porque eso dejaría sin ruido la zona del soporte. Las frecuencias se guardan sin ruido.
+- **Ruido:** gaussiano. En las formas es **relativo a la amplitud pico de cada modo** (2%); no es relativo punto a punto, porque eso dejaría sin ruido la zona del soporte. En las frecuencias es relativo a cada frecuencia (`nivel_omega` = 0.03%, la dispersión de las tres mediciones de la Tabla 3 de Marshall). `omega_limpia` guarda las frecuencias sin ruido.
+- **Tensión residual:** σ₀ = +10 MPa en la viga biempotrada y 0 en los voladizos, cuyo extremo libre no conserva tensión axial (decisión del 2026-10-04).
 - **Semilla:** la misma config y semilla producen exactamente los mismos datos.
 - **Crimen inverso:** los generadores usan 200 elementos; los métodos de inversión deben usar una discretización distinta (más gruesa).
 
@@ -145,7 +148,7 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 
 **Métricas** (`pinn_mems.severidad`), siempre contra M0 con la misma viga:
 
-- `sesgo_E = (ω₁ᴳ / ω₁ᴹ⁰)² − 1`: el error en E de quien invierte ω₁ con el modelo ideal. Es el eje de calibración.
+- `sesgo_E`: el error en E de quien invierte ω₁ con el modelo ideal (misma geometría, densidad y σ₀). Sin tensión vale (ω₁ᴳ / ω₁ᴹ⁰)² − 1; con tensión (biempotrada) la frecuencia no es ∝ √E y se invierte el modelo numéricamente (`severidad.E_aparente`). Es el eje de calibración.
 - `corrimiento_omega1`, `corrimiento_omega3`: corrimiento relativo de ω₁ y ω₃.
 - `diferencia_forma`: diferencia L2 relativa de las formas (modos 1–3).
 - `delta_L`: alargamiento de una viga ideal con el mismo ω₁.
@@ -161,13 +164,13 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 | Config | Parámetro | Sesgo en E | Δω₃ | Dif. de forma | ΔL equivalente |
 |---|---|---|---|---|---|
 | m1_voladizo_s1 … s6 | κ_θ = 396.1, 156.1, 76.1, 36.1, 22.8, 12.1 | −1 … −25% | −0.5 … −9.1% | 0.6 … 11.8% | 0.75 … 22.4 µm |
-| m1_biempotrada_s1 … s6 | κ_θ = 790.3, 310.3, 150.3, 70.3, 43.6, 22.3 | −1 … −25% | −0.5 … −10.9% | 0.5 … 9.9% | 0.75 … 22.4 µm |
+| m1_biempotrada_s1 … s6 (σ₀ = +10 MPa) | κ_θ = 985.3, 387.6, 188.3, 88.7, 55.5, 28.9 | −1 … −25% | −0.4 … −8.5% | 0.4 … 8.4% | — (con tensión ΔL no aplica) |
 | m2_voladizo | L = 14.4 µm (L/h = 5.2) | −5% | −26.1% | 12.5% | — |
 | m2_biempotrada | L = 42.2 µm (L/h = 15.4) | −5% | −9.2% | 2.6% | — |
 | m3_voladizo | α = 0.0415 | −5% | −0.3% | 1.5% | — |
-| m3_biempotrada | α = 0.0491 | −0.03% | −0.01% | 2.2% | — |
+| m3_biempotrada | α = 0.0440 | −0.01% | −0.01% | 1.8% | — |
 | m1_voladizo_s5_ku_* | κ_θ = 22.8; κ_u = 188 / 659 / 1318 | −18.0 / −15.9 / −15.4% | −39.5 / −21.7 / −14.2% | 58.9 / 35.3 / 22.3% | — |
-| m1_biempotrada_s5_ku_* | κ_θ = 43.6; κ_u = 188 / 659 / 1318 | −56.8 / −32.0 / −24.1% | −59.8 / −44.2 / −32.2% | 67.3 / 51.6 / 39.9% | — |
+| m1_biempotrada_s5_ku_* | κ_θ = 55.5; κ_u = 188 / 659 / 1318 | −94.4 / −53.8 / −36.9% | −56.5 / −43.6 / −32.5% | 70.3 / 54.6 / 42.8% | — |
 
 **Observaciones:**
 - En s1 y s2 la diferencia de forma (< 2%) queda por debajo del ruido (2%): un método que solo use formas casi no distingue esos niveles de M0.
@@ -186,7 +189,8 @@ Un archivo `.npz` por conjunto, con nombre `m<generador>_<estructura>[_s<nivel>]
 | `xi` | (N,) | Puntos de muestreo, de 0 a 1 |
 | `w` | (3, N) | Formas modales con ruido (entrada de los métodos) |
 | `w_limpia` | (3, N) | Formas sin ruido (solo análisis) |
-| `omega` | (3,) | ω₁–ω₃ en rad/s |
+| `omega` | (3,) | ω₁–ω₃ en rad/s, con ruido (0.03%) |
+| `omega_limpia` | (3,) | ω₁–ω₃ sin ruido (solo análisis) |
 | `nombre`, `estructura`, `generador` | texto | Identificación |
 | `params` | JSON | E, L, b, h, ρ, σ₀ y los parámetros del generador |
 | `ruido` | JSON | Nivel y semilla |
@@ -211,6 +215,23 @@ Con eso la forma mixta de la PINN queda sin constantes físicas, `M̂ − W″ =
 - Para la PINN conviene **θ = E/E_ref ≈ 1**; λ, n y κ escalan como 1/θ.
 - El solver usa internamente los mismos grupos; hay pruebas de ida y vuelta y de consistencia con él.
 
+### 4.8 Matriz experimental
+
+Definida en `datos/sinteticos/matriz.yaml` (plan §4.8, decisiones del 2026-10-04 en [`contexto/bitacora-decisiones.md`](../contexto/bitacora-decisiones.md)) y generada con `src/pinn_mems/matriz.py`:
+
+| Eje | Valores |
+|---|---|
+| Caso | M0, M1 s1–s6, M2, M3 (9) |
+| N (puntos por estructura) | 5, 15, 40 |
+| k (estructuras) | 1: voladizo de 300 µm · 3: voladizo de 300 µm + biempotrada de 300 µm (σ₀ = +10 MPa) + voladizo de 200 µm |
+| Semillas | 0 … 9 |
+| Modos | se guardan 3; el método usa 1 o 3 |
+
+- **Mismo anclaje en el grupo de 3:** el k_θ físico del voladizo de 300 µm de cada caso. Como la biempotrada tiene la misma L, b, h y E, su κ_θ es el mismo; en el voladizo de 200 µm, κ_θ escala con L. En M3 las tres estructuras llevan la misma conicidad α. Por eso, en los grupos, el error en E de la biempotrada y del voladizo corto no es el del nivel nominal: sale de la física, como en un chip real.
+- **M2 solo con k = 1**, porque sus vigas cortas no forman un grupo realista.
+- **Semillas:** cada estructura de una corrida usa una semilla distinta (1000·semilla + índice), para que el ruido no se repita.
+- **Total:** 510 corridas y 990 archivos `.npz` (≈ 5 MB) en `datos/sinteticos/generados/matriz/<id>/<rol>.npz`, con `manifiesto.csv` (id, caso, N, k, semilla, rol, archivo). Se regeneran en ≈ 40 s y no se versionan.
+
 ---
 
 ## 5. Cómo usarlo
@@ -220,6 +241,7 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/pytest                                   # 85 pruebas
 .venv/bin/python scripts/calibrar_severidad.py     # recalcula niveles, reescribe configs m1_–m3_ y calibracion.csv
 .venv/bin/python scripts/generar_sinteticos.py     # escribe datos/sinteticos/generados/*.npz
+.venv/bin/python scripts/generar_matriz.py         # las 510 corridas de la matriz experimental
 ```
 
 Desde Python:
@@ -245,20 +267,16 @@ Las configs `m1_*`, `m2_*` y `m3_*` las escribe `calibrar_severidad.py`; no se e
 - [x] Hay un formato estándar de salida y un script que regenera cualquier conjunto a partir de su config y semilla
 - [x] Las funciones de adimensionalización tienen pruebas
 - [x] M2 y M3 están implementados con una severidad cada uno
-- [ ] La matriz experimental completa está generada (ver §7)
+- [x] La matriz experimental completa está generada (`scripts/generar_matriz.py`, ver §4.8)
 
 ---
 
 ## 7. Pendientes
 
-1. **Matriz experimental** ([plan §4.8](../contexto/plan-tesis-pinn-mems.md#48-matriz-experimental)): 9 casos × N ∈ {5, 15, 40} × k ∈ {1, 3} estructuras × 10 semillas. Hoy cada config produce un conjunto con semilla 0 y N = 100. Decisiones abiertas:
-   - longitud del segundo voladizo para k = 3 (propuesta: 300 + 200 µm, con el mismo k_θ **físico**, de modo que el corto sienta más el anclaje);
-   - valor de σ₀ ≠ 0 (todas las configs usan σ₀ = 0, y el plan estima E y σ₀);
-   - si las frecuencias también llevan ruido;
-   - cómo se forma el grupo de 3 estructuras en M2, que usa vigas cortas.
-2. **κ_u** con los valores de Kobrinsky et al. (2000), y recalibrar. En la biempotrada importa: con κ_u = 10³ el sesgo de s3 pasa de 5% a 19%.
-3. **Verificar la cifra de 5%** de M-TEST contra la fuente original.
-4. **Rango de ε_r** con las tablas RS1/RS9 del NIST, para no elegir un σ₀ que pandee la biempotrada (en L = 300 µm pandea con σ₀ ≈ −19 MPa).
+1. **Kobrinsky et al. (2000):** sigue sin conseguirse ([T53](../contexto/tareas/T53-rigidez-soporte-fuentes.md)). κ_u se estudia como sensibilidad con valores de la tesis de Deutsch.
+2. **Verificar la cifra de 5%** de M-TEST contra la fuente original (nivel s3).
+3. **Rango de ε_r** con las tablas RS1/RS9 del NIST, para contrastar el σ₀ = +10 MPa elegido (la biempotrada de 300 µm pandea con σ₀ ≈ −19 MPa).
+4. **CI** que corra las pruebas automáticamente ([T10](../contexto/tareas/T10-validacion-eigensolver-g1.md)).
 
 ---
 

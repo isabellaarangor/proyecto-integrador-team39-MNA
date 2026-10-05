@@ -116,3 +116,28 @@ def test_configs_de_sensibilidad_a_kappa_u(estructura):
         sesgos[sufijo] = severidad(VIGA, estructura, Soporte(**soporte)).sesgo_E
     # anillo (el más blando) < pilares apilados < pilares laterales < solo giro (−15 %)
     assert sesgos["anillo"] < sesgos["pilares_apilados"] < sesgos["pilares_laterales"] < -0.15
+
+
+# --- Error en E con tensión axial ---------------------------------------------
+
+
+def test_E_aparente_sin_tension_es_la_razon_de_frecuencias_al_cuadrado():
+    from pinn_mems.severidad import E_aparente
+
+    w0 = resolver_modos(VIGA, "voladizo").omega[0]
+    assert E_aparente(VIGA, "voladizo", 0.9 * w0) == pytest.approx(VIGA.E * 0.81, rel=1e-12)
+
+
+def test_E_aparente_con_tension_reproduce_la_frecuencia():
+    """Con σ₀ ≠ 0 la frecuencia no es ∝ √E: el E aparente se obtiene invirtiendo
+    el modelo ideal y debe devolver exactamente la frecuencia observada."""
+    from pinn_mems.severidad import E_aparente
+
+    tensa = Viga(**{**VIGA.__dict__, "sigma0": 10e6})
+    w_obs = resolver_modos(tensa, "biempotrada", Soporte(kappa_theta=40.0)).omega[0]
+    E_ap = E_aparente(tensa, "biempotrada", w_obs)
+    w_ideal = resolver_modos(Viga(**{**tensa.__dict__, "E": E_ap}), "biempotrada").omega[0]
+    assert w_ideal == pytest.approx(w_obs, rel=1e-9)
+    # la tensión no escala con E, así que el error en E supera al de (ω/ω₀)²
+    w0 = resolver_modos(tensa, "biempotrada").omega[0]
+    assert E_ap / tensa.E - 1 < (w_obs / w0) ** 2 - 1

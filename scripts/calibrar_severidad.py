@@ -55,7 +55,11 @@ SOPORTES_DEUTSCH = {  # tipo en la Tabla 2.1 → sufijo de la config
 }
 NU = 0.17  # Poisson del óxido de silicio
 
-PARAMS = {"E": 70.0e9, "L": 300.0e-6, "b": 28.0e-6, "h": 2.743e-6, "rho": 2200.0, "sigma0": 0.0}
+PARAMS_BASE = {"E": 70.0e9, "L": 300.0e-6, "b": 28.0e-6, "h": 2.743e-6, "rho": 2200.0}
+# σ₀ = +10 MPa en la viga biempotrada; el voladizo no conserva tensión axial
+# (extremo libre), así que σ₀ = 0. Decisión del 2026-10-04 (contexto/bitacora-decisiones.md).
+SIGMA0 = {"voladizo": 0.0, "biempotrada": 10.0e6}
+RUIDO = {"nivel": 0.02, "nivel_omega": 0.0003, "semilla": 0}  # 2 % en formas, 0.03 % en ω
 ESTRUCTURAS = ["voladizo", "biempotrada"]
 COLUMNAS_MODELO = ["kappa_theta", "kappa_u", "L", "alpha"]
 
@@ -79,7 +83,7 @@ def escribir_config(nombre, generador, estructura, params, bloque, comentario):
     config |= bloque
     config |= {
         "muestreo": {"n_puntos": 100, "n_modos": 3},
-        "ruido": {"nivel": 0.02, "semilla": 0},
+        "ruido": dict(RUIDO),
         "malla": {"n_elem": 200},
     }
     encabezado = f"# {comentario}\n# Generado por scripts/calibrar_severidad.py; no editar a mano.\n"
@@ -100,9 +104,15 @@ def fila(nombre, generador, estructura, nivel, sev, **modelo):
 
 
 def main() -> None:
-    viga = Viga(**PARAMS)
     filas = []
     for estructura in ESTRUCTURAS:
+        PARAMS = {**PARAMS_BASE, "sigma0": SIGMA0[estructura]}
+        viga = Viga(**PARAMS)
+        escribir_config(
+            f"m0_{estructura}", "M0", estructura, PARAMS, {},
+            f"M0: empotramiento ideal (control). Geometría de RM 8096, NIST SP 260-177; σ₀ = {SIGMA0[estructura] / 1e6:g} MPa.",
+        )
+        filas.append(fila(f"m0_{estructura}", "M0", estructura, "control", severidad(viga, estructura)))
         # M1: 6 severidades
         forma_referencia = None
         for i, objetivo in enumerate(SESGOS_M1, start=1):

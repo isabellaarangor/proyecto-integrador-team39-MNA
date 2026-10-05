@@ -1,4 +1,4 @@
-# M1 s5 + sensibilidad a κ_u: soporte 'pilares_laterales' de Deutsch (2002), k_u = 164.5 N/m → κ_u = 1317.59; sesgo en E = -24.1%.
+# M1 s5 + sensibilidad a κ_u: soporte 'pilares_laterales' de Deutsch (2002), k_u = 164.5 N/m → κ_u = 1317.59; sesgo en E = -36.9%.
 # Generado por scripts/calibrar_severidad.py; no editar a mano.
 nombre: m1_biempotrada_s5_ku_pilares_laterales
 generador: M1
@@ -9,15 +9,16 @@ params:
   b: 2.8e-05
   h: 2.743e-06
   rho: 2200.0
-  sigma0: 0.0
+  sigma0: 10000000.0
 soporte:
-  kappa_theta: 43.6318
+  kappa_theta: 55.4534
   kappa_u: 1317.59
 muestreo:
   n_puntos: 100
   n_modos: 3
 ruido:
   nivel: 0.02
+  nivel_omega: 0.0003
   semilla: 0
 malla:
   n_elem: 200

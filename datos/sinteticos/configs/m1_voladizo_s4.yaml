@@ -18,6 +18,7 @@ muestreo:
   n_modos: 3
 ruido:
   nivel: 0.02
+  nivel_omega: 0.0003
   semilla: 0
 malla:
   n_elem: 200

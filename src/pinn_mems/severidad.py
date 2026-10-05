@@ -5,8 +5,10 @@ inversión (M0: Euler–Bernoulli, espesor uniforme, empotramiento ideal). Se
 reporta con:
 
 - `sesgo_E`: el error relativo en E que comete quien invierte ω₁ con el modelo
-  ideal. Como ω² ∝ E, vale (ω₁ᴳ / ω₁ᴹ⁰)² − 1. Es el eje con el que se calibra
-  M1, M2 y el M3 del voladizo.
+  ideal (misma geometría, densidad y σ₀). Sin carga axial ω² ∝ E y vale
+  (ω₁ᴳ / ω₁ᴹ⁰)² − 1; con tensión, parte de la rigidez no depende de E y se
+  invierte el modelo numéricamente. Es el eje con el que se calibra M1, M2 y el
+  M3 del voladizo.
 - `corrimiento_omega1`, `corrimiento_omega3`: ωᵢᴳ / ωᵢᴹ⁰ − 1. M2 afecta sobre
   todo a los modos altos.
 - `diferencia_forma`: diferencia L2 relativa entre las formas modales (modos
@@ -63,7 +65,7 @@ def severidad(
     razon = mg.omega / m0.omega
     w0, wg = m0.forma(_XI), mg.forma(_XI)
     return Severidad(
-        sesgo_E=float(razon[0] ** 2 - 1),
+        sesgo_E=E_aparente(viga, estructura, mg.omega[0]) / viga.E - 1,
         corrimiento_omega1=float(razon[0] - 1),
         corrimiento_omega3=float(razon[-1] - 1),
         diferencia_forma=_l2_relativa(wg, w0),
@@ -79,10 +81,24 @@ def _raiz(f: Callable[[float], float], a: float, b: float, que: str) -> float:
     return brentq(f, a, b, xtol=1e-10)
 
 
-def _sesgo_E(viga: Viga, estructura: str, **modelo) -> float:
+def E_aparente(viga: Viga, estructura: str, omega1: float) -> float:
+    """El E con el que el modelo ideal (empotramiento perfecto, misma geometría,
+    densidad y σ₀) da la frecuencia `omega1`."""
     w0 = resolver_modos(viga, estructura, n_modos=1).omega[0]
+    if viga.sigma0 == 0:
+        return float(viga.E * (omega1 / w0) ** 2)  # ω² ∝ E
+
+    def f(log_E: float) -> float:
+        v = Viga(**{**viga.__dict__, "E": 10.0**log_E})
+        return resolver_modos(v, estructura, n_modos=1).omega[0] - omega1
+
+    log_E = math.log10(viga.E)
+    return float(10.0 ** brentq(f, log_E - 1.5, log_E + 1.5, xtol=1e-12))
+
+
+def _sesgo_E(viga: Viga, estructura: str, **modelo) -> float:
     wg = resolver_modos(viga, estructura, n_modos=1, **modelo).omega[0]
-    return (wg / w0) ** 2 - 1
+    return E_aparente(viga, estructura, wg) / viga.E - 1
 
 
 def _validar_sesgo(sesgo_objetivo: float) -> None:

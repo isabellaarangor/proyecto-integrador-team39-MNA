@@ -1,8 +1,21 @@
-# M0: empotramiento ideal (control). Geometría de RM 8096, NIST SP 260-177.
+# M0: empotramiento ideal (control). Geometría de RM 8096, NIST SP 260-177; σ₀ = 0 MPa.
+# Generado por scripts/calibrar_severidad.py; no editar a mano.
 nombre: m0_voladizo
 generador: M0
 estructura: voladizo
-params: {E: 70.0e+9, L: 300.0e-6, b: 28.0e-6, h: 2.743e-6, rho: 2200.0, sigma0: 0.0}
-muestreo: {n_puntos: 100, n_modos: 3}
-ruido: {nivel: 0.02, semilla: 0}
-malla: {n_elem: 200}
+params:
+  E: 70000000000.0
+  L: 0.0003
+  b: 2.8e-05
+  h: 2.743e-06
+  rho: 2200.0
+  sigma0: 0.0
+muestreo:
+  n_puntos: 100
+  n_modos: 3
+ruido:
+  nivel: 0.02
+  nivel_omega: 0.0003
+  semilla: 0
+malla:
+  n_elem: 200

@@ -72,7 +72,7 @@ def test_sin_ruido_w_igual_a_w_limpia():
 def test_guardar_y_cargar_ida_y_vuelta(tmp_path):
     original = generar(config("M1", kappa_theta=50.0, nivel=0.02))
     copia = Conjunto.cargar(original.guardar(tmp_path / "c.npz"))
-    for campo in ("xi", "w", "w_limpia", "omega"):
+    for campo in ("xi", "w", "w_limpia", "omega", "omega_limpia"):
         assert np.array_equal(getattr(copia, campo), getattr(original, campo))
     for campo in ("nombre", "estructura", "generador", "params", "ruido", "version", "config"):
         assert getattr(copia, campo) == getattr(original, campo)
@@ -107,3 +107,15 @@ def test_configs_del_repo_generan(ruta):
     c = generar(cargar_config(ruta))
     assert c.w.shape == (c.omega.size, c.xi.size)
     assert np.all(c.omega > 0)
+
+
+def test_ruido_en_frecuencias_relativo_y_reproducible():
+    """0.03 % relativo en ω; no cambia el ruido de las formas."""
+    con = {**config(nivel=0.02, semilla=5), "ruido": {"nivel": 0.02, "nivel_omega": 0.0003, "semilla": 5}}
+    a, b = generar(con), generar(con)
+    sin = generar(config(nivel=0.02, semilla=5))
+    assert np.array_equal(a.omega, b.omega)
+    assert np.array_equal(a.w, sin.w)
+    assert np.array_equal(a.omega_limpia, sin.omega)
+    relativo = a.omega / a.omega_limpia - 1
+    assert np.all(np.abs(relativo) < 5 * 0.0003) and np.any(relativo != 0)

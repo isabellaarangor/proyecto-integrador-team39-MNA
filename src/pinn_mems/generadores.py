@@ -11,12 +11,12 @@ idéntica a partir de ella y su semilla. Ejemplo de config:
     timoshenko: {nu: 0.17, kappa_s: null}         # solo M2; null = Cowper
     conicidad: {alpha: 0.1}                       # solo M3, h(ξ) = h̄·(1 + α·(ξ − ½))
     muestreo: {n_puntos: 100, n_modos: 3}
-    ruido: {nivel: 0.02, semilla: 0}
+    ruido: {nivel: 0.02, nivel_omega: 0.0003, semilla: 0}
     malla: {n_elem: 200}
 
-El ruido es gaussiano y relativo a la amplitud pico de cada modo (las formas
-modales tienen amplitud arbitraria, así que un ruido absoluto no tendría
-sentido). Las frecuencias se guardan sin ruido.
+El ruido es gaussiano. En las formas es relativo a la amplitud pico de cada
+modo (tienen amplitud arbitraria, así que un ruido absoluto no tendría sentido);
+en las frecuencias es relativo a cada frecuencia (`nivel_omega`, 0 por defecto).
 """
 
 from __future__ import annotations
@@ -46,13 +46,14 @@ class Conjunto:
     xi: np.ndarray  # (n_puntos,) puntos de muestreo en [0, 1]
     w: np.ndarray  # (n_modos, n_puntos) formas modales con ruido
     w_limpia: np.ndarray  # (n_modos, n_puntos) formas modales sin ruido
-    omega: np.ndarray  # (n_modos,) [rad/s]
+    omega: np.ndarray  # (n_modos,) [rad/s], con ruido si nivel_omega > 0
     estructura: str
     generador: str
     params: dict  # material, geometría y soporte
     ruido: dict  # nivel y semilla
     version: str = "desconocida"  # commit de git del generador
     config: dict = field(default_factory=dict)
+    omega_limpia: np.ndarray | None = None  # (n_modos,) sin ruido; None = igual a omega
 
     def guardar(self, ruta: str | Path) -> Path:
         ruta = Path(ruta)
@@ -63,6 +64,7 @@ class Conjunto:
             w=self.w,
             w_limpia=self.w_limpia,
             omega=self.omega,
+            omega_limpia=self.omega if self.omega_limpia is None else self.omega_limpia,
             nombre=self.nombre,
             estructura=self.estructura,
             generador=self.generador,
@@ -82,6 +84,7 @@ class Conjunto:
                 w=d["w"],
                 w_limpia=d["w_limpia"],
                 omega=d["omega"],
+                omega_limpia=d["omega_limpia"] if "omega_limpia" in d.files else d["omega"],
                 estructura=str(d["estructura"]),
                 generador=str(d["generador"]),
                 params=json.loads(str(d["params"])),
@@ -155,6 +158,7 @@ def generar(config: dict) -> Conjunto:
     n_elem = int((config.get("malla") or {}).get("n_elem", N_ELEM_GENERADOR))
     ruido = config.get("ruido") or {}
     nivel = _como_float(ruido.get("nivel", 0.0))
+    nivel_omega = _como_float(ruido.get("nivel_omega", 0.0))
     semilla = int(ruido.get("semilla", 0))
 
     modos = resolver_modos(viga, estructura, n_modos=n_modos, n_elem=n_elem, **modelo)
@@ -164,6 +168,8 @@ def generar(config: dict) -> Conjunto:
     rng = np.random.default_rng(semilla)
     amplitud = np.abs(w_limpia).max(axis=1, keepdims=True)
     w = w_limpia + nivel * amplitud * rng.standard_normal(w_limpia.shape)
+    # Se sortea después de las formas para no cambiar el ruido de w
+    omega = modos.omega * (1 + nivel_omega * rng.standard_normal(modos.omega.shape))
 
     params = {k: _como_float(v) for k, v in config["params"].items()} | params_modelo
 
@@ -172,11 +178,12 @@ def generar(config: dict) -> Conjunto:
         xi=xi,
         w=w,
         w_limpia=w_limpia,
-        omega=modos.omega,
+        omega=omega,
+        omega_limpia=modos.omega,
         estructura=estructura,
         generador=generador,
         params=params,
-        ruido={"nivel": nivel, "semilla": semilla},
+        ruido={"nivel": nivel, "nivel_omega": nivel_omega, "semilla": semilla},
         version=_version_git(),
         config=config,
     )

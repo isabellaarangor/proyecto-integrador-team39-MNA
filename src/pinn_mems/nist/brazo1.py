@@ -337,4 +337,47 @@ def fit_anchoring_curve_with_chip(df: pd.DataFrame, initial_guess=(75.0, 12.0)) 
         "delta_L_um": result.x[1], "delta_L_ci95": (result.x[1] - t_crit * se[1], result.x[1] + t_crit * se[1]),
         "chip_factors": dict(zip(chips, factores(result.x))),
         "residual_sd_GPa": float(np.sqrt(s2)), "dof": dof,
+        "residuals": df.assign(E_pred_GPa=E - result.fun, residual_GPa=result.fun),
+    }
+
+
+def diagnose_chip_fit(df: pd.DataFrame) -> dict:
+    """Diagnóstico de residuos del ajuste con factor por chip (24 puntos de la Fig. 6).
+
+    Devuelve los residuos y una tabla de pruebas: normalidad (Shapiro–Wilk),
+    igualdad de varianzas entre longitudes (Levene), falta de ajuste contra la
+    media de cada combinación chip × longitud (error puro de los participantes
+    que comparten chip) y estabilidad de ΔL al quitar un chip o un participante.
+    """
+    from scipy import stats
+
+    fit = fit_anchoring_curve_with_chip(df)
+    res = fit["residuals"]
+    r = res["residual_GPa"]
+    longitudes = sorted(res["L_um"].unique())
+
+    celda = res.groupby(["chip", "L_um"])["E_GPa"].transform("mean")
+    sse, spe = float(np.sum(r**2)), float(np.sum((res["E_GPa"] - celda) ** 2))
+    gl_pe = len(res) - res.groupby(["chip", "L_um"]).ngroups
+    gl_lof = fit["dof"] - gl_pe
+    F = ((sse - spe) / gl_lof) / (spe / gl_pe)
+
+    sin_chip = [fit_anchoring_curve_with_chip(df[df["chip"] != c])["delta_L_um"] for c in sorted(df["chip"].unique())]
+    sin_part = [fit_anchoring_curve_with_chip(df[df["participant"] != p])["delta_L_um"]
+                for p in sorted(df["participant"].unique())]
+    delta_L = sin_chip + sin_part
+
+    pruebas = pd.DataFrame([
+        {"prueba": "Normalidad (Shapiro–Wilk)", "estadístico": stats.shapiro(r).statistic,
+         "p": stats.shapiro(r).pvalue},
+        {"prueba": "Igual varianza por longitud (Levene)",
+         "estadístico": stats.levene(*[r[res["L_um"] == L] for L in longitudes]).statistic,
+         "p": stats.levene(*[r[res["L_um"] == L] for L in longitudes]).pvalue},
+        {"prueba": f"Falta de ajuste (F con {gl_lof} y {gl_pe} gl)", "estadístico": F,
+         "p": stats.f.sf(F, gl_lof, gl_pe)},
+    ]).set_index("prueba")
+    return {
+        "fit": fit, "residuals": res, "tests": pruebas,
+        "by_length": r.groupby(res["L_um"]).agg(media="mean", desviacion="std"),
+        "delta_L_leave_one_out": (min(delta_L), max(delta_L)),
     }

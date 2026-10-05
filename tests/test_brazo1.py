@@ -252,3 +252,18 @@ def test_el_efecto_de_chip_acota_mucho_mejor_delta_L():
     assert ancho(con_chip["delta_L_ci95"]) < 0.3 * ancho(promedios["delta_L_ci95"])
     assert con_chip["dof"] == 19
     assert sum(con_chip["chip_factors"].values()) == pytest.approx(4.0)
+
+
+def test_los_24_puntos_permiten_diagnosticar_el_ajuste():
+    """Con los 24 valores individuales sí hay muestra para un diagnóstico de residuos:
+    la curva no muestra falta de ajuste ni varianza distinta entre longitudes, y ΔL
+    no depende de un solo chip o participante."""
+    diag = brazo1.diagnose_chip_fit(brazo1.load_fig6_reproducibility())
+    assert len(diag["residuals"]) == 24
+    assert diag["residuals"]["residual_GPa"].sum() == pytest.approx(0.0, abs=0.5)
+    assert set(diag["tests"]["p"].between(0, 1)) == {True}
+    falta_de_ajuste = diag["tests"].filter(like="Falta de ajuste", axis=0)["p"].iloc[0]
+    assert falta_de_ajuste > 0.05
+    lo, hi = diag["delta_L_leave_one_out"]
+    ci = diag["fit"]["delta_L_ci95"]
+    assert ci[0] <= lo <= hi <= ci[1]

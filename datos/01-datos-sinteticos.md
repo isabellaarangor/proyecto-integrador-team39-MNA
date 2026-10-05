@@ -169,6 +169,7 @@ Todas las pruebas están en `tests/test_eigensolver.py` y pasan con error muy po
 **Observaciones:**
 - En s1 y s2 la diferencia de forma (< 2%) queda por debajo del ruido (2%): un método que solo use formas casi no distingue esos niveles de M0.
 - Con un k_θ **físico** fijo, el E aparente sube con la longitud con un ΔL casi constante (11.8–12.7 µm entre 150 y 450 µm). Es la forma de la curva que se ajustó a los datos del NIST.
+- **La rigidez del chip real corresponde a s5.** Ajustando E_real y k_θ con el solver M1 a las Tablas 5 y 6 de Marshall se obtiene k_θ ≈ 2.6×10⁻⁷ N·m/rad, es decir κ_θ ≈ 23 en L = 300 µm, prácticamente el κ_θ = 22.8 de s5 ([T54](../contexto/tareas/T54-rigidez-soporte-desde-brazo1.md)). Pero los mismos datos se explican igual de bien con un anclaje que se desplaza en lugar de girar, así que κ_u sigue sin fijarse.
 - En la biempotrada, **M1 y M2 dejan huellas de forma muy parecidas**. Un método L3 con resortes podría absorber el cortante como si fuera flexibilidad del anclaje.
 - El voladizo de M2 (L/h ≈ 5) está al límite de la teoría de vigas: es un caso de estrés más que un dispositivo típico.
 

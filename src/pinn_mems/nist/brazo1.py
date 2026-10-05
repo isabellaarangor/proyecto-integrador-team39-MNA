@@ -6,6 +6,7 @@ Funciones extraídas del notebook `notebooks/EDA_Brazo1_NIST.ipynb`.
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -210,3 +211,86 @@ def equivalent_frequency_correction(L, f_design_kHz, delta_L_um, L_ref_um=300.0)
     g = ((L + delta_L_um) / L) ** 2
     g_ref = ((L_ref_um + delta_L_um) / L_ref_um) ** 2
     return f * (g / g_ref - 1.0)
+
+
+# --- Rigidez del anclaje con el modelo M1 (T54) -------------------------------
+
+# Geometría de los voladizos de Marshall: W = 28 µm (Tabla 1), t = 2.743 µm (Tabla 3)
+CANTILEVER_WIDTH_M = 28e-6
+CANTILEVER_THICKNESS_M = 2.743e-6
+OXIDE_DENSITY = 2200.0  # kg/m³ (Tabla 3: 2.2 g/cm³)
+
+
+def apparent_modulus_m1(L_um, E_real_GPa: float, k_theta: float, k_u: float = np.inf):
+    """E que daría la fórmula ideal para un voladizo con anclaje elástico.
+
+    Usa el eigensolver del proyecto (modelo M1): E_ap = E_real·(ω₁ᴹ¹/ω₁ᴹ⁰)².
+    k_theta en N·m/rad y k_u en N/m (np.inf = rígido).
+    """
+    from pinn_mems.eigensolver import Soporte, Viga, resolver_modos
+
+    resultado = []
+    for L in np.atleast_1d(np.asarray(L_um, dtype=float)):
+        viga = Viga(E=E_real_GPa * 1e9, L=L * 1e-6, b=CANTILEVER_WIDTH_M,
+                    h=CANTILEVER_THICKNESS_M, rho=OXIDE_DENSITY)
+        soporte = Soporte.desde_rigideces(viga, k_theta, k_u)
+        w0 = resolver_modos(viga, "voladizo", n_modos=1).omega[0]
+        w1 = resolver_modos(viga, "voladizo", soporte, n_modos=1).omega[0]
+        resultado.append(E_real_GPa * (w1 / w0) ** 2)
+    return np.array(resultado)
+
+
+@lru_cache(maxsize=2)
+def _frequency_ratio_table(spring: str) -> tuple[np.ndarray, np.ndarray]:
+    """(ω₁ᴹ¹/ω₁ᴹ⁰)² tabulado contra κ (adimensional); solo depende de κ."""
+    from pinn_mems.eigensolver import Soporte, Viga, resolver_modos
+
+    kappas = np.logspace(-1, 4, 400) if spring == "theta" else np.logspace(-1, 8, 400)
+    viga = Viga(E=70e9, L=300e-6, b=CANTILEVER_WIDTH_M, h=CANTILEVER_THICKNESS_M, rho=OXIDE_DENSITY)
+    w0 = resolver_modos(viga, "voladizo", n_modos=1).omega[0]
+    soporte = (lambda k: Soporte(kappa_theta=k)) if spring == "theta" else (lambda k: Soporte(kappa_u=k))
+    ratios = [(resolver_modos(viga, "voladizo", soporte(k), n_modos=1).omega[0] / w0) ** 2 for k in kappas]
+    return np.log(kappas), np.array(ratios)
+
+
+def _apparent_modulus_tabulated(L_um, E_real_GPa, k, spring):
+    log_kappa, ratio = _frequency_ratio_table(spring)
+    EI = E_real_GPa * 1e9 * CANTILEVER_WIDTH_M * CANTILEVER_THICKNESS_M**3 / 12
+    L = np.asarray(L_um, dtype=float) * 1e-6
+    kappa = k * L / EI if spring == "theta" else k * L**3 / EI
+    return E_real_GPa * np.interp(np.log(kappa), log_kappa, ratio)
+
+
+def fit_anchoring_stiffness(df: pd.DataFrame, uncertainty: str = "se_GPa", spring: str = "theta") -> dict:
+    """Ajusta E_real y una rigidez física del anclaje, común a todas las longitudes.
+
+    ``spring="theta"`` ajusta k_θ (N·m/rad) con k_u rígido; ``spring="u"`` ajusta
+    k_u (N/m) con k_θ rígido. A diferencia de la curva con ΔL, la rigidez es una
+    propiedad física del anclaje: el ΔL equivalente puede variar con L.
+
+    Primero busca en una malla de (E_real, log k) y luego refina con
+    ``least_squares``: con 3 puntos el problema tiene valles largos y planos.
+    """
+    if spring not in {"theta", "u"}:
+        raise ValueError("spring debe ser 'theta' o 'u'")
+    L = df["L_um"].to_numpy(dtype=float)
+    E_obs = df["E_mean_GPa"].to_numpy(dtype=float)
+    sigma = df[uncertainty].to_numpy(dtype=float)
+
+    def residuos(params):
+        E_real, log_k = params
+        return (E_obs - _apparent_modulus_tabulated(L, E_real, 10.0**log_k, spring)) / sigma
+
+    malla_E = np.linspace(40, 120, 161)
+    malla_logk = np.linspace(-9, -4, 201) if spring == "theta" else np.linspace(-3, 4, 281)
+    _, E0, logk0 = min((np.sum(residuos((E, lk)) ** 2), E, lk) for E in malla_E for lk in malla_logk)
+    result = least_squares(residuos, x0=[E0, logk0], x_scale=[1.0, 0.05], xtol=1e-12, ftol=1e-12)
+    E_real, log_k = result.x
+    return {
+        "E_real_GPa": E_real,
+        "stiffness": 10.0**log_k,
+        "spring": spring,
+        "dof": len(L) - 2,
+        "weighted_rss": float(np.sum(result.fun**2)),
+        "E_pred_GPa": _apparent_modulus_tabulated(L, E_real, 10.0**log_k, spring),
+    }

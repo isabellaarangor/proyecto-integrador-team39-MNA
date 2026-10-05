@@ -224,6 +224,7 @@ Solo vale la pena para separar el efecto del chip del de la longitud. Las tablas
 - **No apliques f_correction.** Los datos se registraron en la hoja YM.1, que no la incluye [F15, p. 40; F29, p. 320]. La deriva que esa corrección quita es justo lo que queremos medir.
 - Solo hay **una frecuencia (ω₁) por voladizo**, así que este brazo es **débilmente supervisado**. Decláralo así y avisa en G2.
 - Para correr la escalera (T39) se reconstruye f a partir de E con la Ec. 7 de Marshall y la geometría de la Tabla 1. Como la geometría es la real, la ida y vuelta es consistente.
+- **El mecanismo del anclaje no se identifica con estas tablas** ([T54](../contexto/tareas/T54-rigidez-soporte-desde-brazo1.md)). Con el modelo M1, un anclaje que solo gira (k_θ ≈ 2.6×10⁻⁷ N·m/rad, igual en las Tablas 5 y 6) y uno que solo se desplaza (k_u ≈ 24 N/m) ajustan la Tabla 6 dentro del umbral χ² con 1 grado de libertad, pero dan E_real de 75.5 y 66.8 GPa. Es un argumento directo a favor de L3 con información adicional (más longitudes, formas modales o valores publicados de k_u).
 
 **Paso 4 — Registrar el veredicto**
 En la bitácora de decisiones (T11) anota ΔL ± IC, si la tendencia es consistente con el anclaje, la limitación de 1 grado de libertad y cualquier sorpresa.

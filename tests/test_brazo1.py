@@ -188,3 +188,38 @@ def test_correccion_equivalente_tiene_el_patron_y_la_escala_de_NIST(request, fix
     assert df[1] == pytest.approx(0.0, abs=1e-12)
     assert df[2] < 0
     assert df == pytest.approx([2.67, 0.0, -0.24], abs=0.3)
+
+
+# --- Rigidez del anclaje con el modelo M1 (T54) ------------------------------
+
+CHI2_95_1GL = 3.841  # umbral χ² del 95 % con 1 grado de libertad
+
+
+def test_ajuste_m1_recupera_una_rigidez_conocida():
+    """Con E aparentes generados por el eigensolver, se recuperan E_real y k_θ."""
+    E_real, k_theta = 72.0, 2.6e-7
+    datos = pd.DataFrame({
+        "L_um": LONGITUDES,
+        "E_mean_GPa": brazo1.apparent_modulus_m1(LONGITUDES, E_real, k_theta),
+        "se_GPa": [0.1, 0.1, 0.1],
+    })
+    ajuste = brazo1.fit_anchoring_stiffness(datos)
+    assert ajuste["E_real_GPa"] == pytest.approx(E_real, rel=2e-3)
+    assert ajuste["stiffness"] == pytest.approx(k_theta, rel=2e-2)
+
+
+def test_las_dos_tablas_dan_la_misma_rigidez_rotacional(repetibilidad, reproducibilidad):
+    """El anclaje es el mismo diseño: k_θ ≈ 2.6×10⁻⁷ N·m/rad en ambas tablas."""
+    k5 = brazo1.fit_anchoring_stiffness(repetibilidad)["stiffness"]
+    k6 = brazo1.fit_anchoring_stiffness(reproducibilidad)["stiffness"]
+    assert k5 == pytest.approx(2.6e-7, rel=0.15)
+    assert k6 == pytest.approx(k5, rel=0.10)
+
+
+def test_el_brazo_1_no_distingue_giro_de_desplazamiento_del_anclaje(reproducibilidad):
+    """Hallazgo documentado: con 3 longitudes, un anclaje que solo gira y uno que solo
+    se desplaza ajustan igual de bien, pero implican E_real distintos."""
+    giro = brazo1.fit_anchoring_stiffness(reproducibilidad, spring="theta")
+    desplazamiento = brazo1.fit_anchoring_stiffness(reproducibilidad, spring="u")
+    assert giro["weighted_rss"] < CHI2_95_1GL and desplazamiento["weighted_rss"] < CHI2_95_1GL
+    assert abs(giro["E_real_GPa"] - desplazamiento["E_real_GPa"]) > 5.0

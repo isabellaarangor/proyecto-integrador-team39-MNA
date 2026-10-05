@@ -1,0 +1,7 @@
+# [F15, p. 79 (PDF 108), Table SG1] Cassard et al. (2013), NIST SP 260-177. Configuraciones de voladizos para gradiente de deformación. Copia sin modificar (las longitudes de diseño se separan con ";").
+RM,width_um,lengths_um,structural_layer,orientation_deg,quantity
+RM 8096,40,200;248;300;348;400,oxide,0,three of each length (or 15 beams)
+RM 8096,40,200;248;300;348;400,oxide,180,three of each length (or 15 beams)
+RM 8097,16,400;450;500;550;600;650;700;750;800,poly1,90,three of each length (or 27 beams)
+RM 8097,16,400;450;500;550;600;650;700;750;800,poly1,180,three of each length (or 27 beams)
+RM 8097,16,400;450;500;550;600;650;700;750;800,poly2,180,three of each length (or 27 beams)

@@ -1,0 +1,7 @@
+# [F29, p. 311, Table 1] Marshall et al. (2010), J. Res. NIST 115(5). Geometría de diseño de los voladizos de óxido. Copia sin modificar.
+L_um,W_um,orientation_deg,material,n_cantilevers
+200,28,0,oxide,5
+248,28,0,oxide,5
+300,28,0,oxide,5
+348,28,0,oxide,5
+400,28,0,oxide,5

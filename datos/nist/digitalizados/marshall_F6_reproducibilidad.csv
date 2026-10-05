@@ -1,0 +1,26 @@
+# [F29, p. 322, Fig. 6] Marshall et al. (2010). 24 puntos de reproducibilidad digitalizados con scripts/digitalizar_marshall_fig6.py (resolución ≈0.22 GPa/px; calibración con las líneas 64.2 ± 9.3 GPa).
+participant,chip,instrument,L_um,E_GPa,x_px,y_px
+1,chip 1,vibrómetro de doble haz,200,60.32,552.5,268.0
+1,chip 1,vibrómetro de doble haz,300,65.61,560.9,244.1
+1,chip 1,vibrómetro de doble haz,400,68.06,567.4,233.1
+2,chip 1,vibrómetro de un haz,200,60.32,589.0,268.0
+2,chip 1,vibrómetro de un haz,300,65.62,597.1,244.1
+2,chip 1,vibrómetro de un haz,400,66.84,604.1,238.6
+3,chip 1,interferómetro estroboscópico,200,60.31,626.0,268.1
+3,chip 1,interferómetro estroboscópico,300,65.31,633.8,245.5
+3,chip 1,interferómetro estroboscópico,400,67.37,640.8,236.2
+4,chip 2,excitación PZT,200,58.3,670.1,277.1
+4,chip 2,excitación PZT,300,62.79,677.1,256.9
+4,chip 2,excitación PZT,400,64.53,685.0,249.0
+5,chip 2,excitación térmica,200,57.54,706.9,280.6
+5,chip 2,excitación térmica,300,62.55,714.0,257.9
+5,chip 2,excitación térmica,400,64.51,721.6,249.1
+6,chip 2,excitación PZT,200,57.03,743.9,282.9
+6,chip 2,excitación PZT,300,61.02,750.1,264.9
+6,chip 2,excitación PZT,400,64.71,758.4,248.2
+7,chip 3,,200,58.33,787.0,277.0
+7,chip 3,,300,62.3,795.0,259.1
+7,chip 3,,400,64.87,801.8,247.5
+8,chip 4,,200,57.84,831.5,279.2
+8,chip 4,,300,64.53,838.4,249.0
+8,chip 4,,400,67.08,846.5,237.5

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Descripción de los datos</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; max-width: 800px; margin: 40px auto; padding: 0 16px; color: #000; background: #fff; }
+  h2 { font-size: 14pt; }
+  table { border-collapse: collapse; margin: 12px 0; }
+  th, td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; text-align: left; }
+  th { background: #d9d9d9; }
+  p { text-align: justify; }
+  .caption { font-style: italic; text-align: left; }
+</style>
+</head>
+<body>
+
+<h2>Descripción de los datos</h2>
+
+<p>El proyecto emplea dos fuentes de datos complementarias: las mediciones experimentales publicadas por el National Institute of Standards and Technology (NIST) en la guía de usuario de los materiales de referencia RM 8096 y RM 8097, conocidos como MEMS 5-in-1 (Cassard et al., 2013), y un conjunto de datos sintéticos generado a partir de modelos mecánicos de vigas, destinado a la experimentación controlada en la que el valor verdadero de los parámetros es conocido.</p>
+
+<p><b>Contexto de los datos experimentales</b></p>
+
+<p>El MEMS 5-in-1 es un chip de referencia que contiene estructuras de prueba diseñadas para caracterizar propiedades dimensionales y mecánicas de películas delgadas mediante métodos estandarizados. Entre ellos se encuentran la norma SEMI MS4, que determina el módulo de Young a partir de la frecuencia de resonancia de voladizos, y las normas ASTM E2245 y ASTM E2246, que determinan la deformación residual y el gradiente de deformación a partir del perfil de vigas biempotradas y voladizos curvados (Cassard et al., 2013). Además de los valores de referencia, la guía documenta estudios de repetibilidad y reproducibilidad en los que las mismas estructuras fueron medidas por distintos participantes, laboratorios, instrumentos y chips: el estudio interlaboratorio de módulo de Young de SEMI 2008–2009 (Marshall et al., 2010) y el estudio interlaboratorio de ASTM de 2002 para deformación residual y gradiente de deformación (Cassard et al., 2013).</p>
+
+<p>Es importante señalar que estos datos no constituyen un conjunto tabular convencional de aprendizaje automático, sino tablas y figuras de mediciones metrológicas contenidas en un documento técnico de 253 páginas, por lo que requieren ser transcritas y, en el caso de las figuras, digitalizadas. Asimismo, se trata de un material de referencia y no de un material certificado: en el cálculo del módulo de Young la densidad del material se supone y no se mide. En consecuencia, no existe un valor verdadero de las propiedades contra el cual comparar directamente las estimaciones (Cassard et al., 2013).</p>
+
+<p><b>Estructura y contenido</b></p>
+
+<p>La información relevante para el proyecto se organiza en dos grupos, según el tipo de observación y la propiedad que permite identificar.</p>
+
+<p><i>Grupo 1: frecuencia de resonancia de voladizos (módulo de Young).</i> Comprende las especificaciones geométricas de los voladizos (Tabla YM1), los resultados de repetibilidad obtenidos por un participante en un solo laboratorio e instrumento (Tabla YM7) sobre doce voladizos medidos cuatro veces cada uno, así como los resultados de reproducibilidad obtenidos por ocho participantes en cinco laboratorios, con siete instrumentos y cuatro chips (Tabla YM8). Las mediciones corresponden a voladizos de óxido de silicio de 200, 300 y 400 µm de longitud, fabricados en chips del estudio interlaboratorio mediante un proceso CMOS con micromaquinado de volumen similar al empleado en el RM 8096 (Marshall et al., 2010; Cassard et al., 2013). Mientras que las tablas reportan promedios por longitud, la Figura YM6 presenta los valores individuales de cada medición y de cada participante, lo que permite analizar los datos a nivel de voladizo. En este grupo, cada estructura aporta una única observación escalar, su frecuencia de resonancia, a partir de la cual se deriva un valor del módulo de Young. La guía incluye además el presupuesto de incertidumbre de la medición y una corrección empírica de frecuencia dependiente de la longitud del voladizo (Cassard et al., 2013).</p>
+
+<p><i>Grupo 2: perfil de vigas (esfuerzo y deformación residual).</i> Comprende la geometría de vigas biempotradas y voladizos curvados (Tablas RS1 y SG1), los resultados de repetibilidad y reproducibilidad de deformación residual y gradiente de deformación agregados por rango de longitudes (Tablas RS9 y SG8), los valores individuales de cada viga en función de su longitud (Figuras RS10 y SG10) y ejemplos de trazas del perfil medido a lo largo de una viga (Figuras RS2c, RS3c, SG2c y SG3c). Estas trazas corresponden a estructuras individuales mostradas con fines ilustrativos, pero constituyen las únicas observaciones espacialmente densas del documento, ya que registran la deformación de la estructura en múltiples puntos de su longitud.</p>
+
+<p>La Tabla 2 resume las variables involucradas en el problema inverso.</p>
+
+<table>
+  <tr><th>Tipo</th><th>Variable</th><th>Descripción</th><th>Fuente</th></tr>
+  <tr><td>Entrada</td><td>L, b, h</td><td>Longitud, ancho y espesor de la estructura</td><td>Tablas YM1, RS1, SG1</td></tr>
+  <tr><td>Entrada</td><td>x</td><td>Posición a lo largo de la viga</td><td>Trazas de perfil (Grupo 2)</td></tr>
+  <tr><td>Entrada</td><td>ρ</td><td>Densidad del material (supuesta; 2.2 g/cm³ para SiO₂)</td><td>Tabla YM1</td></tr>
+  <tr><td>Observación</td><td>f (ω)</td><td>Frecuencia de resonancia medida</td><td>Grupo 1</td></tr>
+  <tr><td>Observación</td><td>w(x)</td><td>Perfil o deflexión de la viga</td><td>Grupo 2</td></tr>
+  <tr><td>Parámetro a identificar</td><td>E</td><td>Módulo de Young</td><td>Grupo 1</td></tr>
+  <tr><td>Parámetro a identificar</td><td>σ₀ (ε<sub>r</sub>), κ₀</td><td>Esfuerzo o deformación residual y gradiente de deformación</td><td>Grupo 2</td></tr>
+</table>
+<p class="caption">Tabla 2. Variables de entrada, observaciones y parámetros físicos a identificar.</p>
+
+<p><b>Datos sintéticos</b></p>
+
+<p>Debido a que en los datos experimentales se desconoce el valor verdadero de las propiedades, el efecto de cada tratamiento de la discrepancia sobre el parámetro identificado se evaluará mediante datos sintéticos. Estos se generarán resolviendo el problema de vibración de la viga con modelos que pueden ser deliberadamente más completos que el utilizado para la identificación, por ejemplo, incorporando un anclaje flexible en lugar de un empotramiento perfectamente rígido, y agregando ruido de medición controlado a las observaciones. De esta forma se conoce tanto el valor verdadero de los parámetros como la magnitud de la discrepancia introducida, lo que permite medir directamente el sesgo de cada estrategia de identificación. Los datos del NIST se reservan para el análisis exploratorio y para la validación de los resultados en condiciones reales.</p>
+
+<p><b>Uso de cada tipo de dato</b></p>
+
+<p>Ambas fuentes cumplen funciones distintas y complementarias. Los datos sintéticos permiten responder qué estrategia de tratamiento de la discrepancia identifica mejor los parámetros y por qué, ya que en ellos se conoce la respuesta correcta. Los datos experimentales permiten comprobar si esa conclusión se sostiene en un dispositivo real, donde la discrepancia existe pero su magnitud es desconocida. La Tabla 3 resume el papel de cada una.</p>
+
+<table>
+  <tr><th>Aspecto</th><th>Datos sintéticos</th><th>Datos experimentales (NIST)</th></tr>
+  <tr><td>Propósito principal</td><td>Medir el error de identificación de cada estrategia</td><td>Motivar el problema y validar los resultados en condiciones reales</td></tr>
+  <tr><td>Valor verdadero de los parámetros</td><td>Conocido, definido por el equipo</td><td>Desconocido</td></tr>
+  <tr><td>Discrepancia de modelo</td><td>Introducida de forma controlada y con severidad variable</td><td>Real, de origen y magnitud desconocidos</td></tr>
+  <tr><td>Etapa del proyecto</td><td>Experimentación principal: comparación de estrategias, sensibilidad a la severidad, al ruido y a la cantidad de datos</td><td>Análisis exploratorio, línea base con el método estandarizado y validación final</td></tr>
+  <tr><td>Criterio de evaluación</td><td>Sesgo y variabilidad del parámetro estimado respecto del valor verdadero</td><td>Consistencia física: independencia del módulo de Young respecto de la longitud y concordancia con la dispersión entre laboratorios</td></tr>
+</table>
+<p class="caption">Tabla 3. Uso de los datos sintéticos y experimentales en el proyecto.</p>
+
+<p><b>Relevancia para el proyecto</b></p>
+
+<p>Los datos del NIST evidencian la discrepancia que motiva este trabajo. El módulo de Young promedio aumenta de 59.8 GPa en voladizos de 200 µm a 67.5 GPa en los de 400 µm, y la dispersión entre longitudes (≈10 %) supera ampliamente a la observada dentro de cada una (&lt;1.5 %). Aunque el material es el mismo, el NIST reporta un módulo “efectivo” y señala como posible causa la unión de los voladizos con su soporte (Cassard et al., 2013): el efecto de un anclaje no ideal se atribuye al parámetro del material.</p>
+
+<p>Así, estos datos permiten comparar las estrategias de identificación ante una discrepancia real, verificando que el módulo estimado no dependa de la longitud y usando la dispersión entre laboratorios como referencia de incertidumbre.</p>
+
+<p><b>Limitaciones y alternativas</b></p>
+
+<p>La revisión preliminar de la guía indica que los datos de frecuencia de resonancia son adecuados para el proyecto, en particular porque la Figura YM6 presenta los valores individuales de cada medición. En cambio, los datos de perfil son más limitados de lo previsto: las trazas corresponden a ejemplos de estructuras individuales y la deformación residual no muestra una dependencia evidente con la longitud (Cassard et al., 2013). Dado que la pregunta de investigación se responde principalmente con datos sintéticos, estas limitaciones afectan la etapa de validación y no el núcleo del estudio. Para mitigarlas se contemplan las siguientes alternativas, en orden de preferencia: (1) utilizar los datos de frecuencia como validación principal y los de perfil como evidencia secundaria; (2) complementar con mediciones publicadas en otros trabajos sobre la flexibilidad de los soportes y el módulo de Young de películas delgadas (Kobrinsky et al., 2000); (3) solicitar a los autores los datos originales de los estudios interlaboratorio, y (4) si ninguno de los conjuntos resultara utilizable, trasladar el mismo diseño experimental a otro fenómeno MEMS con discrepancia documentada, como el amortiguamiento por película comprimida (Bao y Yang, 2007), conservando la metodología de comparación.</p>
+
+</body>
+</html>

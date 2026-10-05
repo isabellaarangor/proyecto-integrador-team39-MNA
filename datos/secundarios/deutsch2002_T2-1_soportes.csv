@@ -1,0 +1,7 @@
+# [F30, p. 41, Table 2.1] Deutsch (2002), tesis doctoral MIT. Deflexión al centro del segmento central de tres segmentos iguales de 608 µm (polisilicio, t = 1 µm, b = 20 µm, hueco de 8 µm, E = 160 GPa, esfuerzo residual 15 MPa en tensión) bajo una carga uniforme de 500 Pa, simulada con MEMCAD. Copia sin modificar.
+support_type,beam_displacement_um,reference
+Conformal Step-Up,7.15,Figure 2.23a
+Conformal Ring,1.48,Figure 2.23b
+Stacked Support Pillars,1.38,Figure 2.24a
+Lateral Support Pillars,1.36,Figure 2.24b
+Ideal doubly clamped,1.34,Figure 2.22a

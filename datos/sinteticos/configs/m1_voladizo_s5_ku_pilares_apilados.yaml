@@ -1,0 +1,24 @@
+# M1 s5 + sensibilidad a κ_u: soporte 'pilares_apilados' de Deutsch (2002), k_u = 82.3 N/m → κ_u = 658.79; sesgo en E = -15.9%.
+# Generado por scripts/calibrar_severidad.py; no editar a mano.
+nombre: m1_voladizo_s5_ku_pilares_apilados
+generador: M1
+estructura: voladizo
+params:
+  E: 70000000000.0
+  L: 0.0003
+  b: 2.8e-05
+  h: 2.743e-06
+  rho: 2200.0
+  sigma0: 0.0
+soporte:
+  kappa_theta: 22.7713
+  kappa_u: 658.79
+muestreo:
+  n_puntos: 100
+  n_modos: 3
+ruido:
+  nivel: 0.02
+  nivel_omega: 0.0003
+  semilla: 0
+malla:
+  n_elem: 200

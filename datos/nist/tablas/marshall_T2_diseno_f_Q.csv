@@ -1,0 +1,7 @@
+# [F29, p. 313, Table 2] Marshall et al. (2010). f_can,init, Q y pdiff para las longitudes de diseño (W_can = 28 µm). Copia sin modificar.
+L µm,f inicial kHz,Q,pdiff %
+200,62.5,148.0,0.0006
+248,40.6,96.3,0.0013
+300,27.8,65.8,0.0029
+348,20.6,48.9,0.0052
+400,15.6,37.0,0.0091

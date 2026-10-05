@@ -1,0 +1,10 @@
+# [F15, p. 92 (PDF 121), Table SG8] Cassard et al. (2013), NIST SP 260-177. Resultados de gradiente de deformación del round robin de ASTM (2002), en m⁻¹. Copia sin modificar; "–" = sin valor. Notas: (a) u_csg1 según ASTM E 2246-02; (b) u_csg1 según ASTM E 2246-05, Ec. (SG16); (c) Ec. (SG17); (d) Ec. (SG12).
+quantity,repeatability_Ldes_500_to_650_um,repeatability_Ldes_400_to_750_um,reproducibility_Ldes_500_to_650_um
+n,24,48,6
+s_g_ave_1_per_m,4.71,4.97,4.67
+sigma_repeat_samp,13 %,20 %,–
+plus_minus_2_sigma_limits_1_per_m,±1.2 (± 25 %),±2.0 (± 40 %),±1.7 (± 37 %)
+u_c_sg1_ave (a),0.73 (14 %),0.84 (17 %),0.56 (12 %)
+u_c_sg1_ave (b),0.47 (10 %),0.56 (11 %),–
+u_c_sg2_ave (c),0.44 (9.5 %),0.52 (11 %),–
+u_c_sg3_ave (d),0.74 (16 %),1.12 (23 %),–

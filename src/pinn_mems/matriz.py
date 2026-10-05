@@ -152,3 +152,49 @@ def frecuencias_reservadas(matriz: dict | None = None) -> list[dict]:
             omega = generar(cfg).omega_limpia
             filas.append({"caso": caso, "L_um": L_um, **{f"omega{i + 1}_rad_s": float(w) for i, w in enumerate(omega)}})
     return filas
+
+
+# --- Subestudio de colocación (RQ4) --------------------------------------------
+
+
+@dataclass(frozen=True)
+class CorridaColocacion:
+    esquema: str
+    caso: str
+    N: int
+    semilla: int
+
+    @property
+    def id(self) -> str:
+        return f"col_{self.esquema}_{self.caso}_N{self.N}_seed{self.semilla}"
+
+
+def corridas_colocacion(matriz: dict | None = None) -> list[CorridaColocacion]:
+    col = (matriz or cargar_matriz())["colocacion"]
+    return [CorridaColocacion(e, c, int(col["N"]), s)
+            for e in col["esquemas"] for c in col["casos"] for s in range(int(col["semillas"]))]
+
+
+def config_colocacion(corrida: CorridaColocacion, matriz: dict | None = None) -> dict:
+    matriz = matriz or cargar_matriz()
+    cfg = copy.deepcopy(_config_base(corrida.caso, "voladizo"))
+    cfg["muestreo"] = {"n_puntos": corrida.N, "n_modos": int(matriz.get("n_modos", 3)), "esquema": corrida.esquema}
+    cfg["ruido"] = {**cfg["ruido"], "semilla": 1000 * corrida.semilla}
+    return cfg
+
+
+def generar_colocacion(salida: Path, matriz: dict | None = None) -> Path:
+    """Corridas de colocación en `salida/<id>/voladizo.npz` y `manifiesto_colocacion.csv`."""
+    matriz = matriz or cargar_matriz()
+    salida = Path(salida)
+    filas = []
+    for corrida in corridas_colocacion(matriz):
+        ruta = generar(config_colocacion(corrida, matriz)).guardar(salida / corrida.id / "voladizo.npz")
+        filas.append({"id": corrida.id, "esquema": corrida.esquema, "caso": corrida.caso, "N": corrida.N,
+                      "semilla": corrida.semilla, "archivo": ruta.relative_to(salida).as_posix()})
+    manifiesto = salida / "manifiesto_colocacion.csv"
+    with open(manifiesto, "w", newline="", encoding="utf-8") as f:
+        escritor = csv.DictWriter(f, fieldnames=list(filas[0]))
+        escritor.writeheader()
+        escritor.writerows(filas)
+    return manifiesto

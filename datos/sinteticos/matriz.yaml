@@ -13,3 +13,11 @@ n_modos: 3
 # NIST (Tabla 1 de Marshall) pero el round robin no las midió. En M2 (vigas cortas)
 # se usan las mismas proporciones respecto del voladizo de referencia.
 longitudes_reservadas: [248.0e-6, 348.0e-6]
+# Subestudio de colocación (RQ4, T21): 3 esquemas × 2 severidades × 10 semillas,
+# con el voladizo de 300 µm (k = 1) y N = 15. Con los 4 métodos son las 240
+# corridas del plan §4.8.
+colocacion:
+  esquemas: [uniforme, anclaje, punta]
+  casos: [m1_s3, m1_s5]
+  N: 15
+  semillas: 10

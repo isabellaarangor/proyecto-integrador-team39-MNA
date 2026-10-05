@@ -10,7 +10,7 @@ idéntica a partir de ella y su semilla. Ejemplo de config:
     soporte: {kappa_theta: 50.0, kappa_u: .inf}   # solo M1, adimensional
     timoshenko: {nu: 0.17, kappa_s: null}         # solo M2; null = Cowper
     conicidad: {alpha: 0.1}                       # solo M3, h(ξ) = h̄·(1 + α·(ξ − ½))
-    muestreo: {n_puntos: 100, n_modos: 3}
+    muestreo: {n_puntos: 100, n_modos: 3}         # opcional: esquema: uniforme | anclaje | punta
     ruido: {nivel: 0.02, nivel_omega: 0.0003, semilla: 0}
     malla: {n_elem: 200}
 
@@ -162,7 +162,9 @@ def generar(config: dict) -> Conjunto:
     semilla = int(ruido.get("semilla", 0))
 
     modos = resolver_modos(viga, estructura, n_modos=n_modos, n_elem=n_elem, **modelo)
-    xi = np.linspace(0.0, 1.0, n_puntos)
+    # Esquema de colocación de los puntos (RQ4); por defecto, uniforme
+    from pinn_mems.colocacion import puntos
+    xi = puntos(muestreo.get("esquema", "uniforme"), n_puntos)
     w_limpia = modos.forma(xi)
 
     rng = np.random.default_rng(semilla)

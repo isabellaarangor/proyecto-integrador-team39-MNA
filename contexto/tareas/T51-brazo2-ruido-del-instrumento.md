@@ -11,7 +11,7 @@
   - dispersión en una zona plana (sustrato o anclaje) de la misma traza;
   - residuo de alta frecuencia tras un suavizado local
 - [x] Reportar el ruido por instrumento/material (RM 8096 y RM 8097) en µm, con su incertidumbre — *RM 8096 ≈ 0.022 µm (rango 0.010–0.036), igual a la rugosidad del NIST; RM 8097 ≈ 0.004 µm (0.003–0.006). El ruido parece correlacionado: ver la guía `02-datos-reales` §6, paso 3*
-- [ ] Anotar el cambio de método en la bitácora y la limitación para T44 — *pendiente para el equipo: no hay trazas repetidas por estructura y el ruido parece correlacionado*
+- [x] Anotar el cambio de método en la bitácora y la limitación para T44 — *entrada del 2026-10-06 (propuesta, falta revisión del equipo)*
 
 ## Terminada cuando
 - [ ] Ruido estimado y justificado, listo para usarse en la verosimilitud; guía y LEEME actualizados

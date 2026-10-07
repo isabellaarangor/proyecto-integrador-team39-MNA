@@ -12,7 +12,7 @@ Las alternativas van de menor a mayor costo. Se avanzan en paralelo la 1, 2 y 3;
 - [x] Revisar la digitalización contra los promedios de YM7/YM8 (diferencia < 0.5 GPa por longitud) — *< 0.06 GPa contra YM8*
 - [ ] Repetir el ajuste `E(L) = E_real·(L/(L+ΔL))⁴` con los 72 puntos y reportar ΔL con intervalo de confianza — *con los 24 de reproducibilidad y un factor por chip: ΔL = 12.2 µm (IC 95 % 11.1–13.3), E_real = 74.4 GPa*
 - [x] Veredicto del Brazo 1: ¿la tendencia con la longitud se mantiene con datos por voladizo? — *sí: los 8 participantes muestran E creciente con L, y el chip explica buena parte de la dispersión (residuo 1.5 → 0.6 GPa)*
-- [ ] Brazo 2 reducido: describir la tendencia de SG10 [F15, p. 92] como indicio secundario y reportar RS10 como resultado nulo
+- [x] Brazo 2 reducido: describir la tendencia de SG10 [F15, p. 92] como indicio secundario y reportar RS10 como resultado nulo
 - [ ] Digitalizar una traza de ejemplo (RS3c o SG3c) para usarla como caso ilustrativo de diagnóstico de residuos
 - [ ] Documentar la pérdida en la bitácora de decisiones y en la sección de limitaciones (T44)
 

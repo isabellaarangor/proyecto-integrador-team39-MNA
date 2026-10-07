@@ -56,3 +56,25 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Pérdida para T44:** las vigas reales de RM 8096 están pandeadas (ε_r ≈ −2.7×10⁻³); las vibraciones alrededor de una viga pandeada quedan fuera del alcance del proyecto.
 - **Quién:** equipo (Manuel).
 - **Estado:** aceptada.
+
+## 2026-10-06 — Hallazgos del Brazo 1 para G0 (T06)
+
+- **Hallazgo:** el Brazo 1 es utilizable. Las Tablas 1, 5 y 6 de Marshall [F29] y la Tabla 3 del SP 260-177 están en `datos/nist/tablas/`. E aparente crece con la longitud, y la curva `(L/(L+ΔL))⁴` ajusta con ΔL = 12.8 µm (Tabla 5) y 12.3 µm (Tabla 6); con los 24 puntos de la Fig. 6 y un factor por chip, ΔL = 12.2 µm (IC 95 % 11.1–13.3) ([notebook](../notebooks/EDA_Brazo1_NIST.ipynb), [T48](tareas/T48-alternativas-datos-reales.md)).
+- **Limitación:** solo hay ω₁ por voladizo, sin formas modales ni modos superiores. El Brazo 1 es débilmente supervisado y la identificabilidad de L3 descansa en el barrido de longitudes; queda señalado para G2 ([T14](tareas/T14-identificabilidad-g2.md)). Además, los datos no distinguen giro de desplazamiento del anclaje ([T54](tareas/T54-rigidez-soporte-desde-brazo1.md)).
+- **Quién:** equipo (Manuel).
+- **Estado:** aceptada; alimenta la decisión G0.
+
+## 2026-10-06 — Hallazgos del Brazo 2 para G0 (T07)
+
+- **Hallazgo:** no hizo falta digitalizar. Los 10 archivos `.xlsx` del NIST traen trazas con 144–640 puntos (paso de 0.39 o 1.96 µm), suficientes para el diagnóstico de residuos. **Cada archivo contiene una sola traza**, así que no hay trazas repetidas de una misma estructura. La conversión a `datos/nist/trazas/` coincide exactamente con las columnas calibradas de las hojas del NIST y reproduce su ejemplo resuelto ([T50](tareas/T50-brazo2-conversion-trazas-validada.md)). Las Tablas RS1, RS9, SG1 y SG8 están en `datos/nist/tablas/`.
+- **Tendencias con la longitud:** RS10 no muestra dependencia (resultado nulo) y SG10 baja de 400 a 600 µm y se estabiliza [F15, pp. 72, 92]. No se cruza ΔL con el Brazo 1 porque los brazos no miden los mismos chips ([T52](tareas/T52-brazo2-eda-por-perfil.md)).
+- **Quién:** equipo (Manuel).
+- **Estado:** aceptada; alimenta la decisión G0.
+
+## 2026-10-06 — Ruido del Brazo 2 estimado dentro de cada traza (T51)
+
+- **Decisión propuesta:** como no hay trazas repetidas, el ruido se estima dentro de cada traza con `src/pinn_mems/nist/ruido.py`. Para la verosimilitud se usa el estimador por segundas diferencias por material: **σ ≈ 0.022 µm en RM 8096** (rango 0.010–0.036) y **σ ≈ 0.004 µm en RM 8097** (0.003–0.006). En T25 se prueba además un modelo de ruido correlacionado y se compara contra el de ruido blanco.
+- **Motivo y evidencia:** el plan comparaba las trazas b, c y d de una estructura, pero cada archivo trae una sola. En RM 8096 el valor coincide con la rugosidad que reporta el NIST (≈0.022 µm rms) [F15, p. 188], así que lo que se mide es sobre todo rugosidad y no el interferómetro. El estimador por suavizado da 1.7–2 veces más que el de segundas diferencias en datos reales (en sintéticos coinciden): el ruido parece correlacionado. Detalle en la guía [`02-datos-reales`](../datos/02-datos-reales-nist-sp260-177.md) §6, paso 3.
+- **Pérdidas para T44:** ruido estimado sin trazas repetidas; un modelo de ruido blanco puede subestimar la incertidumbre del Brazo 2.
+- **Quién:** pendiente de revisión del equipo.
+- **Estado:** propuesta.

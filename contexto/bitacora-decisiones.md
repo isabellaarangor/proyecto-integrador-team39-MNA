@@ -30,16 +30,17 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Quién:** equipo (Manuel).
 - **Estado:** aceptada.
 
-## 2026-10-04 — Compuerta G0: brazos de datos reales (propuesta)
+## 2026-10-04 — Compuerta G0: brazos de datos reales
 
-- **Decisión propuesta:** seguir con **ambos brazos**. El Brazo 1 (frecuencia) es la validación principal; el Brazo 2 (forma) se mantiene como demostración con residuos espaciales reales.
+- **Decisión:** seguir con **ambos brazos**; no se pivota a película comprimida. El Brazo 1 (frecuencia) es la validación principal; el Brazo 2 (forma) se mantiene como demostración con residuos espaciales reales.
 - **Motivo y evidencia:**
   - Brazo 1 viable: ajuste ΔL ≈ 12–13 µm con las Tablas 5 y 6 de Marshall ([notebook](../notebooks/EDA_Brazo1_NIST.ipynb)). Con los 24 puntos de reproducibilidad digitalizados de la Fig. 6 y un factor por chip, ΔL = 12.2 µm (IC 95 % 11.1–13.3) con 19 grados de libertad, en lugar de 1. Limitaciones: solo ω₁ (débilmente supervisado) y no distingue giro de desplazamiento del anclaje ([T54](tareas/T54-rigidez-soporte-desde-brazo1.md)).
   - Brazo 2 útil pero reducido: 4 estructuras de ejemplo, una traza por archivo, sin barrido de longitudes ni cruce de ΔL con el Brazo 1. Las trazas están validadas contra la hoja del NIST y sus residuos son sistemáticos ([T50](tareas/T50-brazo2-conversion-trazas-validada.md), [T52](tareas/T52-brazo2-eda-por-perfil.md)).
   - Diferenciador frente a Zou et al. escrito ([T03](tareas/T03-leer-zou-diferenciador.md)).
+  - Hallazgos detallados en las entradas del 2026-10-06 (T06, T07).
 - **Pérdidas para T44:** sin cruce de ΔL entre brazos; ruido del Brazo 2 estimado dentro de cada traza, no con trazas repetidas; sin valores de Kobrinsky.
-- **Quién:** pendiente de la firma de los tres integrantes.
-- **Estado:** propuesta.
+- **Quién:** Isabella Arango Restrepo, Isaí Ambrocio y Manuel Alejandro Vázquez Meza.
+- **Estado:** aceptada el 2026-10-07. **G0 cerrada.**
 
 ## 2026-10-04 — Hallazgo que afecta la decisión de σ₀ (pendiente de revisar)
 

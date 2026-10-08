@@ -5,11 +5,11 @@
 **Objetivo:** Cerrar G0 con una decisión escrita: ambos brazos / un brazo / pivote a squeeze-film. Nunca un estudio solo sintético.
 
 ## Subtareas
-- [ ] Revisar en equipo los veredictos de T06 (Brazo 1) y T07 (Brazo 2)
-- [ ] Confirmar que el párrafo diferenciador (T03) está escrito — es parte de G0
-- [ ] Decidir: ambos brazos viables → proceder · uno viable → proceder con ese, anotar la pérdida · ninguno → **pivotar a squeeze-film (§3.1.2) de inmediato**
-- [ ] Registrar la decisión, la evidencia y la fecha en la bitácora de decisiones
-- [ ] Si se pivota: re-alcanzar las tareas T12+ en consecuencia (escalera, posteriores y arnés se transfieren sin cambios)
+- [x] Revisar en equipo los veredictos de T06 (Brazo 1) y T07 (Brazo 2)
+- [x] Confirmar que el párrafo diferenciador (T03) está escrito — es parte de G0
+- [x] Decidir: ambos brazos viables → proceder · uno viable → proceder con ese, anotar la pérdida · ninguno → **pivotar a squeeze-film (§3.1.2) de inmediato** — *ambos brazos viables: se procede*
+- [x] Registrar la decisión, la evidencia y la fecha en la bitácora de decisiones
+- [x] Si se pivota: re-alcanzar las tareas T12+ en consecuencia (escalera, posteriores y arnés se transfieren sin cambios) — *no aplica: no se pivota*
 
 ## Terminada cuando
-- [ ] **G0 cerrada:** decisión escrita y firmada en la bitácora de decisiones
+- [x] **G0 cerrada:** decisión escrita y firmada en la bitácora de decisiones — *2026-10-07*

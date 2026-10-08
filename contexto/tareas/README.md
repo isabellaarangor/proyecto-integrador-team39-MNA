@@ -18,7 +18,7 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 - [ ] [T08 Reproducir una hoja del MEMS Calculator (Método 1)](T08-reproduccion-mems-calculator.md) — C
 - [x] [T09 Eigensolver de referencia](T09-eigensolver-de-referencia.md) — A
 - [x] [T10 Validación del eigensolver + pytest (G1)](T10-validacion-eigensolver-g1.md) — A
-- [ ] [T11 Registro de decisión G0](T11-registro-decision-g0.md) — todos
+- [x] [T11 Registro de decisión G0](T11-registro-decision-g0.md) — todos
 - [ ] [T48 Alternativas si los datos reales no alcanzan](T48-alternativas-datos-reales.md) — todos (A dueño)
 
 ## Semana 3 — Avance 1, EDA (G2)

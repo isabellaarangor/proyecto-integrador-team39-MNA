@@ -1,6 +1,6 @@
 # Plan de trabajo en paralelo — semanas 4 y 5
 
-**Desde:** 2026-10-07 · **Metas:** entregar el Avance 2 (domingo 11 de octubre, 23:59), cerrar G2 y G3 (fin de la semana 4) y cerrar G4 (fin de la semana 5). Estado de partida en [`estado-del-proyecto.md`](estado-del-proyecto.md).
+**Metas:** entregar el Avance 2 y cerrar G2 y G3 (fin de la semana 4) y cerrar G4 (fin de la semana 5). Estado de partida en [`estado-del-proyecto.md`](estado-del-proyecto.md).
 
 Tres frentes, uno por persona. Cada frente se queda en **un solo tema y una sola parte del código** durante las dos semanas, y las dependencias entre frentes se reducen a unos cuantos puntos de sincronización. Las actividades de cada frente se dividen en dos:
 
@@ -70,10 +70,10 @@ Un solo tema: el lado de los datos reales y la estadística, más el armado de l
 
 | Día | Entrega del Avance 2 | Avance regular |
 |---|---|---|
-| Mié 7 – Jue 8 | Cada frente escribe sus secciones | Frente 1: T16 y decisión de framework. Frente 2: revisión de T49. Frente 3: T51 |
-| Vie 9 | Frente 3 integra; revisión de 15 min entre los tres | G2 en la bitácora; Frente 1 sigue con T18 |
-| Sáb 10 | Correr el notebook completo de principio a fin y corregir | Frente 1: T19–T20 |
-| **Dom 11, 23:59** | **Entregar `Avance2.39`** | — |
+| Miércoles – jueves | Cada frente escribe sus secciones | Frente 1: T16 y decisión de framework. Frente 2: revisión de T49. Frente 3: T51 |
+| Viernes | Frente 3 integra; revisión de 15 min entre los tres | G2 en la bitácora; Frente 1 sigue con T18 |
+| Sábado | Correr el notebook completo de principio a fin y corregir | Frente 1: T19–T20 |
+| **Domingo** | **Entregar `Avance2.39`** | — |
 | Semana 5 | — | T22, T23, T26, T08, T24/T25; G3 y G4 en la bitácora |
 
 Lo de la entrega suma más o menos un día por persona; el resto de la semana es avance regular.

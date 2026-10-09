@@ -7,7 +7,7 @@ Tres frentes, uno por persona. Cada frente se queda en **un solo tema y una sola
 - **Entrega del Avance 2:** lo que va en el notebook `Avance2.39.ipynb` (ingeniería de características).
 - **Avance regular del proyecto:** tareas del [tablero](tareas/README.md) y compuertas.
 
-Las marcadas con ⇄ cuentan para ambos: se hacen una sola vez.
+Las marcadas con ⇄ cuentan para ambos: se hacen una sola vez. El detalle de cada frente (objetivo, tareas, criterios de cierre y contexto) está en su handoff: [Frente 1](handoffs/frente-1-pinn.md), [Frente 2](handoffs/frente-2-clasico.md), [Frente 3](handoffs/frente-3-nist.md).
 
 | Frente | Rol | Tema | Código | Rama | Persona |
 |---|---|---|---|---|---|
@@ -43,6 +43,7 @@ Un solo tema: estimar parámetros alrededor del eigensolver. T14 y T22 comparten
 - ⇄ PCA de las formas modales del barrido M1 y de la matriz de Fisher: cuántos componentes explican la discrepancia y qué combinaciones de parámetros se identifican. Es también [T14](tareas/T14-identificabilidad-g2.md).
 
 **Avance regular del proyecto**
+0. Objeto de resultado común en `src/pinn_mems/resultado.py` (día 1): T05 está marcada como hecha, pero no existe en el repo, y lo necesitan T08, T18, T22 y T26.
 1. Revisión humana de los CSV de [T49](tareas/T49-brazo1-tablas-csv-rastreables.md) contra los PDF, anotada en `datos/nist/LEEME.md` (una mañana, antes de lo demás). La hace una persona distinta de quien transcribió las tablas.
 2. Veredicto de G2 en la bitácora. **Cierra G2.**
 3. [T22](tareas/T22-inversa-clasica-anidada.md): `least_squares` anidado alrededor del eigensolver, sobre la función de desajuste de T14 (después del domingo).

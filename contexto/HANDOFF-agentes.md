@@ -2,14 +2,14 @@
 titulo: Handoff para agentes — Dónde debe vivir el error de modelo
 tipo: handoff
 estado: revisado
-actualizado: 2026-09-24
+actualizado: 2026-10-08
 audiencia: agentes de IA (y personas que necesiten el detalle)
 fuentes: ver conocimiento/fuentes.md (IDs [Fxx])
 ---
 
 # Handoff para agentes — Dónde debe vivir el error de modelo
 
-Proyecto Integrador, Equipo 39, MNA. 11 semanas, 3 personas. Estado al 2026-09-24: **semana 1, sin código ni experimentos**.
+Proyecto Integrador, Equipo 39, MNA. 11 semanas, 3 personas. Estado al 2026-10-08: **semana 4** (Avance 2, ingeniería de características). G0 y G1 cerradas; Avance 1 (EDA) entregado; eigensolver, generadores M0–M3, matriz sintética y ambos brazos de datos reales listos; **todavía no hay código de PINN**. Estado detallado en [`estado-del-proyecto.md`](estado-del-proyecto.md); reparto del trabajo en [`plan-trabajo-paralelo.md`](plan-trabajo-paralelo.md) y [`handoffs/`](handoffs/).
 
 ## 0. Cómo usar este documento
 
@@ -23,13 +23,21 @@ Proyecto Integrador, Equipo 39, MNA. 11 semanas, 3 personas. Estado al 2026-09-2
 | Ruta | Contenido | Cuándo leerlo |
 |---|---|---|
 | `contexto/plan-tesis-pinn-mems.md` | Plan v3 completo (ES). Versión EN: `pinn-mems-thesis-plan.en.md` | Detalle de diseño, riesgos, apéndices |
-| `contexto/tareas/README.md` | Tablero T01–T47 por semana, responsables, compuertas | Antes de ejecutar cualquier tarea |
+| `contexto/tareas/README.md` | Tablero T01–T54 por semana, responsables, compuertas | Antes de ejecutar cualquier tarea |
+| `contexto/bitacora-decisiones.md` | Decisiones con fecha, motivo y evidencia (G0, matriz, σ₀, calibración de M1, ruido) | Antes de tomar o reabrir una decisión |
+| `contexto/estado-del-proyecto.md` | Hecho, pendiente, compuertas y riesgos a una fecha de corte | Para saber dónde va el proyecto |
+| `contexto/plan-trabajo-paralelo.md` | Tres frentes de trabajo para las semanas 4–5, entregable vs. avance regular | Antes de tomar trabajo |
+| `contexto/handoffs/frente-*.md` | Objetivo, tareas, criterios de cierre y contexto de cada frente | Al empezar a trabajar en un frente |
 | `contexto/conocimiento/README.md` | Índice y reglas de la wiki | Antes de editar la wiki |
-| `contexto/conocimiento/fuentes.md` | 28 fuentes, ID, DOI, estado ✔/◐/○ | Antes de citar |
+| `contexto/conocimiento/fuentes.md` | 30 fuentes, ID, DOI, estado ✔/◐/○ | Antes de citar |
 | `contexto/conocimiento/conceptos/*.md` | PINNs, MEMS, medición de E, anclaje, discrepancia | Para explicar un concepto |
 | `contexto/conocimiento/preguntas/P1–P4` | Preguntas de fondo respondidas | Para justificar el diseño |
 | `contexto/conocimiento/datos/nist-sp260-177-modulo-young.md` | Tablas YM7/YM8, f_correction, ajuste exploratorio | Para cualquier número del NIST |
 | `contexto/conocimiento/datos/nist-sp260-177-deformacion.md` | Tablas/figuras RS y SG (Brazo 2), ubicación y hallazgos | Para el Brazo 2 y la decisión G0 |
+| `contexto/conocimiento/diferenciador-zou-y-boh.md` | Párrafo diferenciador frente a Zou et al. y B-O'H | Para la introducción |
+| `datos/01-datos-sinteticos.md`, `02-datos-reales-…`, `03-fuentes-secundarias-…` | Guías de los datos sintéticos, de los dos brazos del NIST y de fuentes de respaldo | Antes de usar o generar datos |
+| `src/pinn_mems/`, `tests/` | Eigensolver, adimensionalización, generadores, severidad, matriz, colocación, módulos del NIST; pruebas | Antes de escribir código |
+| `notebooks/`, `entregables/` | Notebooks del curso (EDA del Avance 1) y copias entregadas | Antes de armar un entregable |
 
 ## 1. Problema
 
@@ -148,9 +156,9 @@ V(0) = k_u·w(0)     V(L) = −k_u·w(L)
 | Nivel | Se agrega | Barrido |
 |---|---|---|
 | M0 | nada (control) | — |
-| M1 | resortes k_θ, k_u | 6 severidades; una calibrada a ≈5 % sistemático |
+| M1 | resortes k_θ, k_u | 6 severidades (s1–s6): sesgo en E de 1, 2.5, 5, 10, 15 y 25 %; s5 ≈ ΔL del NIST. Eje principal con κ_u = ∞ |
 | M2 | Timoshenko (cortante + inercia rotatoria) | 1 punto |
-| M3 | espesor `h(ξ)=h₀(1+αξ)` | 1 punto |
+| M3 | conicidad `h(ξ)=h̄·(1+α·(ξ−½))` | 1 punto |
 
 **Severidad** = diferencia L2 relativa de la forma modal + corrimiento relativo de frecuencia.
 
@@ -178,12 +186,14 @@ Ablación interna: condiciones de frontera duras vs. suaves.
 |---|---|
 | Celdas | M0 + M1 × 6 + M2 + M3 = 9 |
 | Puntos de medición N | 5, 15, 40 |
-| Estructuras k | 1 (voladizo), 3 (voladizo + biempotrada + voladizo) |
+| Estructuras k | 1 (voladizo de 300 µm), 3 (voladizo 300 µm + biempotrada 300 µm con σ₀ = −5 MPa + voladizo 200 µm, mismo anclaje) |
 | Modos | 1, 3 |
 | Semillas | 10 (no negociable) |
-| Ruido | 2 % gaussiano relativo, fijo |
+| Ruido | 2 % gaussiano relativo en formas; 0.03 % en frecuencias |
 
 Total: 1080 corridas por método, ≈ 5400 corridas de PINN. Sub-estudio de colocación (RQ4): 240 corridas.
+
+**Implementada** en `datos/sinteticos/matriz.yaml` (decisiones del 2026-10-04): M2 solo con k = 1; 510 corridas de datos (se guardan 3 modos y cada método usa 1 o 3); longitudes reservadas de 248 y 348 µm para validación. Detalle en `datos/01-datos-sinteticos.md` §4.8.
 
 **Orden de recortes pre-acordado** si una corrida de PINN tarda más de 1 min (se mide en G3):
 
@@ -231,7 +241,7 @@ Prueba A8: ajustar `(L/(L+ΔL))⁴` y reportar ΔL con intervalo de confianza. L
 - **Residual strain** [F15, p. 58]: existe δε_r,correction para desviaciones del soporte, "currently assumed … = 0".
 - **Densidad supuesta**, no medida; por eso es RM y no SRM [F15, p. 2].
 - **YM7/YM8 no son chips RM 8096** sino chips del round robin con un proceso similar, registrados en la hoja YM.1, **sin f_correction** [F15, pp. 40, 46]. La Fig. YM6 [F15, p. 48] da los 72 valores individuales.
-- **Brazo 2:** RS10 "reveals no obvious length dependence" [F15, p. 72]; SG10 sí muestra tendencia [F15, p. 92]. Las trazas RS2c/RS3c/SG2c/SG3c son ejemplos de una sola estructura. Ver [`conocimiento/datos/nist-sp260-177-deformacion.md`](conocimiento/datos/nist-sp260-177-deformacion.md). TODO(equipo): contradice el plan §4.10 paso 5; decidir en T11.
+- **Brazo 2:** RS10 "reveals no obvious length dependence" [F15, p. 72]; SG10 sí muestra tendencia [F15, p. 92]. Las trazas RS2c/RS3c/SG2c/SG3c son ejemplos de una sola estructura. Ver [`conocimiento/datos/nist-sp260-177-deformacion.md`](conocimiento/datos/nist-sp260-177-deformacion.md). **Resuelto en G0 (2026-10-07):** el Brazo 2 se mantiene como demostración con residuos espaciales reales, sin cruce de ΔL con el Brazo 1, porque no miden los mismos chips.
 
 **INFERENCIA.** La práctica del NIST es una mezcla: invierte con L0, agrega una corrección empírica tipo L2 en forma de tabla y la convierte en incertidumbre. No hay L3. Nuestro L3 reemplaza la tabla con dos parámetros físicos; ese es el argumento de utilidad industrial.
 
@@ -240,7 +250,9 @@ Prueba A8: ajustar `(L/(L+ΔL))⁴` y reportar ΔL con intervalo de confianza. L
 - YM7: E_real ≈ 77 GPa, ΔL ≈ 13 µm.
 - YM8: E_real ≈ 75 GPa, ΔL ≈ 12 µm.
 
-Son 3 puntos para 2 parámetros. Existen causas alternativas: residuos, socavado, capas. Confirmar en T06 con los datos por viga.
+Son 3 puntos para 2 parámetros. Existen causas alternativas: residuos, socavado, capas.
+
+**Confirmado con datos por voladizo** (24 puntos de reproducibilidad de la Fig. 6 de Marshall [F29], con un factor por chip): ΔL = 12.2 µm (IC 95 % 11.1–13.3), E_real = 74.4 GPa. Los promedios no distinguen giro de desplazamiento del anclaje, y esa elección cambia E_real (75.5 contra 66.8 GPa en la Tabla 6) ([T54](tareas/T54-rigidez-soporte-desde-brazo1.md)).
 
 ## 6. Respuestas a las preguntas de fondo (detalle en `conocimiento/preguntas/`)
 
@@ -273,6 +285,8 @@ Son 3 puntos para 2 parámetros. Existen causas alternativas: residuos, socavado
 | 9 | Resumen ejecutivo | — | — | — |
 | 10–11 | Presentación final | — | — | — |
 
+**Estado (semana 4):** G0 ✅ (2026-10-07, ambos brazos) · G1 ✅ · G2 pendiente (T14, sin empezar) · G3 pendiente (no hay código de PINN; T16 estaba en la semana 3). Avance 1 entregado el 2026-10-04.
+
 **Niveles de alcance** (Plan §4.13):
 
 - Nivel 0: solo E, M0.
@@ -287,11 +301,13 @@ Son 3 puntos para 2 parámetros. Existen causas alternativas: residuos, socavado
 - B = PINN (dueño de RQ1 y RQ2).
 - C = clásico y arnés (dueño de RQ3 y RQ4; también de la interfaz de resultados).
 - A se empareja con B en las semanas 3–4.
+- Semanas 4–5: el trabajo se reparte en tres frentes (PINN, inversión clásica, datos del NIST + MCMC + redacción); personas por asignar. Ver [`plan-trabajo-paralelo.md`](plan-trabajo-paralelo.md).
 
 ## 8. Herramientas (Plan §6)
 
 - **Ruta crítica:** Python 3.11+, NumPy/SciPy, PyTorch, DeepXDE, emcee o PyMC, ArviZ, W&B, Hydra/YAML, pytest, matplotlib.
-- **Riesgo de DeepXDE:** verificar temprano que soporta salida múltiple en forma mixta; si no, usar PyTorch puro en la semana 3.
+- **Riesgo de DeepXDE:** verificar temprano que soporta salida múltiple en forma mixta; si no, usar PyTorch puro. Decisión pendiente en T16 (semana 4).
+- **En `pyproject.toml` hoy:** numpy, scipy, pyyaml, pandas, openpyxl; pytest y matplotlib en `dev`. PyTorch, DeepXDE, emcee/PyMC, ArviZ y W&B se agregan cuando cada frente los necesite.
 - **Descartados:** COMSOL, ANSYS Student, PhysicsNeMo, DeepONet/FNO.
 - **Cómputo:** CPU suficiente.
 
@@ -299,21 +315,28 @@ Son 3 puntos para 2 parámetros. Existen causas alternativas: residuos, socavado
 
 | Riesgo | Prob. | Mitigación |
 |---|---|---|
-| Zou et al. más cercano de lo esperado | Media | Diferenciador en semana 1; si se solapa, énfasis en L3 + RQ5 |
+| Zou et al. más cercano de lo esperado | Baja | Diferenciador escrito (T03): no cuantifican L0→L1 ni usan un estándar; no hace falta pivotar |
 | H3 parece resultado conocido (KOH) | Media | Presentar H3 como predicción probada en un régimen nuevo; L1 es lo nuevo |
 | Corrida de PINN > 1 min | Media | G3 + orden de recortes; forma mixta |
 | Datos reales solo como escalares derivados | **Alta** | Brazo 1 débilmente supervisado; Brazo 2 no se afecta |
 | L3 gana en todo, la PINN no aporta | **Alta** | Es el resultado esperado [F09]; acordarlo con el asesor en semana 1 |
-| Tres bases de código incompatibles | **Alta** | C es dueño de la interfaz; todo por configuración |
+| Tres bases de código incompatibles | **Alta** | C es dueño de la interfaz; todo por configuración. **El objeto de resultado común aún no existe** (T05 marcada como hecha sin él) |
+| PINN atrasada | **Alta** | T16 no empezó en la semana 3; G3 vence en la semana 4. Si se atrasa, registrar que G3 pasa a la semana 5 |
 
 ## 10. Pendientes abiertos
 
-- [ ] T02: preguntar al asesor si un resultado de diagnóstico es aceptable, si MEMS cuenta como banco de pruebas, y cuál es el formato del documento final.
-- [ ] T03: escribir el párrafo que nos diferencia de [F07] y [F09].
-- [ ] T04: leer el cuerpo de [F26] y confirmar los supuestos secundarios.
-- [ ] T06/T07/T11: datos por viga, trazas del Brazo 2, decisión G0.
-- [ ] Fuentes ○ en `fuentes.md` (F19, F28 y las pendientes de agregar).
-- [ ] `grep -r "TODO(equipo)" contexto/conocimiento` lista el resto.
+Cerrados desde la versión anterior: T02 (asesor), T03 (diferenciador), T04 (Jekic), T06/T07/T11 (G0).
+
+- [ ] Hueco de T05: objeto de resultado común, método dummy, `CONTRIBUTING.md` y CI no existen en el repo.
+- [ ] T14: identificabilidad, cierra G2.
+- [ ] T16–T20: primera PINN, framework, forma mixta, validación y cronometraje; cierra G3.
+- [ ] T08: reproducir una hoja del MEMS Calculator (Método 1, L0 real).
+- [ ] T49: revisión humana de las tablas de `datos/nist/tablas/` (hoy solo las revisó un agente).
+- [ ] T51: aceptar la propuesta de ruido del Brazo 2 en la bitácora.
+- [ ] T03: leer Brynjarsdóttir & O'Hagan (2014) completo (el PDF no se pudo descargar automáticamente).
+- [ ] T53: artículo de Kobrinsky et al. (2000) con valores de k_θ y k_u (requiere acceso de biblioteca).
+- [ ] Fuentes ○ en `fuentes.md`.
+- [ ] `grep -r "TODO(equipo)" contexto/` lista el resto.
 
 ## 11. Reglas para agentes
 

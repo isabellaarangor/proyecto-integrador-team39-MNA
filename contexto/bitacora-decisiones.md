@@ -91,3 +91,14 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Tiempo:** ≈ 12 s por corrida con un modo y ≈ 32 s con tres (red 3×32, 128 puntos de colocación, 1 hilo). El cronometraje formal queda para T20.
 - **Quién:** equipo (Manuel).
 - **Estado:** propuesta.
+
+## 2026-10-10 — Validación de la PINN y CF duras por defecto (T19, primera mitad de G3)
+
+- **Decisión:** la PINN usa **CF duras** (transformación de salida) por defecto. Las CF suaves quedan solo como opción de ablación.
+- **Motivo y evidencia:** salida de `scripts/validar_pinn.py`, guardada en [`resultados/validacion-pinn/`](../resultados/validacion-pinn/). Todas las corridas parten de E 20 % abajo del verdadero, con σ₀ conocido en la biempotrada:
+  - **Validación contra el eigensolver** (M0 sin ruido, 100 puntos, voladizo y biempotrada, modos 1–3): error en E ≤ 0.006 % y error de forma (L2 relativo) ≤ 0.02 %, con los dos modos de CF. **Muy por debajo del 1 %.**
+  - **Ablación** (M0 con ruido, N = 15, modos 1 y 3, 10 semillas, mismo presupuesto): con CF duras el error en E es como máximo 0.14 % (sesgo entre −0.001 % y +0.04 %, desviación entre 0.04 % y 0.07 %). Con CF suaves aparece un sesgo negativo de −0.05 % a −0.23 % y la dispersión crece de 4 a 22 veces; en el voladizo, modo 1, el peor caso llega a −2.4 %. El error de forma también es menor con CF duras.
+  - Las 92 corridas convergen.
+- **Pendiente:** los tiempos de este estudio no son el cronometraje formal. Las corridas compitieron por el CPU (8 procesos en 4 núcleos físicos, además de baja de frecuencia por temperatura). El cronometraje se hace en T20.
+- **Quién:** equipo (Manuel).
+- **Estado:** propuesta.

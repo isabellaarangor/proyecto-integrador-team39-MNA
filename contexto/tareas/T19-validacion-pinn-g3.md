@@ -5,11 +5,11 @@
 **Objetivo:** Validar la PINN contra la referencia del eigensolver a <1%, y correr la ablación simétrica de CF duras vs. suaves que la forma mixta hace significativa.
 
 ## Subtareas
-- [ ] Validación directa: forma modal de la PINN + parámetros implicados vs. referencia, voladizo y puente, modos 1–3
-- [ ] Concordancia <1% o una razón diagnosticada de por qué no
-- [ ] Ablación: CF impuestas duras vs. penalización suave, mismo presupuesto, varias semillas
-- [ ] Registrar qué modo de CF es el default de aquí en adelante
-- [ ] Archivar las gráficas de validación
+- [x] Validación directa: forma modal de la PINN + parámetros implicados vs. referencia, voladizo y puente, modos 1–3 — *`scripts/validar_pinn.py`*
+- [x] Concordancia <1% o una razón diagnosticada de por qué no — *E ≤ 0.006 %, forma ≤ 0.02 % sin ruido*
+- [x] Ablación: CF impuestas duras vs. penalización suave, mismo presupuesto, varias semillas — *10 semillas, N = 15 con ruido*
+- [x] Registrar qué modo de CF es el default de aquí en adelante — *CF duras (bitácora, 2026-10-10)*
+- [x] Archivar las gráficas de validación — *`resultados/validacion-pinn/`*
 
 ## Terminada cuando
-- [ ] Coincidencia <1% documentada; decisión de CF registrada (primera mitad de G3)
+- [x] Coincidencia <1% documentada; decisión de CF registrada (primera mitad de G3)

@@ -1,0 +1,9 @@
+estructura,modo,cf,sesgo_E_pct,desv_E_pct,max_abs_E_pct,error_forma_pct,tiempo_s,convergio
+biempotrada,1,duras,-0.0012,0.0392,0.0756,0.4424,45.5071,1.0
+biempotrada,1,suaves,-0.2265,0.3784,0.6411,0.6086,41.5254,1.0
+biempotrada,3,duras,0.0394,0.0648,0.1125,1.0142,48.2522,1.0
+biempotrada,3,suaves,-0.1672,0.1992,0.514,1.0699,37.8135,1.0
+voladizo,1,duras,0.0051,0.0496,0.1052,0.4242,48.3571,1.0
+voladizo,1,suaves,-0.2124,1.0968,2.435,0.7011,42.5108,1.0
+voladizo,3,duras,0.0353,0.071,0.1404,0.9338,47.0811,1.0
+voladizo,3,suaves,-0.0462,0.3048,0.4984,1.0902,43.0693,1.0

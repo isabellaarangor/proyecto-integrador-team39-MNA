@@ -3,6 +3,7 @@ import pytest
 
 from pinn_mems import Soporte, Viga, resolver_modos
 from pinn_mems.ingenieria_caracteristicas import (
+    direcciones_fisher,
     cocientes_frecuencia,
     matriz_correlacion,
     pca_svd,
@@ -80,3 +81,20 @@ def test_pca_explica_variacion_y_reconstruye_con_todos_los_componentes():
 def test_pca_rechaza_matriz_sin_variacion():
     with pytest.raises(ValueError):
         pca_svd(np.ones((3, 4)))
+
+
+def test_direcciones_fisher_ordena_y_recupera_la_matriz():
+    F = np.array([[4.0, 1.0], [1.0, 2.0]])
+    d = direcciones_fisher(F)
+    assert d.valores[0] > d.valores[1]
+    assert d.vectores @ np.diag(d.valores) @ d.vectores.T == pytest.approx(F)
+    assert d.desviacion == pytest.approx(1 / np.sqrt(d.valores))
+    assert d.condicion == pytest.approx(d.valores[0] / d.valores[1])
+    assert np.all(d.vectores[np.argmax(np.abs(d.vectores), axis=0), [0, 1]] > 0)
+
+
+def test_direcciones_fisher_rechaza_matrices_invalidas():
+    with pytest.raises(ValueError):
+        direcciones_fisher(np.array([[1.0, 2.0], [0.0, 1.0]]))
+    with pytest.raises(ValueError):
+        direcciones_fisher(np.array([[1.0, 0.0], [0.0, -1.0]]))

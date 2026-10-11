@@ -103,3 +103,40 @@ def pca_svd(observaciones: np.ndarray, varianza_objetivo: float = 0.95) -> Resul
         scores=scores,
         n_componentes_objetivo=n_objetivo,
     )
+
+
+@dataclass(frozen=True)
+class DireccionesFisher:
+    """Descomposición propia de una matriz de Fisher, de la dirección mejor a la peor determinada."""
+
+    valores: np.ndarray  # valores propios, de mayor a menor
+    vectores: np.ndarray  # columnas: combinaciones de parámetros (vectores unitarios)
+    desviacion: np.ndarray  # desviación estándar mínima a lo largo de cada dirección, 1/√valor
+    condicion: float  # cociente entre el mayor y el menor valor propio
+
+
+def direcciones_fisher(F: np.ndarray) -> DireccionesFisher:
+    """Valores y vectores propios de la matriz de Fisher.
+
+    Cada vector propio es una combinación de parámetros; su valor propio dice
+    cuánta información traen los datos sobre ella. Un valor pequeño marca una
+    combinación mal determinada. El signo se fija para que la componente de
+    mayor magnitud sea positiva.
+    """
+    matriz = np.asarray(F, dtype=float)
+    if matriz.ndim != 2 or matriz.shape[0] != matriz.shape[1] or not np.all(np.isfinite(matriz)):
+        raise ValueError("F debe ser una matriz cuadrada finita.")
+    if not np.allclose(matriz, matriz.T, rtol=1e-8, atol=0):
+        raise ValueError("F debe ser simétrica.")
+    valores, vectores = np.linalg.eigh(matriz)
+    if valores[0] <= 0:
+        raise ValueError("F debe ser definida positiva.")
+    valores, vectores = valores[::-1], vectores[:, ::-1]
+    signos = np.sign(vectores[np.argmax(np.abs(vectores), axis=0), np.arange(vectores.shape[1])])
+    vectores = vectores * signos
+    return DireccionesFisher(
+        valores=valores,
+        vectores=vectores,
+        desviacion=1 / np.sqrt(valores),
+        condicion=float(valores[0] / valores[-1]),
+    )

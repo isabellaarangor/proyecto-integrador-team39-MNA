@@ -54,12 +54,12 @@ def correr(k, n_modos, presupuesto, semilla):
         "redes": len(meds),
         "presupuesto": presupuesto,
         "semilla": semilla,
-        "tiempo_s": r["tiempo_s"],
-        "error_E_pct": 100 * (r["E"] / E - 1),
-        "convergio": r["convergio"],
+        "tiempo_s": r.tiempo_s,
+        "error_E_pct": 100 * (r.parametros["E"] / E - 1),
+        "convergio": r.convergio,
     }
-    if r["sigma0"] is not None:
-        fila["error_sigma0_pct"] = 100 * (r["sigma0"] / conjuntos["biempotrada"].params["sigma0"] - 1)
+    if "sigma0" in r.parametros:
+        fila["error_sigma0_pct"] = 100 * (r.parametros["sigma0"] / conjuntos["biempotrada"].params["sigma0"] - 1)
     return fila
 
 

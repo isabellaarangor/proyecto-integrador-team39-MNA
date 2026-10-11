@@ -45,6 +45,7 @@ from torch import nn
 from pinn_mems.adimensional import Escalas
 from pinn_mems.eigensolver import Soporte
 from pinn_mems.generadores import Conjunto
+from pinn_mems.resultado import Resultado, hash_config
 
 ESTRUCTURAS = ("voladizo", "biempotrada")
 MODOS_CF = ("duras", "suaves")
@@ -211,12 +212,12 @@ def _d(y, x):
     return torch.autograd.grad(y, x, torch.ones_like(y), create_graph=True)[0]
 
 
-def entrenar(mediciones: list[Medicion], config: ConfigPINN | None = None) -> dict:
-    """Entrena la PINN y devuelve el resultado.
+def entrenar(mediciones: list[Medicion], config: ConfigPINN | None = None) -> Resultado:
+    """Entrena la PINN y devuelve un `Resultado`.
 
-    El resultado es un `dict` con E, θ, σ₀ (o None sin biempotradas), n, la
-    semilla, el tiempo de reloj, la bandera de convergencia, las pérdidas finales
-    por término, el historial y `predecir(i, xi) → (W, M̂)` para la medición i.
+    `parametros` trae E y, si hay biempotradas, σ₀ (en Pa); `residuales`, las
+    pérdidas finales por término. En `extra` quedan θ, n_ref, el historial y
+    `predecir(i, xi) → (W, M̂)` para la medición i.
     """
     config = config or ConfigPINN()
     if not mediciones:
@@ -311,21 +312,29 @@ def entrenar(mediciones: list[Medicion], config: ConfigPINN | None = None) -> di
     theta = float(torch.exp(ln_theta.detach()))
     esc = mediciones[0].escalas
     sigma0 = float(biemp[0].escalas.desde_n(float(n_ref.detach()))) if biemp else None
-    convergio = all(math.isfinite(v) for v in finales.values()) and finales["total"] < config.tol_convergencia
+    finitas = all(math.isfinite(v) for v in finales.values())
+    convergio = finitas and finales["total"] < config.tol_convergencia
+    razon_falla = None
+    if not finitas:
+        razon_falla = "pérdida no finita"
+    elif not convergio:
+        razon_falla = f"pérdida total {finales['total']:.2e} > tolerancia {config.tol_convergencia:.0e}"
 
     def predecir(i: int, xi):
         W, M = redes[i](t(xi), mediciones[i].kappa_theta / theta)
         return W.detach().numpy().ravel(), M.detach().numpy().ravel()
 
-    return {
-        "E": float(esc.desde_theta(theta)),
-        "theta": theta,
-        "sigma0": sigma0,
-        "n_ref": float(n_ref.detach()),
-        "semilla": config.semilla,
-        "tiempo_s": tiempo,
-        "convergio": convergio,
-        "perdidas": finales,
-        "historial": historial,
-        "predecir": predecir,
-    }
+    parametros = {"E": float(esc.desde_theta(theta))}
+    if sigma0 is not None:
+        parametros["sigma0"] = sigma0
+    return Resultado(
+        metodo="pinn",
+        parametros=parametros,
+        convergio=convergio,
+        tiempo_s=tiempo,
+        semilla=config.semilla,
+        residuales=finales,
+        hash_config=hash_config(config),
+        razon_falla=razon_falla,
+        extra={"theta": theta, "n_ref": float(n_ref.detach()), "historial": historial, "predecir": predecir},
+    )

@@ -55,7 +55,7 @@ def correr(tarea):
     med = mediciones_desde_conjunto(conjunto, [modo], sigma0=p["sigma0"])
     r = entrenar(med, ConfigPINN(cf=cf, theta0=0.8, semilla=semilla))
     referencia = resolver_modos(Viga(**p), estructura, n_modos=3).forma(XI_FINO)[modo]
-    W, _ = r["predecir"](0, XI_FINO)
+    W, _ = r.extra["predecir"](0, XI_FINO)
     return {
         "estudio": estudio,
         "estructura": estructura,
@@ -64,11 +64,11 @@ def correr(tarea):
         "semilla": semilla,
         "N": n_puntos,
         "ruido": ruido,
-        "error_E_pct": 100 * (r["E"] / p["E"] - 1),
+        "error_E_pct": 100 * (r.parametros["E"] / p["E"] - 1),
         "error_forma_pct": 100 * np.linalg.norm(W - referencia) / np.linalg.norm(referencia),
-        "tiempo_s": r["tiempo_s"],
-        "convergio": r["convergio"],
-        **{f"perdida_{k}": v for k, v in r["perdidas"].items()},
+        "tiempo_s": r.tiempo_s,
+        "convergio": r.convergio,
+        **{f"perdida_{k}": v for k, v in r.residuales.items()},
         "W": W,
         "W_ref": referencia,
     }

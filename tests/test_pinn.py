@@ -10,6 +10,7 @@ torch = pytest.importorskip("torch")
 from pinn_mems import Soporte, Viga, generar, resolver_modos  # noqa: E402
 from pinn_mems.adimensional import Escalas  # noqa: E402
 from pinn_mems.pinn import ConfigPINN, Medicion, entrenar, mediciones_desde_conjunto  # noqa: E402
+from pinn_mems.resultado import Resultado  # noqa: E402
 
 VIGA = Viga(E=70e9, L=300e-6, b=28e-6, h=2.743e-6, rho=2200.0)
 ESC = Escalas.desde_viga(VIGA)
@@ -33,9 +34,9 @@ def test_cf_duras_se_cumplen_sin_entrenar():
     vol = Medicion("voladizo", xi, np.zeros(2), lam_ref=12.36, escalas=ESC)
     biemp = Medicion("biempotrada", xi, np.zeros(2), lam_ref=500.6, escalas=ESC)
     r = entrenar([vol, biemp], ConfigPINN(capas=(8,), iter_adam=0, iter_lbfgs=0))
-    W, M = r["predecir"](0, xi)
+    W, M = r.extra["predecir"](0, xi)
     assert W[0] == 0.0 and M[1] == 0.0
-    W, _ = r["predecir"](1, xi)
+    W, _ = r.extra["predecir"](1, xi)
     assert np.allclose(W, 0.0)
 
 
@@ -46,9 +47,9 @@ def test_problema_directo_reproduce_la_forma_del_eigensolver():
                    lam_ref=float(modos.lam[0]), escalas=ESC)
     r = entrenar([med], ConfigPINN(invertir_E=False, **RAPIDA))
     xi = np.linspace(0, 1, 50)
-    W, _ = r["predecir"](0, xi)
+    W, _ = r.extra["predecir"](0, xi)
     assert np.max(np.abs(W - modos.forma(xi)[0])) < 1e-2
-    assert r["theta"] == 1.0
+    assert r.extra["theta"] == 1.0
 
 
 @pytest.mark.parametrize("estructura,modo", [("voladizo", 0), ("biempotrada", 1)])
@@ -56,27 +57,29 @@ def test_inverso_recupera_E_en_m0_limpio(estructura, modo):
     conjunto = generar(_config_m0(estructura))
     med = mediciones_desde_conjunto(conjunto, [modo], limpio=True)
     r = entrenar(med, ConfigPINN(theta0=0.8, **RAPIDA))
-    assert r["E"] == pytest.approx(VIGA.E, rel=5e-3)
-    assert r["convergio"]
+    assert r.parametros["E"] == pytest.approx(VIGA.E, rel=5e-3)
+    assert r.convergio
 
 
 def test_cf_suaves_tambien_recuperan_E():
     conjunto = generar(_config_m0("voladizo"))
     med = mediciones_desde_conjunto(conjunto, [0], limpio=True)
     r = entrenar(med, ConfigPINN(cf="suaves", theta0=0.8, **RAPIDA))
-    assert r["E"] == pytest.approx(VIGA.E, rel=1e-2)
-    assert r["perdidas"]["cf"] < 1e-4
+    assert r.parametros["E"] == pytest.approx(VIGA.E, rel=1e-2)
+    assert r.residuales["cf"] < 1e-4
 
 
 def test_registra_cada_termino_de_perdida():
     conjunto = generar(_config_m0("voladizo", n_puntos=5))
     med = mediciones_desde_conjunto(conjunto, [0])
     r = entrenar(med, ConfigPINN(capas=(8,), iter_adam=20, iter_lbfgs=0, registrar_cada=10))
-    assert [f["iter"] for f in r["historial"]] == [0, 10, 20]
+    assert [f["iter"] for f in r.extra["historial"]] == [0, 10, 20]
     for clave in ("datos", "r1", "r2", "cf", "total", "theta"):
-        assert all(math.isfinite(f[clave]) for f in r["historial"])
-    assert set(r) >= {"E", "theta", "sigma0", "semilla", "tiempo_s", "convergio", "perdidas"}
-    assert r["sigma0"] is None
+        assert all(math.isfinite(f[clave]) for f in r.extra["historial"])
+    assert isinstance(r, Resultado) and r.metodo == "pinn" and r.semilla == 0
+    assert set(r.residuales) == {"datos", "r1", "r2", "cf", "total"}
+    assert "sigma0" not in r.parametros
+    assert len(r.hash_config) == 12 and r.tiempo_s > 0
 
 
 def test_mediciones_desde_conjunto_usa_E_ref_y_sigma0():
@@ -98,7 +101,7 @@ def test_cf_duras_del_resorte_rotacional_sin_entrenar():
             for e in ("voladizo", "biempotrada")]
     r = entrenar(meds, ConfigPINN(capas=(8,), iter_adam=0, iter_lbfgs=0))
     for i, estructura in enumerate(("voladizo", "biempotrada")):
-        W, M = r["predecir"](i, xi)
+        W, M = r.extra["predecir"](i, xi)
         assert W[0] == 0.0
         assert M[0] == pytest.approx(kappa * (W[1] - W[0]) / 1e-7, rel=1e-4)
         if estructura == "biempotrada":
@@ -117,9 +120,9 @@ def test_soporte_elastico_verdadero_recupera_E_y_el_ideal_no(estructura, soporte
     conjunto = generar(_config_m0(estructura, soporte=soporte))
     med = mediciones_desde_conjunto(conjunto, [0], soporte=soporte, limpio=True)
     r = entrenar(med, ConfigPINN(theta0=0.8, cf=cf, **RAPIDA))
-    assert r["E"] == pytest.approx(VIGA.E, rel=5e-3)
+    assert r.parametros["E"] == pytest.approx(VIGA.E, rel=5e-3)
     ideal = entrenar(mediciones_desde_conjunto(conjunto, [0], limpio=True), ConfigPINN(theta0=0.8, **RAPIDA))
-    assert ideal["E"] < 0.97 * VIGA.E
+    assert ideal.parametros["E"] < 0.97 * VIGA.E
 
 
 def test_grupo_k3_comparte_E_y_recupera_sigma0():
@@ -130,8 +133,8 @@ def test_grupo_k3_comparte_E_y_recupera_sigma0():
     meds = [m for c in conjuntos.values() for m in mediciones_desde_conjunto(c, [0], limpio=True)]
     assert len({m.escalas.L for m in meds}) == 2
     r = entrenar(meds, ConfigPINN(theta0=0.8, invertir_n=True, **RAPIDA))
-    assert r["E"] == pytest.approx(VIGA.E, rel=5e-3)
-    assert r["sigma0"] == pytest.approx(conjuntos["biempotrada"].params["sigma0"], rel=5e-2)
+    assert r.parametros["E"] == pytest.approx(VIGA.E, rel=5e-3)
+    assert r.parametros["sigma0"] == pytest.approx(conjuntos["biempotrada"].params["sigma0"], rel=5e-2)
 
 
 def test_validaciones():

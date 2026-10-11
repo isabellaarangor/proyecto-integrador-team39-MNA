@@ -79,3 +79,15 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Pérdidas para T44:** ruido estimado sin trazas repetidas; un modelo de ruido blanco puede subestimar la incertidumbre del Brazo 2.
 - **Quién:** pendiente de revisión del equipo.
 - **Estado:** propuesta.
+
+## 2026-10-10 — Framework de la PINN: PyTorch puro (T16)
+
+- **Decisión:** la PINN se implementa en **PyTorch puro** (`src/pinn_mems/pinn/`), sin DeepXDE. `pyproject.toml` agrega el grupo opcional `pinn = ["torch>=2.2"]`.
+- **Motivo y evidencia:** se programó el mismo problema en los dos (voladizo M0, modo 1, 100 puntos con ruido, forma mixta con CF duras, θ inicial 0.8, 3000 iteraciones de Adam + L-BFGS, 1 hilo de CPU):
+  - Los dos recuperan E con el mismo error: +0.072 % con DeepXDE y +0.070 % con PyTorch puro.
+  - DeepXDE tardó 21 s y PyTorch puro 12 s.
+  - DeepXDE resuelve bien las dos salidas, los residuales acoplados, las CF duras y el escalar entrenable. Pero el proyecto necesita varias redes que comparten θ (un modo y una estructura por red, cada una con su λ y sus CF). Después vienen las redes de discrepancia (L2), los pesos adaptativos (L1) y el registro de cada término de pérdida. Todo eso choca con el modelo de una sola geometría de DeepXDE. Con PyTorch es un ciclo de ~250 líneas que controlamos por completo.
+- **Primeros resultados (M0, CF duras, θ inicial 0.8):** error en E < 0.1 % en voladizo y biempotrada, modos 1–3, con y sin ruido. También con N = 5 y N = 15 puntos. Con CF suaves queda < 0.25 %. **E y σ₀ juntos no se pueden separar con un solo modo** en la biempotrada (−21 % en E); con 3 modos sí (+0.07 %, σ₀ = −5.00 MPa). Pasa a G2 / T14.
+- **Tiempo:** ≈ 12 s por corrida con un modo y ≈ 32 s con tres (red 3×32, 128 puntos de colocación, 1 hilo). El cronometraje formal queda para T20.
+- **Quién:** equipo (Manuel).
+- **Estado:** propuesta.

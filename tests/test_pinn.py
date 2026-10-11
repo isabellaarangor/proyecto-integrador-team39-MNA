@@ -122,6 +122,18 @@ def test_soporte_elastico_verdadero_recupera_E_y_el_ideal_no(estructura, soporte
     assert ideal["E"] < 0.97 * VIGA.E
 
 
+def test_grupo_k3_comparte_E_y_recupera_sigma0():
+    """Voladizos de 300 y 200 µm + biempotrada: un modo por estructura basta para E y σ₀."""
+    from pinn_mems.matriz import Corrida, generar_corrida
+
+    conjuntos = generar_corrida(Corrida("m0", N=15, k=3, semilla=0))
+    meds = [m for c in conjuntos.values() for m in mediciones_desde_conjunto(c, [0], limpio=True)]
+    assert len({m.escalas.L for m in meds}) == 2
+    r = entrenar(meds, ConfigPINN(theta0=0.8, invertir_n=True, **RAPIDA))
+    assert r["E"] == pytest.approx(VIGA.E, rel=5e-3)
+    assert r["sigma0"] == pytest.approx(conjuntos["biempotrada"].params["sigma0"], rel=5e-2)
+
+
 def test_validaciones():
     with pytest.raises(ValueError):
         ConfigPINN(cf="mixtas")

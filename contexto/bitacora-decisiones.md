@@ -102,3 +102,29 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Pendiente:** los tiempos de este estudio no son el cronometraje formal. Las corridas compitieron por el CPU (8 procesos en 4 núcleos físicos, además de baja de frecuencia por temperatura). El cronometraje se hace en T20.
 - **Quién:** equipo (Manuel).
 - **Estado:** propuesta.
+
+## 2026-10-10 — Cronometraje de la PINN y matriz sin recortes (T20, segunda mitad de G3)
+
+- **Decisión propuesta:** **no recortar la matriz**. Se queda con 9 casos × N = 5/15/40 × k = 1/3 × modos 1/3 × 10 semillas, más la colocación: 1,080 corridas por método. Se mantiene el presupuesto de entrenamiento de la validación (3000 Adam + 500 L-BFGS).
+- **Motivo y evidencia:** salida de `scripts/cronometrar_pinn.py`, guardada en [`resultados/cronometraje-pinn/`](../resultados/cronometraje-pinn/). Son corridas de M0 con N = 15 y ruido, una a la vez, con 1 hilo, en un i7-1165G7 (laptop, 4 núcleos físicos) y 3 semillas. Mediana del tiempo por corrida:
+
+  | Corrida | Redes | Tiempo | Error máx. en E |
+  |---|---|---|---|
+  | k = 1, 1 modo | 1 | 18 s | 0.07 % |
+  | k = 1, 3 modos | 3 | 51 s | 0.08 % |
+  | k = 3, 1 modo | 3 | 51 s | 0.04 % |
+  | k = 3, 3 modos | 9 | 110 s (máx. 157 s) | 0.11 % |
+
+  - El tiempo crece en proporción al número de redes: unos 17 s por red.
+  - **Promedio ponderado por la composición de la matriz: ≈ 54 s por corrida**, apenas por debajo del umbral de 1 min. El peor caso (k = 3, 3 modos) lo supera.
+  - Proyección: ≈ 16 h-núcleo por método PINN y ≈ 81 h-núcleo para ~5 métodos. Con 3 máquinas de 4 núcleos son ≈ 7 h de reloj. Si L1–L3 cuestan 1.5 veces más que L0, son ≈ 10 h. Cabe con holgura.
+  - **El presupuesto reducido (1500 + 300) no sirve:** baja el tiempo unas 2.8 veces, pero en k = 3 con 3 modos el error en E sube a 0.6 % y en σ₀ a 7.5 %.
+- **Por qué no se aplica el orden de recortes:** el promedio queda por debajo del umbral, y el umbral existe para asegurar que la matriz quepa en el cómputo disponible, lo cual se cumple. Si hiciera falta más tiempo, hay dos alternativas antes que recortar:
+  1. Vectorizar las redes de un grupo: hoy se entrenan en un ciclo, una tras otra.
+  2. Repartir la matriz en sesiones de Colab.
+- **Supuestos y riesgos:**
+  - Las otras 2 máquinas del equipo no se han medido; se supuso que son parecidas a esta.
+  - L1–L3 todavía no existen.
+  - Con k = 3 y 3 modos, σ₀ sale con −1.7 % de error (con 1 modo, −0.3 %); se revisa en T26.
+- **Quién:** equipo (Manuel).
+- **Estado:** propuesta. **G3 se cierra** cuando el equipo la acepte.

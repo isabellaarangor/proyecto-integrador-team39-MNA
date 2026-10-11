@@ -14,6 +14,20 @@ Escalas internas: con s = √λ_ref, W″ y M̂ son de orden s y M̂″ de orden
 que M̂ sale de la red multiplicada por s y r₁, r₂ se dividen entre s y s². Con
 eso todos los términos de pérdida quedan cerca de 1 en cualquier modo.
 
+Soporte elástico (M1, y L3 más adelante). Salen de la misma energía que
+ensambla el eigensolver, ½∫(W″² + n·W′² − λ·W²) + ½κ_θ·W′² + ½κ_u·W² en cada
+soporte; κ_θ y κ_u también escalan como 1/θ:
+
+    ξ = 0:   M̂ = κ_θ·W′        M̂′ − n·W′ = −κ_u·W
+    ξ = 1:   M̂ = −κ_θ·W′       M̂′ − n·W′ = +κ_u·W      (biempotrada)
+
+κ = ∞ es empotramiento ideal (W = 0 o W′ = 0). Con CF duras, lo que se puede
+imponer por transformación de salida se impone así: W = 0 y W′ = 0 con un
+factor polinomial, la condición del resorte rotacional como corrección de M̂
+(restricción esencial sobre M̂) y el extremo libre del voladizo, M̂ = M̂′ = 0,
+con el factor (1 − ξ)². La condición del resorte traslacional (κ_u finito)
+involucra M̂′ y siempre va como penalización. Con CF suaves todas se penalizan.
+
 El problema directo (λ conocida, sin inversión) es el caso `invertir_E=False`
 con un solo dato para fijar la amplitud, p. ej. W(1) = 1 en el voladizo.
 """
@@ -29,6 +43,7 @@ import torch
 from torch import nn
 
 from pinn_mems.adimensional import Escalas
+from pinn_mems.eigensolver import Soporte
 from pinn_mems.generadores import Conjunto
 
 ESTRUCTURAS = ("voladizo", "biempotrada")
@@ -46,10 +61,14 @@ class Medicion:
     lam_ref: float  # λ calculada con la ω medida y E = E_ref
     escalas: Escalas
     n_ref: float = 0.0  # carga axial con E = E_ref: valor fijo o inicial (solo biempotrada)
+    kappa_theta: float = math.inf  # rigidez del soporte que supone el modelo, con E = E_ref
+    kappa_u: float = math.inf
 
     def __post_init__(self):
         if self.estructura not in ESTRUCTURAS:
             raise ValueError(f"estructura debe ser una de {ESTRUCTURAS}, no {self.estructura!r}")
+        if not (self.kappa_theta >= 0 and self.kappa_u >= 0):
+            raise ValueError("las rigideces del soporte deben ser ≥ 0")
 
 
 @dataclass
@@ -85,13 +104,16 @@ def mediciones_desde_conjunto(
     *,
     E_ref: float | None = None,
     sigma0: float | None = None,
+    soporte: Soporte = Soporte(),
     limpio: bool = False,
 ) -> list[Medicion]:
     """Convierte un `Conjunto` sintético en una medición por modo.
 
     `modos` son índices base 0 (todos por defecto). `E_ref` es el E nominal con
     que se adimensionaliza (por defecto el verdadero del conjunto). `sigma0` es
-    el valor fijo o inicial de σ₀ en Pa (0 si se omite). Con `limpio=True` se
+    el valor fijo o inicial de σ₀ en Pa (0 si se omite). `soporte` es el que
+    supone el modelo, adimensional con E_ref (empotramiento ideal por defecto,
+    como en L0), no necesariamente el que generó los datos. Con `limpio=True` se
     usan las formas y frecuencias sin ruido.
     """
     p = conjunto.params
@@ -109,6 +131,8 @@ def mediciones_desde_conjunto(
             lam_ref=float(esc.a_lambda(omega[m])),
             escalas=esc,
             n_ref=n_ref if conjunto.estructura == "biempotrada" else 0.0,
+            kappa_theta=soporte.kappa_theta,
+            kappa_u=soporte.kappa_u,
         )
         for m in modos
     ]
@@ -117,7 +141,7 @@ def mediciones_desde_conjunto(
 class _Red(nn.Module):
     """MLP ξ ↦ (W, M̂) de un modo, con las CF duras opcionales."""
 
-    def __init__(self, capas, estructura: str, s: float, cf: str):
+    def __init__(self, capas, m: Medicion, cf: str):
         super().__init__()
         dims = (1, *capas, 2)
         bloques = []
@@ -126,21 +150,61 @@ class _Red(nn.Module):
             if i < len(dims) - 2:
                 bloques.append(nn.Tanh())
         self.mlp = nn.Sequential(*bloques)
-        self.estructura = estructura
-        self.s = s
-        self.cf = cf
+        self.estructura = m.estructura
+        self.s = math.sqrt(m.lam_ref)
+        self.duras = cf == "duras"
+        self.fija_W = math.isinf(m.kappa_u)
+        self.fija_W1 = self.fija_W and math.isinf(m.kappa_theta)
+        self.resorte_theta = not math.isinf(m.kappa_theta)
+        extremos = [0.0] if m.estructura == "voladizo" else [0.0, 1.0]
+        self.register_buffer("extremos", torch.tensor(extremos, dtype=torch.float64).reshape(-1, 1))
 
-    def forward(self, xi):
+    def _base(self, xi):
+        """W con las CF esenciales sobre W ya impuestas y M̂ sin corregir."""
         salida = self.mlp(2 * xi - 1)
-        NW, NM = salida[:, :1], salida[:, 1:]
-        M = self.s * NM
-        if self.cf == "suaves":
-            return NW, M
+        W, M = salida[:, :1], self.s * salida[:, 1:]
+        if not self.duras or not self.fija_W:
+            return W, M
+        # Factores que anulan W (y W′ si el soporte rotacional es ideal);
+        # 4 y 16 normalizan su máximo a 1 en la biempotrada
         if self.estructura == "voladizo":
-            # W(0) = W′(0) = 0 y M̂(1) = M̂′(1) = 0
-            return xi**2 * NW, (1 - xi) ** 2 * M
-        # Biempotrada: W = W′ = 0 en ambos extremos; 16 = 1/máx ξ²(1−ξ)²
-        return 16 * xi**2 * (1 - xi) ** 2 * NW, M
+            return (xi**2 if self.fija_W1 else xi) * W, M
+        if self.fija_W1:
+            return 16 * xi**2 * (1 - xi) ** 2 * W, M
+        return 4 * xi * (1 - xi) * W, M
+
+    def forward(self, xi, kappa_theta=None):
+        W, M = self._base(xi)
+        if not self.duras:
+            return W, M
+        if self.resorte_theta:
+            # Corrige M̂ para que valga ±κ_θ·W′ en cada soporte
+            e = self.extremos.clone().requires_grad_(True)
+            We, Me = self._base(e)
+            objetivo = kappa_theta * _d(We, e)
+            if self.estructura == "voladizo":
+                M = M - Me[0] + objetivo[0]
+            else:
+                M = M + (1 - xi) * (objetivo[0] - Me[0]) + xi * (-objetivo[1] - Me[1])
+        if self.estructura == "voladizo":
+            return W, (1 - xi) ** 2 * M  # extremo libre: M̂(1) = M̂′(1) = 0
+        return W, M
+
+    def condiciones(self, kappa_theta, kappa_u, n):
+        """Residuales de las CF que no impone la transformación, escalados a O(1)."""
+        e = torch.tensor([[0.0], [1.0]], dtype=torch.float64, requires_grad=True)
+        W, M = self(e, kappa_theta)
+        W1, M1 = _d(W, e), _d(M, e)
+        s = self.s
+        res = []
+        for i, signo in ((0, 1.0), (1, -1.0))[: len(self.extremos)]:
+            if not self.duras or not self.fija_W:
+                res.append(W[i] if self.fija_W else (M1[i] - n * W1[i] + signo * kappa_u * W[i]) / s**1.5)
+            if not self.duras or not self.resorte_theta and not self.fija_W1:
+                res.append(W1[i] / s**0.5 if not self.resorte_theta else (M[i] - signo * kappa_theta * W1[i]) / s)
+        if self.estructura == "voladizo" and not self.duras:
+            res += [M[1] / s, M1[1] / s**1.5]
+        return res
 
 
 def _d(y, x):
@@ -166,7 +230,7 @@ def entrenar(mediciones: list[Medicion], config: ConfigPINN | None = None) -> di
     t0 = time.perf_counter()
 
     redes = nn.ModuleList(
-        _Red(config.capas, m.estructura, math.sqrt(m.lam_ref), config.cf) for m in mediciones
+        _Red(config.capas, m, config.cf) for m in mediciones
     )
     ln_theta = nn.Parameter(
         torch.tensor(math.log(config.theta0), dtype=torch.float64), requires_grad=config.invertir_E
@@ -181,7 +245,6 @@ def entrenar(mediciones: list[Medicion], config: ConfigPINN | None = None) -> di
     t = lambda a: torch.as_tensor(a, dtype=torch.float64).reshape(-1, 1)  # noqa: E731
     xi_c = t(np.linspace(0, 1, config.n_colocacion)).requires_grad_(True)
     datos = [(t(m.xi), t(m.W)) for m in mediciones]
-    extremos = t([0.0, 1.0]).requires_grad_(True)
     pesos = config.pesos
 
     def perdidas() -> dict:
@@ -191,20 +254,15 @@ def entrenar(mediciones: list[Medicion], config: ConfigPINN | None = None) -> di
             s = red.s
             lam = m.lam_ref / theta
             n = (n_ref if m.estructura == "biempotrada" else 0.0) / theta
-            W, M = red(xi_c)
+            kth, ku = m.kappa_theta / theta, m.kappa_u / theta
+            W, M = red(xi_c, kth)
             W2 = _d(_d(W, xi_c), xi_c)
             M2 = _d(_d(M, xi_c), xi_c)
             tot["r1"] = tot["r1"] + torch.mean(((M - W2) / s) ** 2)
             tot["r2"] = tot["r2"] + torch.mean(((M2 - n * W2 - lam * W) / s**2) ** 2)
-            tot["datos"] = tot["datos"] + torch.mean((red(xd)[0] - Wd) ** 2)
-            if config.cf == "suaves":
-                We, Me = red(extremos)
-                W1e = _d(We, extremos)
-                if m.estructura == "voladizo":
-                    M1e = _d(Me, extremos)
-                    cf = [We[0], W1e[0] / s**0.5, Me[1] / s, M1e[1] / s**1.5]
-                else:
-                    cf = [We[0], We[1], W1e[0] / s**0.5, W1e[1] / s**0.5]
+            tot["datos"] = tot["datos"] + torch.mean((red(xd, kth)[0] - Wd) ** 2)
+            cf = red.condiciones(kth, ku, n)
+            if cf:
                 tot["cf"] = tot["cf"] + sum(c.squeeze() ** 2 for c in cf) / len(cf)
         k = len(mediciones)
         tot = {key: v / k for key, v in tot.items()}
@@ -256,10 +314,8 @@ def entrenar(mediciones: list[Medicion], config: ConfigPINN | None = None) -> di
     convergio = all(math.isfinite(v) for v in finales.values()) and finales["total"] < config.tol_convergencia
 
     def predecir(i: int, xi):
-        x = t(xi).requires_grad_(False)
-        with torch.no_grad():
-            W, M = redes[i](x)
-        return W.numpy().ravel(), M.numpy().ravel()
+        W, M = redes[i](t(xi), mediciones[i].kappa_theta / theta)
+        return W.detach().numpy().ravel(), M.detach().numpy().ravel()
 
     return {
         "E": float(esc.desde_theta(theta)),

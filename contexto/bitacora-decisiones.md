@@ -89,8 +89,8 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
   - DeepXDE resuelve bien las dos salidas, los residuales acoplados, las CF duras y el escalar entrenable. Pero el proyecto necesita varias redes que comparten θ (un modo y una estructura por red, cada una con su λ y sus CF). Después vienen las redes de discrepancia (L2), los pesos adaptativos (L1) y el registro de cada término de pérdida. Todo eso choca con el modelo de una sola geometría de DeepXDE. Con PyTorch es un ciclo de ~250 líneas que controlamos por completo.
 - **Primeros resultados (M0, CF duras, θ inicial 0.8):** error en E < 0.1 % en voladizo y biempotrada, modos 1–3, con y sin ruido. También con N = 5 y N = 15 puntos. Con CF suaves queda < 0.25 %. **E y σ₀ juntos no se pueden separar con un solo modo** en la biempotrada (−21 % en E); con 3 modos sí (+0.07 %, σ₀ = −5.00 MPa). Pasa a G2 / T14.
 - **Tiempo:** ≈ 12 s por corrida con un modo y ≈ 32 s con tres (red 3×32, 128 puntos de colocación, 1 hilo). El cronometraje formal queda para T20.
-- **Quién:** equipo (Manuel).
-- **Estado:** propuesta.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-11.
 
 ## 2026-10-10 — Validación de la PINN y CF duras por defecto (T19, primera mitad de G3)
 
@@ -100,12 +100,12 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
   - **Ablación** (M0 con ruido, N = 15, modos 1 y 3, 10 semillas, mismo presupuesto): con CF duras el error en E es como máximo 0.14 % (sesgo entre −0.001 % y +0.04 %, desviación entre 0.04 % y 0.07 %). Con CF suaves aparece un sesgo negativo de −0.05 % a −0.23 % y la dispersión crece de 4 a 22 veces; en el voladizo, modo 1, el peor caso llega a −2.4 %. El error de forma también es menor con CF duras.
   - Las 92 corridas convergen.
 - **Pendiente:** los tiempos de este estudio no son el cronometraje formal. Las corridas compitieron por el CPU (8 procesos en 4 núcleos físicos, además de baja de frecuencia por temperatura). El cronometraje se hace en T20.
-- **Quién:** equipo (Manuel).
-- **Estado:** propuesta.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-11. Las CF duras son el modo por defecto de la PINN de aquí en adelante.
 
 ## 2026-10-10 — Cronometraje de la PINN y matriz sin recortes (T20, segunda mitad de G3)
 
-- **Decisión propuesta:** **no recortar la matriz**. Se queda con 9 casos × N = 5/15/40 × k = 1/3 × modos 1/3 × 10 semillas, más la colocación: 1,080 corridas por método. Se mantiene el presupuesto de entrenamiento de la validación (3000 Adam + 500 L-BFGS).
+- **Decisión:** **no recortar la matriz**. Se queda con 9 casos × N = 5/15/40 × k = 1/3 × modos 1/3 × 10 semillas, más la colocación: 1,080 corridas por método. Se mantiene el presupuesto de entrenamiento de la validación (3000 Adam + 500 L-BFGS).
 - **Motivo y evidencia:** salida de `scripts/cronometrar_pinn.py`, guardada en [`resultados/cronometraje-pinn/`](../resultados/cronometraje-pinn/). Son corridas de M0 con N = 15 y ruido, una a la vez, con 1 hilo, en un i7-1165G7 (laptop, 4 núcleos físicos) y 3 semillas. Mediana del tiempo por corrida:
 
   | Corrida | Redes | Tiempo | Error máx. en E |
@@ -126,8 +126,13 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
   - Las otras 2 máquinas del equipo no se han medido. **El equipo decidió usar por ahora los tiempos de esta máquina** (2026-10-11).
   - L1–L3 todavía no existen.
   - Con k = 3 y 3 modos, σ₀ sale con −1.7 % de error (con 1 modo, −0.3 %); se revisa en T26.
-- **Quién:** equipo (Manuel).
-- **Estado:** propuesta. **G3 se cierra** cuando el equipo la acepte.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Tiempo que hay que reservar** (aceptado el 2026-10-11: se mantiene la matriz completa y se hace espacio en el calendario). Con los tiempos de esta máquina:
+  - Métodos PINN (~5): ≈ 81 h-núcleo si todos cuestan como L0, y ≈ 120 h-núcleo si L1–L3 cuestan 1.5 veces más.
+  - Solo en esta laptop (4 núcleos físicos, 4 procesos): ≈ 20–30 h de reloj. Con margen por la baja de frecuencia en corridas largas (observada en T19), **conviene reservar unas 40 h**, es decir, 2 días de la máquina dedicada.
+  - Con 3 máquinas parecidas: ≈ 7–10 h.
+  - No incluye la inversión clásica (segundos por corrida) ni MCMC (T24–T25), que se estiman aparte.
+- **Estado:** aceptada el 2026-10-11. **G3 cerrada.**
 
 ## 2026-10-11 — Compuerta G2: identificabilidad de E, σ₀ y κ_θ
 

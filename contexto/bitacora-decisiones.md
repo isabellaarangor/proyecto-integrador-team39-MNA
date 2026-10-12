@@ -159,3 +159,17 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Pérdidas para T44:** en el Brazo 1 no se separan giro y desplazamiento del anclaje. La identificabilidad de κ_θ es local (Fisher) y se probó en s3.
 - **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
 - **Estado:** aceptada el 2026-10-11. **G2 cerrada.**
+
+## 2026-10-11 — Estimación inicial común y conexión de la PINN con el arnés
+
+- **Decisión propuesta:** todos los métodos de inversión (clásico y PINN) parten de **E inicial = 0.8·E nominal**, es decir θ = E/E_ref = 0.8.
+- **Motivo:** en los datos sintéticos el E nominal (70 GPa) es el verdadero. Empezar en él le regala la respuesta al método y oculta los problemas de convergencia. Si los métodos parten de lugares distintos, la comparación no es justa.
+- **Conexión con el arnés:** la PINN ya se puede llamar desde el arnés con `correr_pinn(corrida, n_modos)` (`src/pinn_mems/pinn/arnes.py`). Hace lo siguiente:
+  - Toma una corrida de `matriz.py` y el número de modos medidos (1 o 3).
+  - Usa la semilla de la corrida, entrena σ₀ solo cuando hay biempotrada y devuelve un `Resultado` con los valores verdaderos en `extra`.
+  - Es reproducible: la misma corrida da el mismo resultado (`tests/test_arnes_pinn.py`).
+- **Pendiente para el arnés (Frente 2, T23):**
+  1. `matriz.corridas()` no incluye el eje de modos (1 o 3): da 510 corridas, no las 1,020 + 60 de colocación que cuenta el plan.
+  2. La clave del almacén debe combinar la config del método (`Resultado.hash_config`) con la corrida y el número de modos.
+- **Quién:** equipo (Manuel).
+- **Estado:** propuesta. La política de inicio requiere que el Frente 2 la adopte en T22.

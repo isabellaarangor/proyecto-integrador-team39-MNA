@@ -9,7 +9,7 @@
 - [ ] Extender sobre k_θ: ¿agregar los modos 2–3 lo hace identificable?
 - [ ] Si el Brazo 1 es solo-frecuencia (bandera de T06), verificar identificabilidad bajo el montaje débilmente supervisado
 - [ ] Graficar y archivar las superficies (son figuras de la tesis)
-- [ ] Registrar el veredicto de G2 en la bitácora de decisiones
+- [x] Registrar el veredicto de G2 en la bitácora de decisiones — *2026-10-11, con evidencia de Fisher y de la PINN*
 
 ## Terminada cuando
-- [ ] **G2 cerrada.** Falla → registrar el repliegue: recuperar solo E (dirección Tier 0)
+- [x] **G2 cerrada.** Falla → registrar el repliegue: recuperar solo E (dirección Tier 0) — *cerrada en positivo el 2026-10-11; las superficies de desajuste siguen pendientes como figuras*

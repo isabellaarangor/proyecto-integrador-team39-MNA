@@ -123,8 +123,34 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
   1. Vectorizar las redes de un grupo: hoy se entrenan en un ciclo, una tras otra.
   2. Repartir la matriz en sesiones de Colab.
 - **Supuestos y riesgos:**
-  - Las otras 2 máquinas del equipo no se han medido; se supuso que son parecidas a esta.
+  - Las otras 2 máquinas del equipo no se han medido. **El equipo decidió usar por ahora los tiempos de esta máquina** (2026-10-11).
   - L1–L3 todavía no existen.
   - Con k = 3 y 3 modos, σ₀ sale con −1.7 % de error (con 1 modo, −0.3 %); se revisa en T26.
 - **Quién:** equipo (Manuel).
 - **Estado:** propuesta. **G3 se cierra** cuando el equipo la acepte.
+
+## 2026-10-11 — Compuerta G2: identificabilidad de E, σ₀ y κ_θ
+
+- **Decisión:** **G2 se cierra en positivo.** Con el diseño de la matriz (grupos de 3 estructuras y 3 modos) se pueden separar E, σ₀ y κ_θ. Hay dos condiciones:
+  - E y σ₀ se separan combinando voladizo y biempotrada, o con varios modos de la biempotrada. **Con un solo modo de una biempotrada sola no se separan.**
+  - κ_θ se separa con 3 modos. **Con 1 modo queda prácticamente sin determinar.**
+- **Motivo y evidencia:**
+  - **E y σ₀** (PINN, M0, θ inicial 0.8):
+    - Biempotrada sola con 1 modo: E sale con −21 % de error y σ₀ con −0.85 MPa en vez de −5 MPa. Los dos se compensan.
+    - Biempotrada con 3 modos: +0.07 % en E y σ₀ = −5.00 MPa.
+    - Grupo k = 3 (voladizos de 300 y 200 µm + biempotrada) con 1 modo por estructura: error ≤ 0.04 % en E y ≤ 0.4 % en σ₀.
+    - Fuente: entradas del 2026-10-10 (T16, T20) y `tests/test_pinn.py`.
+  - **E y κ_θ** (información de Fisher, voladizo s3, 15 puntos; sección del Frente 2, [`frente-2-seleccion.ipynb`](../entregables/avance2/secciones/frente-2-seleccion.ipynb)):
+    - La combinación bien determinada es ≈ ln E + 0.05·ln κ_θ, la que fija la frecuencia, con σ ≈ 0.06 % (1 modo) y 0.035 % (3 modos).
+    - La mal determinada es ≈ ln κ_θ, con σ ≈ 100 % con 1 modo y ≈ 10 % con 3 modos.
+    - Las estimaciones de E y κ_θ tienen correlación −0.9999 con 1 modo y −0.997 con 3.
+    - Cota de E: 5.1 % con 1 modo y 0.47 % con 3 modos.
+  - **Brazo 1 real** (solo ω₁ por voladizo): la identificabilidad descansa en el barrido de longitudes. El ajuste de ΔL con los 24 puntos de la Fig. 6 sí acota el efecto del anclaje (ΔL = 12.2 µm, IC 95 % 11.1–13.3), pero no distingue giro de desplazamiento del anclaje (T54).
+- **Consecuencias:**
+  - Los métodos que estiman σ₀ deben usar el grupo k = 3 o 3 modos.
+  - L3 (κ_θ entrenable) solo tiene sentido con 3 modos o con el barrido de longitudes. Con k = 1 y 1 modo, κ_θ no es identificable y se espera que E quede sesgado.
+  - En el Brazo 1, L3 estima una sola flexibilidad efectiva del anclaje (ΔL), no k_θ y k_u por separado.
+- **Pendiente (no bloquea):** las superficies de desajuste de T14, que son figuras de la tesis, y la verificación formal del montaje solo-frecuencia del Brazo 1.
+- **Pérdidas para T44:** en el Brazo 1 no se separan giro y desplazamiento del anclaje. La identificabilidad de κ_θ es local (Fisher) y se probó en s3.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-11. **G2 cerrada.**

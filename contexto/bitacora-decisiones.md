@@ -79,3 +79,97 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Pérdidas para T44:** ruido estimado sin trazas repetidas; un modelo de ruido blanco puede subestimar la incertidumbre del Brazo 2.
 - **Quién:** pendiente de revisión del equipo.
 - **Estado:** propuesta.
+
+## 2026-10-10 — Framework de la PINN: PyTorch puro (T16)
+
+- **Decisión:** la PINN se implementa en **PyTorch puro** (`src/pinn_mems/pinn/`), sin DeepXDE. `pyproject.toml` agrega el grupo opcional `pinn = ["torch>=2.2"]`.
+- **Motivo y evidencia:** se programó el mismo problema en los dos (voladizo M0, modo 1, 100 puntos con ruido, forma mixta con CF duras, θ inicial 0.8, 3000 iteraciones de Adam + L-BFGS, 1 hilo de CPU):
+  - Los dos recuperan E con el mismo error: +0.072 % con DeepXDE y +0.070 % con PyTorch puro.
+  - DeepXDE tardó 21 s y PyTorch puro 12 s.
+  - DeepXDE resuelve bien las dos salidas, los residuales acoplados, las CF duras y el escalar entrenable. Pero el proyecto necesita varias redes que comparten θ (un modo y una estructura por red, cada una con su λ y sus CF). Después vienen las redes de discrepancia (L2), los pesos adaptativos (L1) y el registro de cada término de pérdida. Todo eso choca con el modelo de una sola geometría de DeepXDE. Con PyTorch es un ciclo de ~250 líneas que controlamos por completo.
+- **Primeros resultados (M0, CF duras, θ inicial 0.8):** error en E < 0.1 % en voladizo y biempotrada, modos 1–3, con y sin ruido. También con N = 5 y N = 15 puntos. Con CF suaves queda < 0.25 %. **E y σ₀ juntos no se pueden separar con un solo modo** en la biempotrada (−21 % en E); con 3 modos sí (+0.07 %, σ₀ = −5.00 MPa). Pasa a G2 / T14.
+- **Tiempo:** ≈ 12 s por corrida con un modo y ≈ 32 s con tres (red 3×32, 128 puntos de colocación, 1 hilo). El cronometraje formal queda para T20.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-11.
+
+## 2026-10-10 — Validación de la PINN y CF duras por defecto (T19, primera mitad de G3)
+
+- **Decisión:** la PINN usa **CF duras** (transformación de salida) por defecto. Las CF suaves quedan solo como opción de ablación.
+- **Motivo y evidencia:** salida de `scripts/validar_pinn.py`, guardada en [`resultados/validacion-pinn/`](../resultados/validacion-pinn/). Todas las corridas parten de E 20 % abajo del verdadero, con σ₀ conocido en la biempotrada:
+  - **Validación contra el eigensolver** (M0 sin ruido, 100 puntos, voladizo y biempotrada, modos 1–3): error en E ≤ 0.006 % y error de forma (L2 relativo) ≤ 0.02 %, con los dos modos de CF. **Muy por debajo del 1 %.**
+  - **Ablación** (M0 con ruido, N = 15, modos 1 y 3, 10 semillas, mismo presupuesto): con CF duras el error en E es como máximo 0.14 % (sesgo entre −0.001 % y +0.04 %, desviación entre 0.04 % y 0.07 %). Con CF suaves aparece un sesgo negativo de −0.05 % a −0.23 % y la dispersión crece de 4 a 22 veces; en el voladizo, modo 1, el peor caso llega a −2.4 %. El error de forma también es menor con CF duras.
+  - Las 92 corridas convergen.
+- **Pendiente:** los tiempos de este estudio no son el cronometraje formal. Las corridas compitieron por el CPU (8 procesos en 4 núcleos físicos, además de baja de frecuencia por temperatura). El cronometraje se hace en T20.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-11. Las CF duras son el modo por defecto de la PINN de aquí en adelante.
+
+## 2026-10-10 — Cronometraje de la PINN y matriz sin recortes (T20, segunda mitad de G3)
+
+- **Decisión:** **no recortar la matriz**. Se queda con 9 casos × N = 5/15/40 × k = 1/3 × modos 1/3 × 10 semillas, más la colocación: 1,080 corridas por método. Se mantiene el presupuesto de entrenamiento de la validación (3000 Adam + 500 L-BFGS).
+- **Motivo y evidencia:** salida de `scripts/cronometrar_pinn.py`, guardada en [`resultados/cronometraje-pinn/`](../resultados/cronometraje-pinn/). Son corridas de M0 con N = 15 y ruido, una a la vez, con 1 hilo, en un i7-1165G7 (laptop, 4 núcleos físicos) y 3 semillas. Mediana del tiempo por corrida:
+
+  | Corrida | Redes | Tiempo | Error máx. en E |
+  |---|---|---|---|
+  | k = 1, 1 modo | 1 | 18 s | 0.07 % |
+  | k = 1, 3 modos | 3 | 51 s | 0.08 % |
+  | k = 3, 1 modo | 3 | 51 s | 0.04 % |
+  | k = 3, 3 modos | 9 | 110 s (máx. 157 s) | 0.11 % |
+
+  - El tiempo crece en proporción al número de redes: unos 17 s por red.
+  - **Promedio ponderado por la composición de la matriz: ≈ 54 s por corrida**, apenas por debajo del umbral de 1 min. El peor caso (k = 3, 3 modos) lo supera.
+  - Proyección: ≈ 16 h-núcleo por método PINN y ≈ 81 h-núcleo para ~5 métodos. Con 3 máquinas de 4 núcleos son ≈ 7 h de reloj. Si L1–L3 cuestan 1.5 veces más que L0, son ≈ 10 h. Cabe con holgura.
+  - **El presupuesto reducido (1500 + 300) no sirve:** baja el tiempo unas 2.8 veces, pero en k = 3 con 3 modos el error en E sube a 0.6 % y en σ₀ a 7.5 %.
+- **Por qué no se aplica el orden de recortes:** el promedio queda por debajo del umbral, y el umbral existe para asegurar que la matriz quepa en el cómputo disponible, lo cual se cumple. Si hiciera falta más tiempo, hay dos alternativas antes que recortar:
+  1. Vectorizar las redes de un grupo: hoy se entrenan en un ciclo, una tras otra.
+  2. Repartir la matriz en sesiones de Colab.
+- **Supuestos y riesgos:**
+  - Las otras 2 máquinas del equipo no se han medido. **El equipo decidió usar por ahora los tiempos de esta máquina** (2026-10-11).
+  - L1–L3 todavía no existen.
+  - Con k = 3 y 3 modos, σ₀ sale con −1.7 % de error (con 1 modo, −0.3 %); se revisa en T26.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Tiempo que hay que reservar** (aceptado el 2026-10-11: se mantiene la matriz completa y se hace espacio en el calendario). Con los tiempos de esta máquina:
+  - Métodos PINN (~5): ≈ 81 h-núcleo si todos cuestan como L0, y ≈ 120 h-núcleo si L1–L3 cuestan 1.5 veces más.
+  - Solo en esta laptop (4 núcleos físicos, 4 procesos): ≈ 20–30 h de reloj. Con margen por la baja de frecuencia en corridas largas (observada en T19), **conviene reservar unas 40 h**, es decir, 2 días de la máquina dedicada.
+  - Con 3 máquinas parecidas: ≈ 7–10 h.
+  - No incluye la inversión clásica (segundos por corrida) ni MCMC (T24–T25), que se estiman aparte.
+- **Estado:** aceptada el 2026-10-11. **G3 cerrada.**
+
+## 2026-10-11 — Compuerta G2: identificabilidad de E, σ₀ y κ_θ
+
+- **Decisión:** **G2 se cierra en positivo.** Con el diseño de la matriz (grupos de 3 estructuras y 3 modos) se pueden separar E, σ₀ y κ_θ. Hay dos condiciones:
+  - E y σ₀ se separan combinando voladizo y biempotrada, o con varios modos de la biempotrada. **Con un solo modo de una biempotrada sola no se separan.**
+  - κ_θ se separa con 3 modos. **Con 1 modo queda prácticamente sin determinar.**
+- **Motivo y evidencia:**
+  - **E y σ₀** (PINN, M0, θ inicial 0.8):
+    - Biempotrada sola con 1 modo: E sale con −21 % de error y σ₀ con −0.85 MPa en vez de −5 MPa. Los dos se compensan.
+    - Biempotrada con 3 modos: +0.07 % en E y σ₀ = −5.00 MPa.
+    - Grupo k = 3 (voladizos de 300 y 200 µm + biempotrada) con 1 modo por estructura: error ≤ 0.04 % en E y ≤ 0.4 % en σ₀.
+    - Fuente: entradas del 2026-10-10 (T16, T20) y `tests/test_pinn.py`.
+  - **E y κ_θ** (información de Fisher, voladizo s3, 15 puntos; sección del Frente 2, [`frente-2-seleccion.ipynb`](../entregables/avance2/secciones/frente-2-seleccion.ipynb)):
+    - La combinación bien determinada es ≈ ln E + 0.05·ln κ_θ, la que fija la frecuencia, con σ ≈ 0.06 % (1 modo) y 0.035 % (3 modos).
+    - La mal determinada es ≈ ln κ_θ, con σ ≈ 100 % con 1 modo y ≈ 10 % con 3 modos.
+    - Las estimaciones de E y κ_θ tienen correlación −0.9999 con 1 modo y −0.997 con 3.
+    - Cota de E: 5.1 % con 1 modo y 0.47 % con 3 modos.
+  - **Brazo 1 real** (solo ω₁ por voladizo): la identificabilidad descansa en el barrido de longitudes. El ajuste de ΔL con los 24 puntos de la Fig. 6 sí acota el efecto del anclaje (ΔL = 12.2 µm, IC 95 % 11.1–13.3), pero no distingue giro de desplazamiento del anclaje (T54).
+- **Consecuencias:**
+  - Los métodos que estiman σ₀ deben usar el grupo k = 3 o 3 modos.
+  - L3 (κ_θ entrenable) solo tiene sentido con 3 modos o con el barrido de longitudes. Con k = 1 y 1 modo, κ_θ no es identificable y se espera que E quede sesgado.
+  - En el Brazo 1, L3 estima una sola flexibilidad efectiva del anclaje (ΔL), no k_θ y k_u por separado.
+- **Pendiente (no bloquea):** las superficies de desajuste de T14, que son figuras de la tesis, y la verificación formal del montaje solo-frecuencia del Brazo 1.
+- **Pérdidas para T44:** en el Brazo 1 no se separan giro y desplazamiento del anclaje. La identificabilidad de κ_θ es local (Fisher) y se probó en s3.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-11. **G2 cerrada.**
+
+## 2026-10-11 — Estimación inicial común y conexión de la PINN con el arnés
+
+- **Decisión propuesta:** todos los métodos de inversión (clásico y PINN) parten de **E inicial = 0.8·E nominal**, es decir θ = E/E_ref = 0.8.
+- **Motivo:** en los datos sintéticos el E nominal (70 GPa) es el verdadero. Empezar en él le regala la respuesta al método y oculta los problemas de convergencia. Si los métodos parten de lugares distintos, la comparación no es justa.
+- **Conexión con el arnés:** la PINN ya se puede llamar desde el arnés con `correr_pinn(corrida, n_modos)` (`src/pinn_mems/pinn/arnes.py`). Hace lo siguiente:
+  - Toma una corrida de `matriz.py` y el número de modos medidos (1 o 3).
+  - Usa la semilla de la corrida, entrena σ₀ solo cuando hay biempotrada y devuelve un `Resultado` con los valores verdaderos en `extra`.
+  - Es reproducible: la misma corrida da el mismo resultado (`tests/test_arnes_pinn.py`).
+- **Pendiente para el arnés (Frente 2, T23):**
+  1. `matriz.corridas()` no incluye el eje de modos (1 o 3): da 510 corridas, no las 1,020 + 60 de colocación que cuenta el plan.
+  2. La clave del almacén debe combinar la config del método (`Resultado.hash_config`) con la corrida y el número de modos.
+- **Quién:** equipo (Manuel).
+- **Estado:** propuesta. La política de inicio requiere que el Frente 2 la adopte en T22.

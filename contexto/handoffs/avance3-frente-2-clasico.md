@@ -23,8 +23,9 @@ Al final de la semana: `correr_clasico` recupera E y σ₀ en M0 sin ruido, sus 
 |---|---|---|---|
 | 0 | Acordar la firma | 15 min con los otros dos frentes el día 1: `correr_clasico(corrida, n_modos, *, sin_ruido=False) -> Resultado` | Día 1 |
 | 1 | [T22](../tareas/T22-inversa-clasica-anidada.md) Inversión clásica | `src/pinn_mems/inversa/clasica.py`: función de residuales, ajuste con `least_squares` y `correr_clasico`. Recupera E y σ₀ en M0 sin ruido; sensibilidad a la estimación inicial; devuelve `Resultado` con `n_resoluciones` y `tiempo_s`. **Avisar al Frente 1 en cuanto esté en `main`** | Primera mitad |
-| 2 | Correr las celdas del clásico | `python scripts/correr_avance3.py --metodo clasico_l0` (lo escribe el Frente 1). Tarda segundos por corrida | En cuanto 1 esté listo |
-| 3 | [T14](../tareas/T14-identificabilidad-g2.md) Superficies de desajuste | Con la misma función de residuales: (E, σ₀) biempotrada sola contra voladizo + biempotrada; (E, κ_θ) del voladizo M1 s3 con 1 contra 3 modos. Figuras en `resultados/superficies/` | Segunda mitad |
+| 2 | Correr las celdas del clásico | `python scripts/correr_avance3.py --metodo clasico_l0` (lo escribe el Frente 1). ≈ 2–4 min en total | En cuanto 1 esté listo |
+| 3 | [T14](../tareas/T14-identificabilidad-g2.md) Superficies de desajuste | Con la misma función de residuales: (E, σ₀) biempotrada sola contra voladizo + biempotrada; (E, κ_θ) del voladizo M1 s3 con 1 contra 3 modos. Mallas en `resultados/superficies/*.npz` (≈ 2 min en total) y figuras | Segunda mitad |
+| 4 | Medir tu máquina | `python scripts/cronometrar_pinn.py --semillas 3` (≈ 15 min, sin supervisión). El script escribe sobre los archivos de Manuel: antes del commit, mover `corridas.csv`, `maquina.txt` y `resumen.csv` a `resultados/cronometraje-pinn/<tu nombre>/` y recuperar los originales con `git restore resultados/cronometraje-pinn/`. Sirve para repartir el cómputo de las semanas 6–7 | Cualquier momento |
 
 ### B. Sección del Avance 3 (`entregables/avance3/secciones/frente-2-clasico.ipynb`)
 
@@ -49,9 +50,10 @@ Al final de la semana: `correr_clasico` recupera E y σ₀ en M0 sin ruido, sus 
 - [ ] `correr_clasico` en `main` con pruebas: recupera E con error < 0.1 % en M0 sin ruido, y σ₀ con k = 3 o 3 modos.
 - [ ] Sensibilidad a la estimación inicial medida (θ₀ de 0.5 a 1.5).
 - [ ] Prueba de cordura: en M1 sin ruido, k = 1 y solo ω₁, el sesgo en E coincide con el calibrado de la severidad (s3 ≈ −5 %).
-- [ ] Las celdas del clásico están en `resultados/avance3/clasico_l0/`.
+- [ ] Las celdas del clásico están en `resultados/avance3/clasico_l0/<hash>/`.
 - [ ] Superficies de T14 archivadas y casillas de T14 cerradas.
-- [ ] Sección entregada al Frente 3, corriendo en menos de 10 min.
+- [ ] Tiempos de tu máquina subidos.
+- [ ] Sección entregada al Frente 3, corriendo en menos de 5 min.
 - [ ] `pytest -m "not notebooks"` en verde.
 
 ## Contexto adicional
@@ -75,6 +77,7 @@ def correr_clasico(corrida, n_modos, *, sin_ruido=False, matriz=None) -> Resulta
 - **Ajuste:** `scipy.optimize.least_squares(method="trf", x_scale="jac", xtol=ftol=1e-10)`, con cotas θ ∈ [0.3, 3] y σ₀ ∈ [−15, 15] MPa. La biempotrada de 300 µm pandea cerca de σ₀ ≈ −19 MPa (n = −4π²); la cota evita esa zona.
 - **Incertidumbre:** desviación estándar de cada parámetro a partir de (JᵀJ)⁻¹·χ²_red, en `Resultado.incertidumbre`.
 - **Costo:** `n_resoluciones` = número de llamadas a `resolver_modos` (un contador en la función de residuales); `tiempo_s` el de reloj.
+- **`hash_config`:** el de la config del método (`n_elem`, cotas, tolerancias, pesos), sin la corrida ni la semilla. Es la carpeta del almacén: si se cambia la config, los resultados nuevos van a otra carpeta.
 - `Resultado`: `metodo="clasico_l0"`, `parametros` en SI con claves `"E"` y `"sigma0"`; en `extra`, `corrida`, `n_modos`, `sin_ruido`, `verdaderos` (`matriz.verdaderos()`) y el χ² reducido.
 
 ### Código existente
@@ -91,6 +94,22 @@ def correr_clasico(corrida, n_modos, *, sin_ruido=False, matriz=None) -> Resulta
 - κ_θ queda prácticamente sin determinar con 1 modo (σ ≈ 100 %) y ≈ 10 % con 3.
 - Las superficies de T14 deben **verse** así: un valle alargado en el primer caso y un mínimo puntual en el segundo.
 
+### Tiempo de cómputo
+
+Medido el 2026-10-16 en la laptop de Manuel:
+
+| Qué | Costo |
+|---|---|
+| Una llamada a `resolver_modos` (3 modos) | ≈ 5.6 ms con `n_elem=100`; ≈ 21 ms con 200 |
+| Una evaluación de residuales | 1 llamada por estructura: ≈ 6 ms con k = 1, ≈ 17 ms con k = 3 |
+| Un ajuste | ≈ 20–60 evaluaciones (con el Jacobiano por diferencias finitas): ≈ 0.2 s con k = 1, ≈ 1 s con k = 3 |
+| Las 220 corridas del Avance 3 | ≈ 2–4 min |
+| Una superficie de 60 × 60 | 3600 evaluaciones: ≈ 20 s con una estructura, ≈ 40 s con dos |
+
+- **Usar `n_elem=100`:** con 200 todo cuesta ≈ 4 veces más y se cae en el crimen inverso.
+- **Las superficies se precalculan** con un script y se guardan como `.npz`; la sección solo las carga y grafica. Si se quiere una en vivo, usar una malla de 30 × 30 (≈ 5–10 s).
+- La ablación y la sensibilidad a la estimación inicial sí pueden correr en vivo: son decenas de ajustes de menos de 1 s.
+
 ### Superficies de desajuste (T14)
 
 - La misma función `residuales`, evaluada sobre una malla (por ejemplo 60 × 60) de (θ, σ₀) o de (ln θ, ln κ_θ). Graficar ½·‖r‖² en escala logarítmica con contornos.
@@ -100,6 +119,6 @@ def correr_clasico(corrida, n_modos, *, sin_ruido=False, matriz=None) -> Resulta
 ### Cómo entregar la sección
 
 - Código reutilizable en `src/pinn_mems/inversa/` con pruebas; en la sección, llamadas cortas y gráficas.
-- La sección lee el almacén (`resultados/avance3/`); puede correr en vivo los ajustes de la ablación, que tardan segundos.
+- La sección lee el almacén (`resultados/avance3/`) y las superficies precalculadas; puede correr en vivo los ajustes de la ablación, que tardan segundos.
 - Lenguaje simple, sin IDs de tareas, fórmulas con `$…$`, sin `git clone` ni rutas `/content/`. Cada técnica lleva su justificación y su interpretación.
 - Errores y resúmenes solo con `Resultado.errores_relativos()` y `metricas.py`; colores de `metricas.COLORES`.

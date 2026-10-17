@@ -51,7 +51,7 @@ correr_semi_ms4(corrida, n_modos, *, sin_ruido=False) -> Resultado  # Frente 3
   - `parametros`: en SI, con las claves `"E"` (Pa) y, si hay biempotrada, `"sigma0"` (Pa).
   - `extra`: `corrida` (el id), `n_modos`, `sin_ruido` y `verdaderos` (de `matriz.verdaderos()`).
   - `n_resoluciones`: las llamadas al eigensolver (`None` en la PINN y en SEMI MS4).
-  - `hash_config`: el de la config del método.
+  - `hash_config`: el de la config del método **sin los campos que cambian en cada corrida** (semilla, `invertir_n`). Así todas las corridas de una misma config comparten hash.
 - Con `sin_ruido=True`, todos usan `conjunto.w_limpia` y `conjunto.omega_limpia` en lugar de `w` y `omega`.
 - Todos parten de `THETA0` = 0.8 cuando el método tiene estimación inicial.
 
@@ -69,8 +69,23 @@ Son unas 220 corridas por método. Con la PINN, a ≈ 54 s por corrida, son ≈ 
 
 ### Almacén de resultados
 
-- El ciclo de semillas (`scripts/correr_avance3.py`, Frente 1) corre cualquier método sobre las celdas y guarda cada `Resultado` en `resultados/avance3/<metodo>/<id de la corrida>_m<n_modos>[_sin_ruido].json`, incluido `extra`.
+- El ciclo de semillas (`scripts/correr_avance3.py`, Frente 1) corre cualquier método sobre las celdas y guarda cada `Resultado` en `resultados/avance3/<metodo>/<hash_config>/<id>_m<n_modos>[_sin_ruido].json`, incluido `extra` salvo lo que no se puede serializar.
 - Si el archivo ya existe, no se vuelve a correr. Así cada quien corre su método sin repetir los de los demás.
+- **El hash va en la ruta** para que un cambio de config (por ejemplo, otro λ_PDE) cree una carpeta nueva en lugar de saltarse corridas que ya no corresponden. `metricas.cargar` lee la carpeta de la config vigente; las anteriores se quedan como historial.
+
+### Tiempo de cómputo
+
+Medido en la laptop de Manuel (i7-1165G7, 1 hilo por proceso; bitácora, 2026-10-10, y medición del 2026-10-16):
+
+| Qué | Costo unitario | Avance 3 | Dónde corre |
+|---|---|---|---|
+| PINN L0 | ≈ 17 s por red (redes = estructuras × modos): 18 s con k = 1 y 1 modo, 110 s con k = 3 y 3 modos | ≈ 240 corridas con el barrido de λ_PDE: **≈ 3.6 h-núcleo, ≈ 1–1.5 h con 4 procesos** | Una noche o una tarde dedicada |
+| Inversión clásica | ≈ 5.6 ms por llamada al eigensolver con 100 elementos (21 ms con 200); ≈ 0.2–1 s por ajuste | 220 corridas: **≈ 2–4 min** | Cualquier máquina |
+| Superficies de desajuste | Una evaluación por punto de la malla: 60 × 60 ≈ 20–40 s por superficie | 4 superficies: **≈ 2 min** | Se precalculan y se guardan |
+| SEMI MS4 | Instantáneo; lo que cuesta es generar la corrida (0.04 s con k = 1, 0.1 s con k = 3) | 220 corridas: **≈ 15 s** | Cualquier máquina |
+
+- **Orden:** primero el barrido de λ_PDE, luego fijarlo y después lanzar las corridas de la PINN. Si se lanzan antes, hay que repetirlas.
+- **Lo caro viene en las semanas 6–7:** ≈ 81–120 h-núcleo para los métodos PINN sobre la matriz completa (bitácora, 2026-10-10). Para planearlas, los Frentes 2 y 3 miden su máquina esta semana con `scripts/cronometrar_pinn.py --semillas 3` (≈ 15 min, sin supervisión) y suben sus archivos en `resultados/cronometraje-pinn/<nombre>/` (el detalle está en sus handoffs).
 
 ### Unidades y presentación
 
@@ -79,7 +94,8 @@ Son unas 220 corridas por método. Con la PINN, a ≈ 54 s por corrida, son ≈ 
 
 ### Notebooks de sección
 
-- **Leen los resultados del almacén; no entrenan la matriz.** Cada sección puede correr en vivo una sola corrida de ejemplo. Cada notebook debe correr en menos de 10 min, el límite de `tests/test_notebooks.py`.
+- **Leen los resultados del almacén; no entrenan la matriz.** Cada sección puede correr en vivo una sola corrida de ejemplo de la PINN, la más barata (k = 1, 1 modo, ≈ 18 s).
+- Meta de tiempo: cada sección en menos de 5 min y el notebook integrado en menos de 15. `tests/test_notebooks.py` corta cualquier celda que tarde más de 10 min.
 - Encuentran el repositorio desde su propia carpeta, como la celda de importaciones del Avance 2. Sin `git clone` ni rutas `/content/`.
 - Están escritos para un lector externo: lenguaje simple, cada técnica con su justificación junto al código y sin identificadores de tareas (T22, G4…).
 

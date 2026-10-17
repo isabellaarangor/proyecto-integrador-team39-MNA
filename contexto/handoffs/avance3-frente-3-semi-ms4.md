@@ -30,7 +30,8 @@ Al final de la semana: `metricas.py` en `main` desde el día 1; SEMI MS4 reprodu
 | # | Tarea | Qué entregar | Cuándo |
 |---|---|---|---|
 | 3 | [T08](../tareas/T08-reproduccion-mems-calculator.md) SEMI MS4 | `src/pinn_mems/nist/semi_ms4.py`: la fórmula de la hoja YM.1 con su presupuesto de incertidumbre; `ejemplo_marshall()` reproduce el ejemplo resuelto (ver Contexto); `correr_semi_ms4` sobre las celdas sintéticas | Primera mitad |
-| 4 | Correr las celdas de SEMI MS4 | `python scripts/correr_avance3.py --metodo semi_ms4` (lo escribe el Frente 1). Es instantáneo | En cuanto 3 esté listo |
+| 4 | Correr las celdas de SEMI MS4 | `python scripts/correr_avance3.py --metodo semi_ms4` (lo escribe el Frente 1). ≈ 15 s en total: lo único que cuesta es generar las corridas | En cuanto 3 esté listo |
+| 4b | Medir tu máquina | `python scripts/cronometrar_pinn.py --semillas 3` (≈ 15 min, sin supervisión). El script escribe sobre los archivos de Manuel: antes del commit, mover `corridas.csv`, `maquina.txt` y `resumen.csv` a `resultados/cronometraje-pinn/<tu nombre>/` y recuperar los originales con `git restore resultados/cronometraje-pinn/`. Sirve para repartir el cómputo de las semanas 6–7 | Cualquier momento |
 
 ### C. Secciones propias (`entregables/avance3/secciones/frente-3-semi-ms4.ipynb`)
 
@@ -63,9 +64,10 @@ Al final de la semana: `metricas.py` en `main` desde el día 1; SEMI MS4 reprodu
 - [ ] `metricas.py` en `main` el día 1, con pruebas.
 - [ ] `ejemplo_marshall()` reproduce E y cada componente de incertidumbre del ejemplo de Marshall dentro del redondeo de la tabla; diferencias anotadas.
 - [ ] `correr_semi_ms4` en `main`; en M0 sin ruido el error en E es < 0.1 %; en M1 sin ruido con k = 1 reproduce el sesgo calibrado del voladizo de 300 µm (`datos/sinteticos/calibracion.csv`; s3 ≈ −5 %).
-- [ ] Las celdas de SEMI MS4 están en `resultados/avance3/semi_ms4/`.
+- [ ] Las celdas de SEMI MS4 están en `resultados/avance3/semi_ms4/<hash>/`.
+- [ ] Tiempos de tu máquina subidos.
 - [ ] Secciones propias escritas; secciones de los Frentes 1 y 2 integradas.
-- [ ] `Avance3.39.ipynb` corre de principio a fin y pasa las pruebas de notebooks; HTML en `entregables/avance3/`; liga entregada en Canvas.
+- [ ] `Avance3.39.ipynb` corre de principio a fin en menos de 15 min y pasa las pruebas de notebooks; HTML en `entregables/avance3/`; liga entregada en Canvas.
 - [ ] Casillas de T08 cerradas en el tablero.
 
 ## Contexto adicional
@@ -77,7 +79,8 @@ El error de cada corrida y el criterio de falla **ya están** en `Resultado` (`e
 ```python
 COLORES = {"semi_ms4": ..., "clasico_l0": ..., "pinn_l0": ...}  # mismo color en todas las figuras
 
-def cargar(metodo: str, raiz=RAIZ / "resultados/avance3") -> list[Resultado]
+def cargar(metodo: str, hash_config: str | None = None, raiz=RAIZ / "resultados/avance3") -> list[Resultado]
+    # lee resultados/avance3/<metodo>/<hash_config>/*.json; sin hash, la única carpeta o error si hay varias
 def tabla(resultados: list[Resultado]) -> pd.DataFrame
     # una fila por corrida con Resultado.a_fila(extra["verdaderos"]) más caso, N, k, n_modos y sin_ruido
 def resumen(tabla: pd.DataFrame, por=("metodo", "caso", "k", "n_modos")) -> pd.DataFrame
@@ -86,6 +89,7 @@ def resumen(tabla: pd.DataFrame, por=("metodo", "caso", "k", "n_modos")) -> pd.D
 
 - El caso, N, k y la semilla se leen del id de la corrida (`m1_s3_k3_N15_seed7`) o se guardan en `extra`. Acordarlo con el Frente 1, que escribe el almacén.
 - Las pruebas usan `Resultado` construidos a mano, sin depender de que existan corridas.
+- **Una carpeta por config:** si la PINN se corrió con dos λ_PDE, habrá dos carpetas en `pinn_l0/`. `cargar` no debe mezclarlas: si hay varias y no se pide un hash, falla con un mensaje claro. El hash vigente de cada método se anota en la sección que lo usa.
 
 ### SEMI MS4 (hoja YM.1)
 
@@ -117,4 +121,11 @@ def resumen(tabla: pd.DataFrame, por=("metodo", "caso", "k", "n_modos")) -> pd.D
 - Sin IDs de tareas; sin decir para quién es el notebook.
 - Fórmulas con `$…$` o `$$…$$`, sin `\(` ni Unicode dentro.
 - **Sin `git clone` ni rutas `/content/`**: el notebook encuentra el repositorio desde su carpeta, como la celda de importaciones del Avance 2. (El del Avance 2 dependía de Colab y de una rama.)
-- Lee los resultados del almacén; no entrena la matriz. Corre de principio a fin, en orden, en menos de 10 min.
+- Lee los resultados del almacén; no entrena la matriz. Corre de principio a fin, en orden.
+
+### Tiempo de cómputo
+
+- **El notebook integrado suma las tres secciones.** Meta: cada sección en menos de 5 min y el integrado en menos de 15. `tests/test_notebooks.py` corta cualquier celda de más de 10 min, y la regla de la entrega es correrlo completo antes de enviarlo: hay que dejar tiempo para correrlo al menos dos veces.
+- Si alguna sección entrena en vivo más de una corrida de ejemplo, pedir que la pase al almacén.
+- **Las corridas tienen que estar en el almacén antes de integrar.** Las de la PINN tardan ≈ 1–1.5 h de reloj en la máquina de Manuel; las del clásico y SEMI MS4, minutos. Si el almacén no está completo, el notebook no se puede cerrar.
+- **El almacén se versiona:** los JSON son pequeños (≈ 700 archivos), así que van en el repo. Así el notebook corre en cualquier máquina sin repetir el cómputo.

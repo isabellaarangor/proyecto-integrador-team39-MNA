@@ -31,8 +31,8 @@ Al final de la semana: la PINN L0 recupera E con menos de 1 % de error en M0 sin
 | # | Tarea | Qué entregar | Cuándo |
 |---|---|---|---|
 | 4 | [T26](../tareas/T26-pinn-l0.md) PINN L0 | λ_PDE alta y fija, con su justificación (ver Contexto); recupera E y σ₀ en M0 sin ruido; tasa de éxito en 10 semillas; vista previa en M1 s1, s3 y s5 | Primera mitad |
-| 5 | Ciclo de semillas y almacén | `scripts/correr_avance3.py --metodo pinn_l0 | clasico_l0 | semi_ms4 [--bloque verificacion | principal | aprendizaje] [--procesos 4]`. Recorre las celdas del plan, llama al método y guarda cada `Resultado` en `resultados/avance3/<metodo>/<id>_m<n_modos>[_sin_ruido].json`. Si el archivo existe, lo salta | Primera mitad, en paralelo con 4 |
-| 6 | Correr las celdas de la PINN | Las ≈ 220 corridas de la PINN (≈ 1 h con 4 procesos). Lanzarlas en cuanto pase la verificación de M0 | Mitad de semana |
+| 5 | Ciclo de semillas y almacén | `scripts/correr_avance3.py --metodo pinn_l0 | clasico_l0 | semi_ms4 [--bloque verificacion | principal | aprendizaje] [--procesos 4]`. Recorre las celdas del plan, llama al método y guarda cada `Resultado` en `resultados/avance3/<metodo>/<hash_config>/<id>_m<n_modos>[_sin_ruido].json`. Si el archivo existe, lo salta | Primera mitad, en paralelo con 4 |
+| 6 | Correr las celdas de la PINN | Las ≈ 220 corridas de la PINN (≈ 1–1.5 h con 4 procesos). **Solo después de fijar λ_PDE** (tarea 4); si no, hay que repetirlas | Mitad de semana |
 
 ### C. Sección del Avance 3 (`entregables/avance3/secciones/frente-1-pinn-l0.ipynb`)
 
@@ -55,8 +55,8 @@ Al final de la semana: la PINN L0 recupera E con menos de 1 % de error en M0 sin
 - [ ] λ_PDE elegida y justificada en la bitácora.
 - [ ] La PINN L0 recupera E con error < 1 % en M0 sin ruido en las 10 semillas (y σ₀ con k = 3 o 3 modos); tasa de éxito reportada.
 - [ ] `scripts/correr_avance3.py` corre los tres métodos y salta lo que ya está en el almacén.
-- [ ] Las celdas de la PINN están en `resultados/avance3/pinn_l0/`.
-- [ ] Sección entregada al Frente 3, corriendo en menos de 10 min.
+- [ ] Las celdas de la PINN están en `resultados/avance3/pinn_l0/<hash>/`, con la config de λ_PDE elegida.
+- [ ] Sección entregada al Frente 3, corriendo en menos de 5 min.
 - [ ] Pruebas en `tests/` para lo nuevo; `pytest -m "not notebooks"` en verde.
 
 ## Contexto adicional
@@ -74,15 +74,28 @@ Al final de la semana: la PINN L0 recupera E con menos de 1 % de error en M0 sin
 - Propuesta: probar λ_PDE ∈ {1, 10, 100} en M0 con ruido (N = 15, k = 1 y 3, 3 semillas). Elegir el valor más alto que mantenga error < 1 % y convergencia en todas las semillas.
 - "Alta" se define por contraste con L1 (semana 6), donde λ_PDE se relaja para que la red pueda apartarse de la física. Lo que importa es fijarlo y documentarlo.
 
-### Tiempos (bitácora, 2026-10-10)
+### Tiempo de cómputo
 
-≈ 17 s por red (una red por modo y por estructura): 18 s con k = 1 y 1 modo, 51 s con 3 redes, 110 s con k = 3 y 3 modos. Con 4 procesos de 1 hilo cada uno se aprovechan los 4 núcleos. No bajar el presupuesto a 1500 + 300 iteraciones: con k = 3 y 3 modos el error en σ₀ sube a 7.5 %.
+≈ 17 s por red (una red por modo y por estructura): 18 s con k = 1 y 1 modo, 51 s con 3 redes y 110 s con k = 3 y 3 modos (máximo 157 s) (bitácora, 2026-10-10). Por cada semilla, las cuatro combinaciones de k y modos suman ≈ 230 s.
+
+| Bloque | Corridas | Tiempo (1 núcleo) |
+|---|---|---|
+| Barrido de λ_PDE (3 valores × 3 semillas; k = 1 con 1 modo y k = 3 con 3 modos) | 18 | ≈ 20 min |
+| Verificación (M0 sin ruido) | 40 | ≈ 38 min |
+| Principal (M0, M1 s1, s3 y s5) | 160 | ≈ 2.6 h |
+| Curva de aprendizaje (N = 5 y 40) | 20 | ≈ 6 min |
+| **Total** | **≈ 240** | **≈ 3.6 h-núcleo** |
+
+- Con 4 procesos de 1 hilo se aprovechan los 4 núcleos: ≈ 1 h de reloj, 1.5 h con el margen por la baja de frecuencia en corridas largas (observada en T19). Mejor de noche o en una tarde sin usar la máquina.
+- λ_PDE alta puede hacer más lenta la convergencia: el barrido mide también el tiempo y se anota en la bitácora junto con el valor elegido.
+- No bajar el presupuesto a 1500 + 300 iteraciones: con k = 3 y 3 modos el error en σ₀ sube a 7.5 %.
+- `--procesos` en el ciclo usa `multiprocessing` con `ConfigPINN(hilos=1)` en cada proceso. Más procesos que núcleos físicos no acelera.
 
 ### Almacén
 
 - `Resultado` se guarda con `dataclasses.asdict`, pero `extra["predecir"]` es una función y no se puede serializar. **No se guarda:** el ciclo quita los valores no serializables de `extra` antes de escribir. `historial` sí se guarda, porque la sección lo usa para las curvas de pérdida.
 - Los arreglos de NumPy se convierten a listas.
-- `hash_config` va en el JSON, para saber con qué config se corrió cada archivo.
+- **`hash_config` por config, no por corrida.** Hoy `entrenar()` lo calcula con la config ya ajustada a la corrida, que incluye `semilla` e `invertir_n`, así que cada corrida tendría un hash distinto. `correr_pinn` debe sobrescribirlo con el hash de la config base (antes de `replace`). Ese hash es la carpeta del almacén: cambiar λ_PDE crea una carpeta nueva y no se salta corridas viejas.
 
 ### Riesgo conocido
 
@@ -91,6 +104,6 @@ Con k = 3 y 3 modos, σ₀ sale con −1.7 % de error (con 1 modo, −0.3 %). Re
 ### Cómo entregar la sección
 
 - Código reutilizable en `src/pinn_mems/` con pruebas; en la sección, llamadas cortas y gráficas.
-- La sección lee el almacén y corre en vivo como mucho una corrida de ejemplo.
+- La sección lee el almacén y corre en vivo como mucho una corrida de ejemplo, la más barata (k = 1, 1 modo, ≈ 18 s). Nunca k = 3 con 3 modos en vivo (hasta 157 s).
 - Lenguaje simple, sin IDs de tareas, fórmulas con `$…$`, sin `git clone` ni rutas `/content/`. Cada técnica lleva su justificación junto al código.
 - Errores y resúmenes solo con `Resultado.errores_relativos()` y `metricas.py`; colores de `metricas.COLORES`.

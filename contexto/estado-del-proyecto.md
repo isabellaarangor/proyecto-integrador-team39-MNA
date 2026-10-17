@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Corte:** 2026-10-16 · **Semana:** 5 (Avance 3, baseline) · Detalle de cada tarea en el [tablero](tareas/README.md); decisiones en la [bitácora](bitacora-decisiones.md).
+**Corte:** 2026-10-16 · **Semana:** 5 (Avance 3, baseline) · Reparto por frente en el [plan del Avance 3](plan-avance3.md); detalle de cada tarea en el [tablero](tareas/README.md); decisiones en la [bitácora](bitacora-decisiones.md).
 
 ## Compuertas
 

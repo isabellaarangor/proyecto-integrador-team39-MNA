@@ -17,7 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 pinn = ["torch>=2.2"]
-dev = ["pytest>=8", "matplotlib>=3.8", "ipykernel", "nbformat", "nbconvert", "nbclient"]
+dev = ["pytest>=8", "matplotlib>=3.8", "statsmodels>=0.14", "ipykernel", "nbformat", "nbconvert", "nbclient"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

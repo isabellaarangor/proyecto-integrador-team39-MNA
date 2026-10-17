@@ -27,12 +27,12 @@ Transcripciones de tablas publicadas, copiadas sin modificar. La primera línea 
 
 | Archivo | Fuente | Hizo | Revisó | Fecha |
 |---|---|---|---|---|
-| `marshall_T1_geometria.csv` | [F29, p. 311, Table 1] | equipo (Brazo 1) | Claude (agente), contra el PDF | 2026-10-04 |
-| `marshall_T2_diseno_f_Q.csv` | [F29, p. 313, Table 2] | equipo (Brazo 1) | Claude (agente), contra el PDF | 2026-10-04 |
-| `marshall_T3_incertidumbre.csv` | [F29, p. 316, Table 3] | equipo (Brazo 1); tipo y condiciones agregados del PDF | Claude (agente), contra el PDF | 2026-10-04 |
-| `marshall_T5_repetibilidad.csv` | [F29, p. 321, Table 5] | equipo (Brazo 1) | Claude (agente), contra el PDF | 2026-10-04 |
-| `marshall_T6_reproducibilidad.csv` | [F29, p. 321, Table 6] | equipo (Brazo 1) | Claude (agente), contra el PDF | 2026-10-04 |
-| `sp260_T3_T4_f_correction.csv` | [F15, pp. 26–27 (PDF 55–56), Tables 3 y 4] | equipo (Tabla 3); Claude (Tabla 4) | Claude (agente), contra el PDF | 2026-10-04 |
+| `marshall_T1_geometria.csv` | [F29, p. 311, Table 1] | equipo (Brazo 1) | Claude (agente) y Manuel Alejandro Vázquez Meza, contra el PDF | 2026-10-04; 2026-10-16 |
+| `marshall_T2_diseno_f_Q.csv` | [F29, p. 313, Table 2] | equipo (Brazo 1) | Claude (agente) y Manuel Alejandro Vázquez Meza, contra el PDF | 2026-10-04; 2026-10-16 |
+| `marshall_T3_incertidumbre.csv` | [F29, p. 316, Table 3] | equipo (Brazo 1); tipo y condiciones agregados del PDF | Claude (agente) y Manuel Alejandro Vázquez Meza, contra el PDF | 2026-10-04; 2026-10-16 |
+| `marshall_T5_repetibilidad.csv` | [F29, p. 321, Table 5] | equipo (Brazo 1) | Claude (agente) y Manuel Alejandro Vázquez Meza, contra el PDF | 2026-10-04; 2026-10-16 |
+| `marshall_T6_reproducibilidad.csv` | [F29, p. 321, Table 6] | equipo (Brazo 1) | Claude (agente) y Manuel Alejandro Vázquez Meza, contra el PDF | 2026-10-04; 2026-10-16 |
+| `sp260_T3_T4_f_correction.csv` | [F15, pp. 26–27 (PDF 55–56), Tables 3 y 4] | equipo (Tabla 3); Claude (Tabla 4) | Claude (agente) y Manuel Alejandro Vázquez Meza, contra el PDF | 2026-10-04; 2026-10-16 |
 | `sp260_RS1_vigas_biempotradas.csv` | [F15, p. 54 (PDF 83), Table RS1] | Claude (agente), del PDF | pendiente | 2026-10-04 |
 | `sp260_RS9_deformacion_residual.csv` | [F15, p. 72 (PDF 101), Table RS9] | Claude (agente), del PDF; signos verificados en la imagen de la página | pendiente | 2026-10-04 |
 | `sp260_SG1_voladizos.csv` | [F15, p. 79 (PDF 108), Table SG1] | Claude (agente), del PDF | pendiente | 2026-10-04 |

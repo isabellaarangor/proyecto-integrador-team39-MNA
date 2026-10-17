@@ -24,24 +24,24 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 ## Semana 3 — Avance 1, EDA (G2)
 - [x] [T12 Generadores de datos M0 + M1](T12-generadores-m0-m1.md) — A
 - [x] [T13 Calibración de severidad](T13-calibracion-severidad.md) — A
-- [ ] [T14 Verificación de identificabilidad + superficie de desajuste (G2)](T14-identificabilidad-g2.md) — C
 - [ ] [T15 Redacción del EDA (Avance 1)](T15-redaccion-eda.md) — C
-- [ ] [T16 Andamiaje de la PINN + viabilidad de DeepXDE](T16-andamiaje-pinn.md) — B
-- [ ] [T49 Brazo 1: tablas de Marshall y SP 260-177 a CSV rastreables](T49-brazo1-tablas-csv-rastreables.md) — C (revisa A)
+- [x] [T16 Andamiaje de la PINN + viabilidad de DeepXDE](T16-andamiaje-pinn.md) — B
+- [x] [T49 Brazo 1: tablas de Marshall y SP 260-177 a CSV rastreables](T49-brazo1-tablas-csv-rastreables.md) — C (revisa A)
 - [ ] [T50 Brazo 2: trazas calibradas en CSV, validadas contra el NIST](T50-brazo2-conversion-trazas-validada.md) — A
 - [ ] [T53 Rigidez del soporte: conseguir las fuentes publicadas](T53-rigidez-soporte-fuentes.md) — A
 
 ## Semana 4 — Avance 2, ingeniería de características (G3)
-- [ ] [T17 Adimensionalización](T17-adimensionalizacion.md) — A
-- [ ] [T18 Implementación de la PINN en forma mixta](T18-pinn-forma-mixta.md) — B
-- [ ] [T19 Validación directa de la PINN + ablación de CF (G3)](T19-validacion-pinn-g3.md) — B
-- [ ] [T20 Cronometraje de una corrida + decisión de recortes](T20-cronometraje-recortes.md) — B
-- [ ] [T21 Análisis de colocación de sensores (RQ4)](T21-analisis-colocacion-rq4.md) — C
+- [x] [T17 Adimensionalización](T17-adimensionalizacion.md) — A
+- [x] [T18 Implementación de la PINN en forma mixta](T18-pinn-forma-mixta.md) — B
+- [x] [T19 Validación directa de la PINN + ablación de CF (G3)](T19-validacion-pinn-g3.md) — B
+- [x] [T20 Cronometraje de una corrida + decisión de recortes](T20-cronometraje-recortes.md) — B
+- [x] [T21 Análisis de colocación de sensores (RQ4)](T21-analisis-colocacion-rq4.md) — C
 - [ ] [T51 Brazo 2: ruido del instrumento (replanteo)](T51-brazo2-ruido-del-instrumento.md) — A
 - [ ] [T52 Brazo 2: EDA por perfil, orientado a la escalera](T52-brazo2-eda-por-perfil.md) — C (con A)
 - [ ] [T54 Rigidez del soporte desde el Brazo 1 + recalibración de M1](T54-rigidez-soporte-desde-brazo1.md) — A
 
 ## Semana 5 — Avance 3, baseline (G4)
+- [ ] [T14 Verificación de identificabilidad + superficie de desajuste (G2)](T14-identificabilidad-g2.md) — C · *pasa al Avance 3: G2 ya cerró; faltan las superficies como figuras*
 - [ ] [T22 Inversa clásica anidada](T22-inversa-clasica-anidada.md) — C
 - [ ] [T23 Arnés de config/semillas/W&B](T23-arnes-experimental.md) — C
 - [ ] [T24 Posterior MCMC P_simple](T24-mcmc-p-simple.md) — A

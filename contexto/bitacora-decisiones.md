@@ -74,11 +74,11 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 
 ## 2026-10-06 — Ruido del Brazo 2 estimado dentro de cada traza (T51)
 
-- **Decisión propuesta:** como no hay trazas repetidas, el ruido se estima dentro de cada traza con `src/pinn_mems/nist/ruido.py`. Para la verosimilitud se usa el estimador por segundas diferencias por material: **σ ≈ 0.022 µm en RM 8096** (rango 0.010–0.036) y **σ ≈ 0.004 µm en RM 8097** (0.003–0.006). En T25 se prueba además un modelo de ruido correlacionado y se compara contra el de ruido blanco.
+- **Decisión:** como no hay trazas repetidas, el ruido se estima dentro de cada traza con `src/pinn_mems/nist/ruido.py`. Para la verosimilitud se usa el estimador por segundas diferencias por material: **σ ≈ 0.022 µm en RM 8096** (rango 0.010–0.036) y **σ ≈ 0.004 µm en RM 8097** (0.003–0.006). En T25 se prueba además un modelo de ruido correlacionado y se compara contra el de ruido blanco.
 - **Motivo y evidencia:** el plan comparaba las trazas b, c y d de una estructura, pero cada archivo trae una sola. En RM 8096 el valor coincide con la rugosidad que reporta el NIST (≈0.022 µm rms) [F15, p. 188], así que lo que se mide es sobre todo rugosidad y no el interferómetro. El estimador por suavizado da 1.7–2 veces más que el de segundas diferencias en datos reales (en sintéticos coinciden): el ruido parece correlacionado. Detalle en la guía [`02-datos-reales`](../datos/02-datos-reales-nist-sp260-177.md) §6, paso 3.
 - **Pérdidas para T44:** ruido estimado sin trazas repetidas; un modelo de ruido blanco puede subestimar la incertidumbre del Brazo 2.
-- **Quién:** pendiente de revisión del equipo.
-- **Estado:** propuesta.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-16.
 
 ## 2026-10-10 — Framework de la PINN: PyTorch puro (T16)
 
@@ -162,7 +162,7 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 
 ## 2026-10-11 — Estimación inicial común y conexión de la PINN con el arnés
 
-- **Decisión propuesta:** todos los métodos de inversión (clásico y PINN) parten de **E inicial = 0.8·E nominal**, es decir θ = E/E_ref = 0.8.
+- **Decisión:** todos los métodos de inversión (clásico y PINN) parten de **E inicial = 0.8·E nominal**, es decir θ = E/E_ref = 0.8.
 - **Motivo:** en los datos sintéticos el E nominal (70 GPa) es el verdadero. Empezar en él le regala la respuesta al método y oculta los problemas de convergencia. Si los métodos parten de lugares distintos, la comparación no es justa.
 - **Conexión con el arnés:** la PINN ya se puede llamar desde el arnés con `correr_pinn(corrida, n_modos)` (`src/pinn_mems/pinn/arnes.py`). Hace lo siguiente:
   - Toma una corrida de `matriz.py` y el número de modos medidos (1 o 3).
@@ -171,5 +171,23 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Pendiente para el arnés (Frente 2, T23):**
   1. `matriz.corridas()` no incluye el eje de modos (1 o 3): da 510 corridas, no las 1,020 + 60 de colocación que cuenta el plan.
   2. La clave del almacén debe combinar la config del método (`Resultado.hash_config`) con la corrida y el número de modos.
-- **Quién:** equipo (Manuel).
-- **Estado:** propuesta. La política de inicio requiere que el Frente 2 la adopte en T22.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-16. El Frente 2 la usa en T22.
+
+## 2026-10-16 — G4 se cierra en dos partes; T14 pasa al Avance 3
+
+- **Decisión:** G4 se divide en dos partes:
+  1. **Avance 3 (semana 5):** los tres métodos L0 recuperan los parámetros de M0 sin ruido: SEMI MS4 (T08), inversión clásica anidada (T22) y PINN L0 (T26).
+  2. **Semana 6:** las posteriores MCMC P_simple y P_rich convergen con R̂ < 1.01 (T24, T25), y se terminan el arnés completo con W&B (T23) y los dos abstracts (T27).
+
+  Las superficies de desajuste de T14 pasan al Avance 3 (Frente 2, después de T22).
+- **Motivo y evidencia:**
+  - No hubo avance de la semana 5 hasta el 2026-10-16.
+  - La rúbrica del Avance 3 no pide MCMC. Pide justificar el algoritmo, analizar la importancia de las características, el sub/sobreajuste, la métrica y el desempeño mínimo.
+  - T14 usa la misma función de desajuste que T22, y sus figuras cubren la representación visual que pide el criterio de características importantes.
+- **Consecuencias:**
+  - G4 queda abierta hasta la semana 6.
+  - En el Avance 3 basta un ciclo mínimo de semillas con un almacén JSON. El eje de modos de `matriz.corridas()` se agrega en T23.
+  - La semana 6 carga además L1 y L2 (T28–T31). Si se atrasa, se aplica la misma regla que con G3: los otros frentes no se detienen.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-16.

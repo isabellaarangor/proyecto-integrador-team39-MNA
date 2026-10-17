@@ -1,8 +1,10 @@
 # T14 — Verificación de identificabilidad + superficie de desajuste (G2)
 
-**Semana:** 3 · **Responsable:** C · **Compuerta:** **G2** · **Depende de:** T09, T12 · **Ref. plan:** §4.4 (identificabilidad), §4.12 semana 3
+**Semana:** 3 → 5 (Avance 3) · **Responsable:** C · **Compuerta:** **G2** · **Depende de:** T09, T12 · **Ref. plan:** §4.4 (identificabilidad), §4.12 semana 3
 
 **Objetivo:** Cerrar G2: confirmar que E y σ₀ son separables vía voladizo + puente, y k_θ separable vía los modos 1–3.
+
+**Reprogramada (2026-10-16):** G2 ya está cerrada; las superficies pasan al Avance 3 (Frente 2, después de T22, con la misma función de desajuste). Van en la sección de características importantes de la rúbrica.
 
 ## Subtareas
 - [ ] Calcular la superficie de desajuste sobre (E, σ₀) para solo-voladizo vs voladizo+puente — mostrar el rompimiento de la degeneración

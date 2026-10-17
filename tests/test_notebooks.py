@@ -9,7 +9,12 @@ from pathlib import Path
 import nbformat
 import pytest
 
-NOTEBOOKS = sorted((Path(__file__).resolve().parents[1] / "notebooks").glob("*.ipynb"))
+RAIZ = Path(__file__).resolve().parents[1]
+# Ya entregados: no se modifican. El del Avance 2 está hecho para Colab
+# (clona la rama PINNs-semana-4), así que esa rama no se borra.
+ENTREGADOS = {RAIZ / "entregables/avance1/EDA_Avance1.ipynb", RAIZ / "entregables/avance2/Avance2.39.ipynb"}
+NOTEBOOKS = sorted((RAIZ / "notebooks").glob("*.ipynb")) + sorted(
+    p for p in (RAIZ / "entregables").rglob("*.ipynb") if p not in ENTREGADOS)
 
 
 @pytest.mark.parametrize("ruta", NOTEBOOKS, ids=lambda p: p.stem)

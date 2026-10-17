@@ -10,7 +10,7 @@ Se mantienen los tres frentes de la semana 4, cada uno en su tema y su parte del
 | 2 | Inversión clásica | `src/pinn_mems/inversa/` (nuevo) | `frente-2-clasico.ipynb` | Isabella |
 | 3 | SEMI MS4, métrica e integración | `src/pinn_mems/nist/` | `frente-3-semi-ms4.ipynb` | Isaí |
 
-Las secciones van en `entregables/avance3/secciones/`; el notebook integrado, en `entregables/avance3/Avance3.39.ipynb`.
+Las secciones van en `entregables/avance3/secciones/`; el notebook integrado, en `entregables/avance3/Avance3.39.ipynb`. El detalle de cada frente (objetivo, tareas, criterios de cierre y contexto) está en su handoff: [Frente 1](handoffs/avance3-frente-1-pinn.md), [Frente 2](handoffs/avance3-frente-2-clasico.md), [Frente 3](handoffs/avance3-frente-3-semi-ms4.md).
 
 ## Criterios de la rúbrica
 
@@ -32,7 +32,7 @@ Antes de que cada frente avance por su lado se fijan las piezas que comparten lo
 |---|---|---|
 | `src/pinn_mems/metricas.py`, con pruebas | Frente 3 | Agrega una lista de `Resultado` por celda: mediana e IQR del error relativo con signo, tasa de éxito y tiempo mediano. El error por corrida y el criterio de falla **no se redefinen**: ya están en `Resultado.errores_relativos()` y `Resultado.fallo()` (umbral `UMBRAL_FALLA` = 50 %) |
 | Lo común sale de `pinn/` | Frente 1 | `THETA0` y `verdaderos()` pasan de `pinn/arnes.py` a `matriz.py`, para que el método clásico no importe del módulo de la PINN |
-| Opción sin ruido en la matriz | Frente 1 | `generar_corrida(corrida, sin_ruido=True)` pone `nivel` y `nivel_omega` en 0 con la misma geometría y semilla. Hoy la matriz siempre genera con ruido (2 % en la forma), y G4 pide recuperar M0 **sin ruido** |
+| `sin_ruido` en `correr_pinn` | Frente 1 | Con `sin_ruido=True` se usan `w_limpia` y `omega_limpia`, que cada `Conjunto` ya trae. Así se verifica M0 **sin ruido**, como pide G4, sin cambiar la matriz |
 | Firmas de los métodos acordadas | los tres (15 min) | Las tres de la tabla de abajo |
 
 ### Firmas de los métodos
@@ -52,6 +52,7 @@ correr_semi_ms4(corrida, n_modos, *, sin_ruido=False) -> Resultado  # Frente 3
   - `extra`: `corrida` (el id), `n_modos`, `sin_ruido` y `verdaderos` (de `matriz.verdaderos()`).
   - `n_resoluciones`: las llamadas al eigensolver (`None` en la PINN y en SEMI MS4).
   - `hash_config`: el de la config del método.
+- Con `sin_ruido=True`, todos usan `conjunto.w_limpia` y `conjunto.omega_limpia` en lugar de `w` y `omega`.
 - Todos parten de `THETA0` = 0.8 cuando el método tiene estimación inicial.
 
 ### Celdas del Avance 3
@@ -145,7 +146,7 @@ Son unas 220 corridas por método. Con la PINN, a ≈ 54 s por corrida, son ≈ 
 
 | Cuándo | Quiénes | Qué |
 |---|---|---|
-| Día 1 (15 min) | todos | Firmas de los métodos y celdas del Avance 3; `metricas.py`, `THETA0`/`verdaderos()` en `matriz.py` y la opción sin ruido, en `main` ese mismo día |
+| Día 1 (15 min) | todos | Firmas de los métodos y celdas del Avance 3; `metricas.py`, `THETA0`/`verdaderos()` en `matriz.py` y `sin_ruido` en la PINN, en `main` ese mismo día |
 | A media semana | todos (15 min) | ¿Los tres L0 recuperan E en M0? ¿Hay acceso al MEMS Calculator? |
 | Antes de integrar | 1, 2 → 3 | Errores y tasas de éxito para la tabla de desempeño |
 | Último día | todos (15 min) | Revisión del notebook integrado antes de entregarlo |

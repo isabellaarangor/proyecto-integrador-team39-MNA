@@ -66,7 +66,7 @@ correr_semi_ms4(corrida, n_modos, *, sin_ruido=False) -> Resultado  # Frente 3
 | `semi_ms4` | `pinn_mems.nist.semi_ms4` | `CONFIG`, `hash_metodo`, `correr_semi_ms4` |
 
 - `CONFIG`: la config del método a nivel de módulo, un `dict` o un dataclass con todo lo que cambia el resultado (malla, cotas, tolerancias, pesos…), sin la corrida ni la semilla.
-- `hash_metodo(config) -> str`: `resultado.hash_config(config)` (de `pinn_mems.resultado`) sin los campos que cambian en cada corrida. Si `CONFIG` no tiene campos así, basta `return hash_config(config)`.
+- `hash_metodo(config) -> str`: `hash_config(config)` (de `pinn_mems.resultado`) sin los campos que cambian en cada corrida. Si `CONFIG` no tiene campos así, basta `return hash_config(config)`.
 - La función del método pone `resultado.hash_config = hash_metodo(CONFIG)`. Si no coincide, el ciclo se detiene con un error.
 - El ciclo corre cada celda en un proceso aparte y guarda el `Resultado` con `pinn_mems.almacen.guardar`; de `extra` se descarta lo que no se puede escribir en JSON. `metricas.cargar` lee con `pinn_mems.almacen.leer`.
 - Cada módulo debe poder importarse sin efectos (nada de cálculos al importar), porque cada proceso lo importa de nuevo.

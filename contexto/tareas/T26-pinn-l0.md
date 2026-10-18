@@ -5,7 +5,7 @@
 **Objetivo:** La PINN con la física tratada como exacta — la instanciación PINN del peldaño superior y el punto de anclaje del eje λ_PDE.
 
 ## Subtareas
-- [x] Fijar λ_PDE alta; documentar el valor elegido y cómo se determinó "alta" — *λ_PDE = 1 con 2000 iteraciones de L-BFGS: con λ = 1 el residual de la ecuación ya queda 4 órdenes por debajo de los datos; λ = 100 no converge con k = 3. `CONFIG_L0` en `pinn/arnes.py`; bitácora 2026-10-18 (propuesta); `scripts/barrer_lambda_pde.py`*
+- [x] Fijar λ_PDE alta; documentar el valor elegido y cómo se determinó "alta" — *λ_PDE = 1 con 2000 iteraciones de L-BFGS: con λ = 1 el residual de la ecuación ya queda 4 órdenes por debajo de los datos; λ = 100 no converge con k = 3. `CONFIG_L0` en `pinn/arnes.py`; bitácora 2026-10-18 (aceptada); `scripts/barrer_lambda_pde.py`*
 - [x] Integrar con el arnés T23 (configs, semillas, objeto de resultado) — *en el Avance 3, con el ciclo mínimo `scripts/correr_avance3.py` y el almacén `pinn_mems.almacen`; el arnés completo (T23) es de la semana 6*
 - [x] Verificar recuperación de (E, σ₀) conocidos bajo M0 sin ruido — *bloque de verificación del Avance 3 (2026-10-18): 40 corridas (k = 1 y 3, 1 y 3 modos, 10 semillas); error máx. en E 0.05 % y en σ₀ 0.67 %; `resultados/avance3/pinn_l0/767d18e8e49a/`*
 - [ ] Correr en algunas severidades M1 para previsualizar la curva de sesgo estilo H1

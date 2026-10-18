@@ -194,7 +194,7 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 
 ## 2026-10-18 — Config de la PINN L0: λ_PDE = 1 y 2000 iteraciones de L-BFGS (T26)
 
-- **Decisión propuesta:** la PINN L0 usa λ_PDE = 1 (la ecuación y las condiciones de frontera pesan lo mismo que los datos) y sube L-BFGS de 500 a 2000 iteraciones. Es `CONFIG_L0` en `src/pinn_mems/pinn/arnes.py` (hash `767d18e8e49a`). El resto queda como en la validación de G3: 3 capas de 32, CF duras, 128 puntos de colocación, 3000 iteraciones de Adam.
+- **Decisión:** la PINN L0 usa λ_PDE = 1 (la ecuación y las condiciones de frontera pesan lo mismo que los datos) y sube L-BFGS de 500 a 2000 iteraciones. Es `CONFIG_L0` en `src/pinn_mems/pinn/arnes.py` (hash `767d18e8e49a`). El resto queda como en la validación de G3: 3 capas de 32, CF duras, 128 puntos de colocación, 3000 iteraciones de Adam.
 - **Motivo y evidencia:** salida de `scripts/barrer_lambda_pde.py` en [`resultados/lambda-pde/`](../resultados/lambda-pde/). M0, N = 15, 3 semillas, en la celda más barata (k = 1, 1 modo) y la más cara (k = 3, 3 modos).
   - **λ_PDE** (con ruido, 500 L-BFGS): con λ = 1 y 10 todo converge y el error en E queda ≤ 0.25 %. Con λ = 100, ninguna corrida de k = 3 converge: la pérdida de datos queda 60 veces arriba del piso del ruido, E sale con hasta 1.2 % de error y σ₀ con hasta 17 %. λ = 10 no mejora nada respecto de λ = 1 y hace σ₀ más variable (0.02–3.9 %).
   - **"Alta" ya se cumple con λ = 1:** gracias a la adimensionalización, con λ = 1 el residual de la ecuación queda 4 órdenes de magnitud por debajo del término de datos (≈ 10⁻⁸ contra 2.4×10⁻⁴ con k = 1). La física ya se satisface prácticamente exacta; subir λ solo empeora el condicionamiento. L1 (semana 6) relajará λ por debajo de 1.
@@ -203,5 +203,5 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Costo:** con k = 1, L-BFGS para solo al converger y el tiempo no cambia; con k = 3 y 3 modos sube ≈ 35 %.
 - **Cómputo medido de nuevo** (i7-1165G7, 2026-10-18): la laptop se calienta y una corrida sola pasa de 23 s a 36–38 s después de unos minutos (los 18 s del 2026-10-10 eran con la CPU fría). Con 4 procesos y `OMP_NUM_THREADS=1` se obtienen ≈ 2.75 veces las corridas por hora de un solo proceso (292 contra 106 corridas de 1 red por hora). Las 220 corridas de la PINN del Avance 3 son ≈ 820 redes: **≈ 2–3 h de reloj** con 4 procesos, no ≈ 1 h. Los scripts ya fijan 1 hilo por proceso.
 - **Verificación con esta config** (bloque de verificación del Avance 3, `scripts/correr_avance3.py`, almacén `resultados/avance3/pinn_l0/767d18e8e49a/`): M0 sin ruido, N = 15, k = 1 y 3, 1 y 3 modos, 10 semillas. Las 40 corridas convergen, ninguna falla; error máximo en E de 0.05 % y en σ₀ de 0.67 % (k = 3 con 3 modos; mediana 0.05 %). **La PINN L0 cumple su parte de G4.**
-- **Quién:** Manuel Alejandro Vázquez Meza (por aprobar).
-- **Estado:** propuesta.
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-18.

@@ -205,3 +205,25 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Verificación con esta config** (bloque de verificación del Avance 3, `scripts/correr_avance3.py`, almacén `resultados/avance3/pinn_l0/767d18e8e49a/`): M0 sin ruido, N = 15, k = 1 y 3, 1 y 3 modos, 10 semillas. Las 40 corridas convergen, ninguna falla; error máximo en E de 0.05 % y en σ₀ de 0.67 % (k = 3 con 3 modos; mediana 0.05 %). **La PINN L0 cumple su parte de G4.**
 - **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
 - **Estado:** aceptada el 2026-10-18.
+
+## 2026-10-18 — Resultados de la PINN L0 en las celdas del Avance 3 (T26)
+
+- **Hallazgo:** con `CONFIG_L0`, las 220 corridas del Avance 3 terminan sin falla. Almacén: `resultados/avance3/pinn_l0/767d18e8e49a/`.
+- **Evidencia** (mediana del error sobre 10 semillas, N = 15, con ruido salvo la verificación):
+
+  | Caso | E, k = 1 (1 / 3 modos) | E, k = 3 (1 / 3 modos) | σ₀, k = 3 (1 / 3 modos) |
+  |---|---|---|---|
+  | M0 sin ruido | ≤ 0.009 % (máx.) | ≤ 0.05 % (máx.) | ≤ 0.67 % (máx.) |
+  | M0 | +0.01 / +0.02 % | −0.02 / +0.02 % | −0.14 / +0.21 % |
+  | M1 s1 | −0.99 / −0.97 % | −1.28 / −1.37 % | +1.64 / +1.71 % |
+  | M1 s3 | −4.99 / −4.79 % | −6.25 / −6.43 % | +7.45 / +8.94 % |
+  | M1 s5 | −15.00 / −13.39 % | −18.16 / −16.66 % | +14.41 / +22.88 % |
+
+  - La dispersión (IQR del error en E) es < 0.1 % en todas las celdas: **la PINN L0 es precisa pero sesgada** cuando el anclaje es flexible.
+  - Con k = 1 y 1 modo, el sesgo coincide con el calibrado de la severidad (−1, −5 y −15 %): es la prueba de cordura de que el método supone empotramiento ideal.
+  - Con 3 modos el sesgo en k = 1 baja un poco (la forma aporta información sobre el anclaje). Con k = 3 el sesgo en E es mayor, porque el voladizo de 200 µm siente más el mismo anclaje, y σ₀ compensa parte del error.
+  - Curva de aprendizaje (M0, k = 1, 1 modo): el error máximo en E es 0.11, 0.10 y 0.12 % con N = 5, 15 y 40. El número de puntos casi no importa: la frecuencia medida fija E.
+- **Consecuencias:** la PINN cumple su parte de G4. La degradación con la severidad es la motivación de L1–L3. Para el Avance 3 alimenta los criterios de sub/sobreajuste (curva de aprendizaje), métrica (sesgo contra dispersión) y desempeño.
+- **Quién:** Manuel Alejandro Vázquez Meza.
+- **Estado:** registrado.
+

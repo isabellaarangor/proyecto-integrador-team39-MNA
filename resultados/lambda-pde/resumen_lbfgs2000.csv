@@ -1,0 +1,3 @@
+lambda_pde,k,modos,max_abs_error_E_pct,max_abs_error_sigma0_pct,convergio,mediana_s,perdida_datos,perdida_r2
+1,1,1,0.07297,,1,29.59,0.0002436,3.268e-08
+1,3,3,0.06681,0.5086,1,200.6,0.0002888,7.373e-06

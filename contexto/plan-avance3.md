@@ -10,7 +10,7 @@ Se mantienen los tres frentes de la semana 4, cada uno en su tema y su parte del
 | 2 | Inversión clásica | `src/pinn_mems/inversa/` (nuevo) | `frente-2-clasico.ipynb` | Isabella |
 | 3 | SEMI MS4, métrica e integración | `src/pinn_mems/nist/` | `frente-3-semi-ms4.ipynb` | Isaí |
 
-Las secciones van en `entregables/avance3/secciones/`; el notebook integrado, en `entregables/avance3/Avance3.39.ipynb`. El detalle de cada frente (objetivo, tareas, criterios de cierre y contexto) está en su handoff: [Frente 1](handoffs/avance3-frente-1-pinn.md), [Frente 2](handoffs/avance3-frente-2-clasico.md), [Frente 3](handoffs/avance3-frente-3-semi-ms4.md).
+Las secciones van en `entregables/avance3/secciones/`; el notebook integrado, en `entregables/avance3/Avance3.39.ipynb`. El detalle de cada frente (objetivo, tareas, criterios de cierre y contexto) está en su handoff: [Frente 1](handoffs/avance3-frente-1-pinn.md), [Frente 2](handoffs/avance3-frente-2-clasico.md), [Frente 3](handoffs/avance3-frente-3-semi-ms4.md). Lo que cambió al implementar las piezas comunes está resumido en el [aviso a los Frentes 2 y 3](handoffs/avance3-aviso-frentes-2-y-3.md).
 
 ## Criterios de la rúbrica
 
@@ -55,6 +55,22 @@ correr_semi_ms4(corrida, n_modos, *, sin_ruido=False) -> Resultado  # Frente 3
 - Con `sin_ruido=True`, todos usan `conjunto.w_limpia` y `conjunto.omega_limpia` en lugar de `w` y `omega`.
 - Todos parten de `THETA0` = 0.8 cuando el método tiene estimación inicial.
 
+### Lo que el ciclo necesita de cada módulo
+
+`scripts/correr_avance3.py` (ya en la rama `avance3-pinn-l0`) importa tres nombres del módulo de cada método. Antes de correr, calcula el hash para saber qué celdas ya están en el almacén; después de correr, verifica que el `Resultado` traiga ese mismo hash.
+
+| Método | Módulo | Lo que importa el ciclo |
+|---|---|---|
+| `pinn_l0` | `pinn_mems.pinn.arnes` | `CONFIG_L0`, `hash_metodo`, `correr_pinn` (ya existen) |
+| `clasico_l0` | `pinn_mems.inversa.clasica` | `CONFIG`, `hash_metodo`, `correr_clasico` |
+| `semi_ms4` | `pinn_mems.nist.semi_ms4` | `CONFIG`, `hash_metodo`, `correr_semi_ms4` |
+
+- `CONFIG`: la config del método a nivel de módulo, un `dict` o un dataclass con todo lo que cambia el resultado (malla, cotas, tolerancias, pesos…), sin la corrida ni la semilla.
+- `hash_metodo(config) -> str`: `hash_config(config)` (de `pinn_mems.resultado`) sin los campos que cambian en cada corrida. Si `CONFIG` no tiene campos así, basta `return hash_config(config)`.
+- La función del método pone `resultado.hash_config = hash_metodo(CONFIG)`. Si no coincide, el ciclo se detiene con un error.
+- El ciclo corre cada celda en un proceso aparte y guarda el `Resultado` con `pinn_mems.almacen.guardar`; de `extra` se descarta lo que no se puede escribir en JSON. `metricas.cargar` lee con `pinn_mems.almacen.leer`.
+- Cada módulo debe poder importarse sin efectos (nada de cálculos al importar), porque cada proceso lo importa de nuevo.
+
 ### Celdas del Avance 3
 
 Los tres métodos corren **las mismas celdas**, un subconjunto de la matriz:
@@ -65,7 +81,7 @@ Los tres métodos corren **las mismas celdas**, un subconjunto de la matriz:
 | Principal | M0, M1 s1, s3 y s5 (con ruido) | 15 | 1, 3 | 1, 3 | 10 | Métrica, desempeño y cómo crece el sesgo con la severidad |
 | Curva de aprendizaje | M0 (con ruido) | 5, 15, 40 | 1 | 1 | 10 | Sub/sobreajuste |
 
-Son unas 220 corridas por método. Con la PINN, a ≈ 54 s por corrida, son ≈ 3.3 h de un núcleo, ≈ 1 h con 4 procesos. Los métodos clásico y SEMI MS4 tardan segundos.
+Son unas 220 corridas por método. Con la PINN son ≈ 2–3 h de reloj con 4 procesos (medido el 2026-10-18; ver la tabla de abajo). Los métodos clásico y SEMI MS4 tardan segundos.
 
 ### Almacén de resultados
 
@@ -79,7 +95,7 @@ Medido en la laptop de Manuel (i7-1165G7, 1 hilo por proceso; bitácora, 2026-10
 
 | Qué | Costo unitario | Avance 3 | Dónde corre |
 |---|---|---|---|
-| PINN L0 | ≈ 17 s por red (redes = estructuras × modos): 18 s con k = 1 y 1 modo, 110 s con k = 3 y 3 modos | ≈ 240 corridas con el barrido de λ_PDE: **≈ 3.6 h-núcleo, ≈ 1–1.5 h con 4 procesos** | Una noche o una tarde dedicada |
+| PINN L0 | ≈ 17 s por red (redes = estructuras × modos): 18 s con k = 1 y 1 modo, 110 s con k = 3 y 3 modos | ≈ 240 corridas con el barrido de λ_PDE: **≈ 2–3 h de reloj con 4 procesos** (la laptop se calienta: 4 procesos rinden ≈ 2.75 veces uno, no 4; bitácora, 2026-10-18) | Una noche o una tarde dedicada |
 | Inversión clásica | ≈ 5.6 ms por llamada al eigensolver con 100 elementos (21 ms con 200); ≈ 0.2–1 s por ajuste | 220 corridas: **≈ 2–4 min** | Cualquier máquina |
 | Superficies de desajuste | Una evaluación por punto de la malla: 60 × 60 ≈ 20–40 s por superficie | 4 superficies: **≈ 2 min** | Se precalculan y se guardan |
 | SEMI MS4 | Instantáneo; lo que cuesta es generar la corrida (0.04 s con k = 1, 0.1 s con k = 3) | 220 corridas: **≈ 15 s** | Cualquier máquina |

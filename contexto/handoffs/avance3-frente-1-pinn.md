@@ -32,7 +32,7 @@ Al final de la semana: la PINN L0 recupera E con menos de 1 % de error en M0 sin
 |---|---|---|---|
 | 4 | [T26](../tareas/T26-pinn-l0.md) PINN L0 | λ_PDE alta y fija, con su justificación (ver Contexto); recupera E y σ₀ en M0 sin ruido; tasa de éxito en 10 semillas; vista previa en M1 s1, s3 y s5 | Primera mitad |
 | 5 | Ciclo de semillas y almacén | `scripts/correr_avance3.py --metodo pinn_l0 | clasico_l0 | semi_ms4 [--bloque verificacion | principal | aprendizaje] [--procesos 4]`. Recorre las celdas del plan, llama al método y guarda cada `Resultado` en `resultados/avance3/<metodo>/<hash_config>/<id>_m<n_modos>[_sin_ruido].json`. Si el archivo existe, lo salta | Primera mitad, en paralelo con 4 |
-| 6 | Correr las celdas de la PINN | Las ≈ 220 corridas de la PINN (≈ 1–1.5 h con 4 procesos). **Solo después de fijar λ_PDE** (tarea 4); si no, hay que repetirlas | Mitad de semana |
+| 6 | Correr las celdas de la PINN | Las ≈ 220 corridas de la PINN (≈ 2–3 h con 4 procesos). **Solo después de fijar λ_PDE** (tarea 4); si no, hay que repetirlas | Mitad de semana |
 
 ### C. Sección del Avance 3 (`entregables/avance3/secciones/frente-1-pinn-l0.ipynb`)
 
@@ -51,13 +51,13 @@ Al final de la semana: la PINN L0 recupera E con menos de 1 % de error en M0 sin
 
 ## Done When
 
-- [ ] `THETA0` y `verdaderos()` en `matriz.py` y `sin_ruido` en `correr_pinn`, en `main` el día 1, con prueba.
-- [ ] λ_PDE elegida y justificada en la bitácora.
-- [ ] La PINN L0 recupera E con error < 1 % en M0 sin ruido en las 10 semillas (y σ₀ con k = 3 o 3 modos); tasa de éxito reportada.
-- [ ] `scripts/correr_avance3.py` corre los tres métodos y salta lo que ya está en el almacén.
-- [ ] Las celdas de la PINN están en `resultados/avance3/pinn_l0/<hash>/`, con la config de λ_PDE elegida.
-- [ ] Sección entregada al Frente 3, corriendo en menos de 5 min.
-- [ ] Pruebas en `tests/` para lo nuevo; `pytest -m "not notebooks"` en verde.
+- [ ] `THETA0` y `verdaderos()` en `matriz.py` y `sin_ruido` en `correr_pinn`, en `main` el día 1, con prueba. — *hecho y con pruebas en la rama `avance3-contrato-pinn`; falta el PR a `main`*
+- [x] λ_PDE elegida y justificada en la bitácora. — *λ_PDE = 1 y 2000 L-BFGS, aceptada el 2026-10-18*
+- [x] La PINN L0 recupera E con error < 1 % en M0 sin ruido en las 10 semillas (y σ₀ con k = 3 o 3 modos); tasa de éxito reportada. — *E ≤ 0.05 %, σ₀ ≤ 0.67 %; 220/220 corridas sin falla*
+- [ ] `scripts/correr_avance3.py` corre los tres métodos y salta lo que ya está en el almacén. — *probado con la PINN y con un método falso (`tests/test_ciclo_avance3.py`); los otros dos se prueban solos en cuanto existan sus módulos*
+- [x] Las celdas de la PINN están en `resultados/avance3/pinn_l0/<hash>/`, con la config de λ_PDE elegida. — *220 corridas en `767d18e8e49a`*
+- [x] Sección entregada al Frente 3, corriendo en menos de 5 min. — *`entregables/avance3/secciones/frente-1-pinn-l0.ipynb`, ≈ 50 s; usa `metricas.py`*
+- [x] Pruebas en `tests/` para lo nuevo; `pytest -m "not notebooks"` en verde.
 
 ## Contexto adicional
 
@@ -86,7 +86,7 @@ Al final de la semana: la PINN L0 recupera E con menos de 1 % de error en M0 sin
 | Curva de aprendizaje (N = 5 y 40) | 20 | ≈ 6 min |
 | **Total** | **≈ 240** | **≈ 3.6 h-núcleo** |
 
-- Con 4 procesos de 1 hilo se aprovechan los 4 núcleos: ≈ 1 h de reloj, 1.5 h con el margen por la baja de frecuencia en corridas largas (observada en T19). Mejor de noche o en una tarde sin usar la máquina.
+- **Medido de nuevo el 2026-10-18:** la laptop se calienta y una corrida sola pasa de 23 s a 36–38 s después de unos minutos; los 17 s por red son con la CPU fría. Con 4 procesos y 1 hilo cada uno (`OMP_NUM_THREADS=1`, que los scripts ya fijan) se obtienen ≈ 2.75 veces las corridas por hora de un proceso. Con `CONFIG_L0` (2000 L-BFGS) las ≈ 220 corridas son **≈ 2–3 h de reloj**. Mejor de noche o en una tarde sin usar la máquina.
 - λ_PDE alta puede hacer más lenta la convergencia: el barrido mide también el tiempo y se anota en la bitácora junto con el valor elegido.
 - No bajar el presupuesto a 1500 + 300 iteraciones: con k = 3 y 3 modos el error en σ₀ sube a 7.5 %.
 - `--procesos` en el ciclo usa `multiprocessing` con `ConfigPINN(hilos=1)` en cada proceso. Más procesos que núcleos físicos no acelera.

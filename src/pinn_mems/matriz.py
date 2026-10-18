@@ -108,10 +108,12 @@ def generar_corrida(corrida: Corrida, matriz: dict | None = None) -> dict[str, C
 
 
 def verdaderos(conjuntos: dict[str, Conjunto]) -> dict[str, float]:
-    """Parámetros verdaderos de una corrida: E y, si hay biempotrada, σ₀ (Pa)."""
-    resultado = {"E": conjuntos["voladizo"].params["E"]}
+    """Parámetros verdaderos de una corrida: E y σ₀ si hay biempotrada."""
+    if "voladizo" not in conjuntos:
+        raise ValueError("se necesita el conjunto del voladizo de referencia")
+    resultado = {"E": float(conjuntos["voladizo"].params["E"])}
     if "biempotrada" in conjuntos:
-        resultado["sigma0"] = conjuntos["biempotrada"].params["sigma0"]
+        resultado["sigma0"] = float(conjuntos["biempotrada"].params["sigma0"])
     return resultado
 
 

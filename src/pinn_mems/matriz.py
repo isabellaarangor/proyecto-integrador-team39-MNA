@@ -21,8 +21,9 @@ RAIZ = Path(__file__).resolve().parents[2]
 CONFIGS = RAIZ / "datos" / "sinteticos" / "configs"
 MATRIZ = RAIZ / "datos" / "sinteticos" / "matriz.yaml"
 
-# Punto de partida común para los métodos que optimizan E/E_ref. Se importa
-# desde aquí para que el baseline clásico no dependa del módulo de la PINN.
+# Estimación inicial común a todos los métodos de inversión: θ = E/E_ref = 0.8.
+# En los datos sintéticos el E nominal (70 GPa) es el verdadero, así que empezar
+# en él regalaría la respuesta (bitácora, 2026-10-11, aceptada el 2026-10-16).
 THETA0 = 0.8
 
 

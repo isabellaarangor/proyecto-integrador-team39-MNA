@@ -7,7 +7,16 @@ import pandas as pd
 import pytest
 
 from pinn_mems import Viga
-from pinn_mems.matriz import Corrida, cargar_matriz, configs_de_corrida, corridas, generar_corrida, generar_matriz
+from pinn_mems.matriz import (
+    THETA0,
+    Corrida,
+    cargar_matriz,
+    configs_de_corrida,
+    corridas,
+    generar_corrida,
+    generar_matriz,
+    verdaderos,
+)
 
 
 def test_tamano_de_la_matriz():
@@ -96,3 +105,11 @@ def test_reservadas_m1_dan_frecuencias_menores_que_el_ideal():
     m0 = {f["L_um"]: f["omega1_rad_s"] for f in frecuencias_reservadas({**cargar_matriz(), "casos": ["m0"]})}
     m1 = {f["L_um"]: f["omega1_rad_s"] for f in frecuencias_reservadas({**cargar_matriz(), "casos": ["m1_s5"]})}
     assert all(m1[L] < m0[L] for L in m0)
+
+
+def test_verdaderos_y_estimacion_inicial_comun():
+    assert THETA0 == 0.8
+    k1 = generar_corrida(Corrida("m1_s3", 5, 1, 0))
+    assert verdaderos(k1) == {"E": 70e9}
+    k3 = generar_corrida(Corrida("m1_s3", 5, 3, 0))
+    assert verdaderos(k3) == {"E": 70e9, "sigma0": -5e6}

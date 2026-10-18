@@ -21,6 +21,10 @@ RAIZ = Path(__file__).resolve().parents[2]
 CONFIGS = RAIZ / "datos" / "sinteticos" / "configs"
 MATRIZ = RAIZ / "datos" / "sinteticos" / "matriz.yaml"
 
+# Punto de partida común para los métodos que optimizan E/E_ref. Se importa
+# desde aquí para que el baseline clásico no dependa del módulo de la PINN.
+THETA0 = 0.8
+
 
 @dataclass(frozen=True)
 class Corrida:
@@ -91,6 +95,16 @@ def configs_de_corrida(corrida: Corrida, matriz: dict | None = None) -> dict[str
 
 def generar_corrida(corrida: Corrida, matriz: dict | None = None) -> dict[str, Conjunto]:
     return {rol: generar(cfg) for rol, cfg in configs_de_corrida(corrida, matriz).items()}
+
+
+def verdaderos(conjuntos: dict[str, Conjunto]) -> dict[str, float]:
+    """Parámetros verdaderos de una corrida: E y σ₀ si hay biempotrada."""
+    if "voladizo" not in conjuntos:
+        raise ValueError("se necesita el conjunto del voladizo de referencia")
+    resultado = {"E": float(conjuntos["voladizo"].params["E"])}
+    if "biempotrada" in conjuntos:
+        resultado["sigma0"] = float(conjuntos["biempotrada"].params["sigma0"])
+    return resultado
 
 
 def generar_matriz(salida: Path, matriz: dict | None = None) -> Path:

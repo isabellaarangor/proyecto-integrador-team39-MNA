@@ -191,3 +191,39 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
   - La semana 6 carga además L1 y L2 (T28–T31). Si se atrasa, se aplica la misma regla que con G3: los otros frentes no se detienen.
 - **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
 - **Estado:** aceptada el 2026-10-16.
+
+## 2026-10-18 — Config de la PINN L0: λ_PDE = 1 y 2000 iteraciones de L-BFGS (T26)
+
+- **Decisión:** la PINN L0 usa λ_PDE = 1 (la ecuación y las condiciones de frontera pesan lo mismo que los datos) y sube L-BFGS de 500 a 2000 iteraciones. Es `CONFIG_L0` en `src/pinn_mems/pinn/arnes.py` (hash `767d18e8e49a`). El resto queda como en la validación de G3: 3 capas de 32, CF duras, 128 puntos de colocación, 3000 iteraciones de Adam.
+- **Motivo y evidencia:** salida de `scripts/barrer_lambda_pde.py` en [`resultados/lambda-pde/`](../resultados/lambda-pde/). M0, N = 15, 3 semillas, en la celda más barata (k = 1, 1 modo) y la más cara (k = 3, 3 modos).
+  - **λ_PDE** (con ruido, 500 L-BFGS): con λ = 1 y 10 todo converge y el error en E queda ≤ 0.25 %. Con λ = 100, ninguna corrida de k = 3 converge: la pérdida de datos queda 60 veces arriba del piso del ruido, E sale con hasta 1.2 % de error y σ₀ con hasta 17 %. λ = 10 no mejora nada respecto de λ = 1 y hace σ₀ más variable (0.02–3.9 %).
+  - **"Alta" ya se cumple con λ = 1:** gracias a la adimensionalización, con λ = 1 el residual de la ecuación queda 4 órdenes de magnitud por debajo del término de datos (≈ 10⁻⁸ contra 2.4×10⁻⁴ con k = 1). La física ya se satisface prácticamente exacta; subir λ solo empeora el condicionamiento. L1 (semana 6) relajará λ por debajo de 1.
+  - **L-BFGS:** sin ruido, con k = 3 y 3 modos, 500 iteraciones dejaban σ₀ con −2 a −3 % de error (E −0.14 a −0.24 %) y el residual r₂ como término dominante: L-BFGS se cortaba antes de converger. Un diagnóstico con una semilla lo separó de la capacidad de la red: 2000 iteraciones de L-BFGS → E −0.000 %, σ₀ +0.02 %; red de 64×3 → σ₀ −0.77 %; 256 puntos de colocación → σ₀ −0.90 %.
+  - **Con 2000 iteraciones** (λ = 1, 3 semillas): sin ruido, E ≤ 0.02 % y σ₀ ≤ 0.18 %; con ruido, E ≤ 0.07 % y σ₀ +0.44 a +0.51 % (antes −1.6 a −1.8 %). La pérdida de datos con ruido se queda en el piso del ruido (2.4–3.5×10⁻⁴), igual que con 500: **no sobreajusta**. Esto resuelve el sesgo de σ₀ con k = 3 y 3 modos anotado en la entrada del 2026-10-10.
+- **Costo:** con k = 1, L-BFGS para solo al converger y el tiempo no cambia; con k = 3 y 3 modos sube ≈ 35 %.
+- **Cómputo medido de nuevo** (i7-1165G7, 2026-10-18): la laptop se calienta y una corrida sola pasa de 23 s a 36–38 s después de unos minutos (los 18 s del 2026-10-10 eran con la CPU fría). Con 4 procesos y `OMP_NUM_THREADS=1` se obtienen ≈ 2.75 veces las corridas por hora de un solo proceso (292 contra 106 corridas de 1 red por hora). Las 220 corridas de la PINN del Avance 3 son ≈ 820 redes: **≈ 2–3 h de reloj** con 4 procesos, no ≈ 1 h. Los scripts ya fijan 1 hilo por proceso.
+- **Verificación con esta config** (bloque de verificación del Avance 3, `scripts/correr_avance3.py`, almacén `resultados/avance3/pinn_l0/767d18e8e49a/`): M0 sin ruido, N = 15, k = 1 y 3, 1 y 3 modos, 10 semillas. Las 40 corridas convergen, ninguna falla; error máximo en E de 0.05 % y en σ₀ de 0.67 % (k = 3 con 3 modos; mediana 0.05 %). **La PINN L0 cumple su parte de G4.**
+- **Quién:** Manuel Alejandro Vázquez Meza (aprobada).
+- **Estado:** aceptada el 2026-10-18.
+
+## 2026-10-18 — Resultados de la PINN L0 en las celdas del Avance 3 (T26)
+
+- **Hallazgo:** con `CONFIG_L0`, las 220 corridas del Avance 3 terminan sin falla. Almacén: `resultados/avance3/pinn_l0/767d18e8e49a/`.
+- **Evidencia** (mediana del error sobre 10 semillas, N = 15, con ruido salvo la verificación):
+
+  | Caso | E, k = 1 (1 / 3 modos) | E, k = 3 (1 / 3 modos) | σ₀, k = 3 (1 / 3 modos) |
+  |---|---|---|---|
+  | M0 sin ruido | ≤ 0.009 % (máx.) | ≤ 0.05 % (máx.) | ≤ 0.67 % (máx.) |
+  | M0 | +0.01 / +0.02 % | −0.02 / +0.02 % | −0.14 / +0.21 % |
+  | M1 s1 | −0.99 / −0.97 % | −1.28 / −1.37 % | +1.64 / +1.71 % |
+  | M1 s3 | −4.99 / −4.79 % | −6.25 / −6.43 % | +7.45 / +8.94 % |
+  | M1 s5 | −15.00 / −13.39 % | −18.16 / −16.66 % | +14.41 / +22.88 % |
+
+  - La dispersión (IQR del error en E) es < 0.1 % en todas las celdas: **la PINN L0 es precisa pero sesgada** cuando el anclaje es flexible.
+  - Con k = 1 y 1 modo, el sesgo coincide con el calibrado de la severidad (−1, −5 y −15 %): es la prueba de cordura de que el método supone empotramiento ideal.
+  - Con 3 modos el sesgo en k = 1 baja un poco (la forma aporta información sobre el anclaje). Con k = 3 el sesgo en E es mayor, porque el voladizo de 200 µm siente más el mismo anclaje, y σ₀ compensa parte del error.
+  - Curva de aprendizaje (M0, k = 1, 1 modo): el error máximo en E es 0.11, 0.10 y 0.12 % con N = 5, 15 y 40. El número de puntos casi no importa: la frecuencia medida fija E.
+- **Consecuencias:** la PINN cumple su parte de G4. La degradación con la severidad es la motivación de L1–L3. Para el Avance 3 alimenta los criterios de sub/sobreajuste (curva de aprendizaje), métrica (sesgo contra dispersión) y desempeño.
+- **Quién:** Manuel Alejandro Vázquez Meza.
+- **Estado:** registrado.
+

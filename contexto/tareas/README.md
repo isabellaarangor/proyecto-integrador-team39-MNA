@@ -46,7 +46,7 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 - [ ] [T23 Arnés de config/semillas/W&B](T23-arnes-experimental.md) — C
 - [ ] [T24 Posterior MCMC P_simple](T24-mcmc-p-simple.md) — A
 - [ ] [T25 Posterior MCMC P_rich + diagnósticos](T25-mcmc-p-rich.md) — A
-- [ ] [T26 PINN L0, λ_PDE alta fija](T26-pinn-l0.md) — B
+- [x] [T26 PINN L0, λ_PDE alta fija](T26-pinn-l0.md) — B
 - [ ] [T27 Borrador de métodos + ambos abstracts (G4)](T27-borrador-metodos-abstracts-g4.md) — todos
 
 ## Semana 6 — Avance 4, modelos alternativos (L1, L2)

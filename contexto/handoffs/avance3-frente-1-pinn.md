@@ -51,13 +51,13 @@ Al final de la semana: la PINN L0 recupera E con menos de 1 % de error en M0 sin
 
 ## Done When
 
-- [ ] `THETA0` y `verdaderos()` en `matriz.py` y `sin_ruido` en `correr_pinn`, en `main` el día 1, con prueba.
-- [ ] λ_PDE elegida y justificada en la bitácora.
-- [ ] La PINN L0 recupera E con error < 1 % en M0 sin ruido en las 10 semillas (y σ₀ con k = 3 o 3 modos); tasa de éxito reportada.
-- [ ] `scripts/correr_avance3.py` corre los tres métodos y salta lo que ya está en el almacén.
-- [ ] Las celdas de la PINN están en `resultados/avance3/pinn_l0/<hash>/`, con la config de λ_PDE elegida.
-- [ ] Sección entregada al Frente 3, corriendo en menos de 5 min.
-- [ ] Pruebas en `tests/` para lo nuevo; `pytest -m "not notebooks"` en verde.
+- [ ] `THETA0` y `verdaderos()` en `matriz.py` y `sin_ruido` en `correr_pinn`, en `main` el día 1, con prueba. — *hecho y con pruebas en la rama `avance3-contrato-pinn`; falta el PR a `main`*
+- [x] λ_PDE elegida y justificada en la bitácora. — *λ_PDE = 1 y 2000 L-BFGS, aceptada el 2026-10-18*
+- [x] La PINN L0 recupera E con error < 1 % en M0 sin ruido en las 10 semillas (y σ₀ con k = 3 o 3 modos); tasa de éxito reportada. — *E ≤ 0.05 %, σ₀ ≤ 0.67 %; 220/220 corridas sin falla*
+- [ ] `scripts/correr_avance3.py` corre los tres métodos y salta lo que ya está en el almacén. — *probado con la PINN y con un método falso (`tests/test_ciclo_avance3.py`); los otros dos se prueban solos en cuanto existan sus módulos*
+- [x] Las celdas de la PINN están en `resultados/avance3/pinn_l0/<hash>/`, con la config de λ_PDE elegida. — *220 corridas en `767d18e8e49a`*
+- [x] Sección entregada al Frente 3, corriendo en menos de 5 min. — *`entregables/avance3/secciones/frente-1-pinn-l0.ipynb`, ≈ 50 s; usa `metricas.py`*
+- [x] Pruebas en `tests/` para lo nuevo; `pytest -m "not notebooks"` en verde.
 
 ## Contexto adicional
 

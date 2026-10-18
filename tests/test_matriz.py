@@ -113,3 +113,10 @@ def test_verdaderos_y_estimacion_inicial_comun():
     assert verdaderos(k1) == {"E": 70e9}
     k3 = generar_corrida(Corrida("m1_s3", 5, 3, 0))
     assert verdaderos(k3) == {"E": 70e9, "sigma0": -5e6}
+
+
+def test_la_corrida_se_reconstruye_desde_su_id():
+    for c in corridas():
+        assert Corrida.desde_id(c.id) == c
+    with pytest.raises(ValueError):
+        Corrida.desde_id("m0_k1_N15")

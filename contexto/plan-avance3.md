@@ -10,7 +10,7 @@ Se mantienen los tres frentes de la semana 4, cada uno en su tema y su parte del
 | 2 | Inversión clásica | `src/pinn_mems/inversa/` (nuevo) | `frente-2-clasico.ipynb` | Isabella |
 | 3 | SEMI MS4, métrica e integración | `src/pinn_mems/nist/` | `frente-3-semi-ms4.ipynb` | Isaí |
 
-Las secciones van en `entregables/avance3/secciones/`; el notebook integrado, en `entregables/avance3/Avance3.39.ipynb`. El detalle de cada frente (objetivo, tareas, criterios de cierre y contexto) está en su handoff: [Frente 1](handoffs/avance3-frente-1-pinn.md), [Frente 2](handoffs/avance3-frente-2-clasico.md), [Frente 3](handoffs/avance3-frente-3-semi-ms4.md).
+Las secciones van en `entregables/avance3/secciones/`; el notebook integrado, en `entregables/avance3/Avance3.39.ipynb`. El detalle de cada frente (objetivo, tareas, criterios de cierre y contexto) está en su handoff: [Frente 1](handoffs/avance3-frente-1-pinn.md), [Frente 2](handoffs/avance3-frente-2-clasico.md), [Frente 3](handoffs/avance3-frente-3-semi-ms4.md). Lo que cambió al implementar las piezas comunes está resumido en el [aviso a los Frentes 2 y 3](handoffs/avance3-aviso-frentes-2-y-3.md).
 
 ## Criterios de la rúbrica
 

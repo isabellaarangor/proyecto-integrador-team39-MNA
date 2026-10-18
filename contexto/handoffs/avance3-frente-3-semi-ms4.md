@@ -87,7 +87,7 @@ def resumen(tabla: pd.DataFrame, por=("metodo", "caso", "k", "n_modos")) -> pd.D
     # por grupo: mediana e IQR del error en E (y σ₀ si existe) en %, tasa de éxito y tiempo mediano
 ```
 
-- El caso, N, k y la semilla se leen del id de la corrida (`m1_s3_k3_N15_seed7`) o se guardan en `extra`. Acordarlo con el Frente 1, que escribe el almacén.
+- El caso, N, k y la semilla salen de `Corrida.desde_id(r.extra["corrida"])` (`pinn_mems.matriz`); `n_modos` y `sin_ruido` vienen en `extra`.
 - Las pruebas usan `Resultado` construidos a mano, sin depender de que existan corridas.
 - **Una carpeta por config:** si la PINN se corrió con dos λ_PDE, habrá dos carpetas en `pinn_l0/`. `cargar` no debe mezclarlas: si hay varias y no se pide un hash, falla con un mensaje claro. El hash vigente de cada método se anota en la sección que lo usa.
 

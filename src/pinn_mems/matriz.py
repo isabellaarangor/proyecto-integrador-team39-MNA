@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import copy
 import csv
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -37,6 +38,14 @@ class Corrida:
     @property
     def id(self) -> str:
         return f"{self.caso}_k{self.k}_N{self.N}_seed{self.semilla}"
+
+    @classmethod
+    def desde_id(cls, texto: str) -> Corrida:
+        """Reconstruye la corrida a partir de su id (p. ej. `m1_s3_k3_N15_seed7`)."""
+        m = re.fullmatch(r"(?P<caso>.+)_k(?P<k>\d+)_N(?P<N>\d+)_seed(?P<semilla>\d+)", texto)
+        if m is None:
+            raise ValueError(f"id de corrida no válido: {texto!r}")
+        return cls(m["caso"], int(m["N"]), int(m["k"]), int(m["semilla"]))
 
 
 def cargar_matriz(ruta: Path = MATRIZ) -> dict:

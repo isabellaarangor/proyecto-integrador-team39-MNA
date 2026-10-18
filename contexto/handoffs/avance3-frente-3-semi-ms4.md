@@ -79,7 +79,7 @@ El error de cada corrida y el criterio de falla **ya están** en `Resultado` (`e
 ```python
 COLORES = {"semi_ms4": ..., "clasico_l0": ..., "pinn_l0": ...}  # mismo color en todas las figuras
 
-def cargar(metodo: str, hash_config: str | None = None, raiz=RAIZ / "resultados/avance3") -> list[Resultado]
+def cargar(metodo: str, hash_config: str | None = None, raiz=almacen.ALMACEN) -> list[Resultado]  # con almacen.leer
     # lee resultados/avance3/<metodo>/<hash_config>/*.json; sin hash, la única carpeta o error si hay varias
 def tabla(resultados: list[Resultado]) -> pd.DataFrame
     # una fila por corrida con Resultado.a_fila(extra["verdaderos"]) más caso, N, k, n_modos y sin_ruido
@@ -107,6 +107,7 @@ def resumen(tabla: pd.DataFrame, por=("metodo", "caso", "k", "n_modos")) -> pd.D
 
   La diferencia en u_cE (3.14 contra 3.2) probablemente viene de u_freq o del redondeo. Revisarla contra el PDF y anotarla: es lo que T08 llama "anotar discrepancias".
 - **MEMS Calculator:** las hojas YM.1 a YM.3 que publica el NIST son plantillas vacías (`datos/02-datos-reales-nist-sp260-177.md`, §7), así que el ejemplo de Marshall es la reproducción de extremo a extremo disponible. Si se consigue una hoja llena, se agrega como segunda verificación.
+- **Lo que necesita el ciclo:** `scripts/correr_avance3.py` hace `from pinn_mems.nist.semi_ms4 import CONFIG, correr_semi_ms4, hash_metodo`. `CONFIG` puede ser tan simple como `{"hoja": "YM.1", "constante": 38.330, "f_correction": False}`; `hash_metodo(config)` devuelve `hash_config(config)` (de `pinn_mems.resultado`), y `correr_semi_ms4` pone `resultado.hash_config = hash_metodo(CONFIG)` (ver el plan, "Lo que el ciclo necesita de cada módulo").
 - **Sobre la matriz:** `correr_semi_ms4` aplica la fórmula a ω₁/2π de cada voladizo de la corrida (el de 300 µm y, con k = 3, el de 200 µm; la biempotrada no se usa, como en la norma) y reporta el promedio. Solo estima E e ignora los modos 2 y 3. `n_resoluciones = None`. En M1 con k = 1 da exactamente el E aparente que calibra la severidad (`severidad.E_aparente`). Con k = 3 el sesgo es otro, porque el voladizo de 200 µm, con el mismo anclaje físico, se desvía más.
 
 ### Datos del NIST que se usan

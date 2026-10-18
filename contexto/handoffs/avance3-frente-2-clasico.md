@@ -61,6 +61,10 @@ Al final de la semana: `correr_clasico` recupera E y σ₀ en M0 sin ruido, sus 
 ### Diseño sugerido de T22
 
 ```python
+CONFIG = {"n_elem": 100, "cotas_theta": (0.3, 3.0), "cotas_sigma0_MPa": (-15, 15), "xtol": 1e-10, "ftol": 1e-10,
+          "sigma_w": 0.02, "sigma_omega": 3e-4}   # todo lo que cambia el resultado; sin corrida ni semilla
+
+def hash_metodo(config) -> str                     # return hash_config(config)  (de pinn_mems.resultado)
 def residuales(x, conjuntos, n_modos, *, sin_ruido=False, soporte=Soporte()) -> np.ndarray
 def ajustar(conjuntos, n_modos, *, theta0=THETA0, sin_ruido=False) -> Resultado
 def correr_clasico(corrida, n_modos, *, sin_ruido=False, matriz=None) -> Resultado
@@ -77,7 +81,8 @@ def correr_clasico(corrida, n_modos, *, sin_ruido=False, matriz=None) -> Resulta
 - **Ajuste:** `scipy.optimize.least_squares(method="trf", x_scale="jac", xtol=ftol=1e-10)`, con cotas θ ∈ [0.3, 3] y σ₀ ∈ [−15, 15] MPa. La biempotrada de 300 µm pandea cerca de σ₀ ≈ −19 MPa (n = −4π²); la cota evita esa zona.
 - **Incertidumbre:** desviación estándar de cada parámetro a partir de (JᵀJ)⁻¹·χ²_red, en `Resultado.incertidumbre`.
 - **Costo:** `n_resoluciones` = número de llamadas a `resolver_modos` (un contador en la función de residuales); `tiempo_s` el de reloj.
-- **`hash_config`:** el de la config del método (`n_elem`, cotas, tolerancias, pesos), sin la corrida ni la semilla. Es la carpeta del almacén: si se cambia la config, los resultados nuevos van a otra carpeta.
+- **`hash_config`:** `correr_clasico` pone `resultado.hash_config = hash_metodo(CONFIG)`. Es la carpeta del almacén: si se cambia la config, los resultados nuevos van a otra carpeta.
+- **Lo que necesita el ciclo:** `scripts/correr_avance3.py` hace `from pinn_mems.inversa.clasica import CONFIG, correr_clasico, hash_metodo`. Los tres nombres tienen que existir con esa firma (ver el plan, "Lo que el ciclo necesita de cada módulo"). Para probarlo: `python scripts/correr_avance3.py --metodo clasico_l0 --bloque verificacion`.
 - `Resultado`: `metodo="clasico_l0"`, `parametros` en SI con claves `"E"` y `"sigma0"`; en `extra`, `corrida`, `n_modos`, `sin_ruido`, `verdaderos` (`matriz.verdaderos()`) y el χ² reducido.
 
 ### Código existente

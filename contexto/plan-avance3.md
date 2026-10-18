@@ -55,6 +55,22 @@ correr_semi_ms4(corrida, n_modos, *, sin_ruido=False) -> Resultado  # Frente 3
 - Con `sin_ruido=True`, todos usan `conjunto.w_limpia` y `conjunto.omega_limpia` en lugar de `w` y `omega`.
 - Todos parten de `THETA0` = 0.8 cuando el método tiene estimación inicial.
 
+### Lo que el ciclo necesita de cada módulo
+
+`scripts/correr_avance3.py` (ya en la rama `avance3-pinn-l0`) importa tres nombres del módulo de cada método. Antes de correr, calcula el hash para saber qué celdas ya están en el almacén; después de correr, verifica que el `Resultado` traiga ese mismo hash.
+
+| Método | Módulo | Lo que importa el ciclo |
+|---|---|---|
+| `pinn_l0` | `pinn_mems.pinn.arnes` | `CONFIG_L0`, `hash_metodo`, `correr_pinn` (ya existen) |
+| `clasico_l0` | `pinn_mems.inversa.clasica` | `CONFIG`, `hash_metodo`, `correr_clasico` |
+| `semi_ms4` | `pinn_mems.nist.semi_ms4` | `CONFIG`, `hash_metodo`, `correr_semi_ms4` |
+
+- `CONFIG`: la config del método a nivel de módulo, un `dict` o un dataclass con todo lo que cambia el resultado (malla, cotas, tolerancias, pesos…), sin la corrida ni la semilla.
+- `hash_metodo(config) -> str`: `resultado.hash_config(config)` (de `pinn_mems.resultado`) sin los campos que cambian en cada corrida. Si `CONFIG` no tiene campos así, basta `return hash_config(config)`.
+- La función del método pone `resultado.hash_config = hash_metodo(CONFIG)`. Si no coincide, el ciclo se detiene con un error.
+- El ciclo corre cada celda en un proceso aparte y guarda el `Resultado` con `pinn_mems.almacen.guardar`; de `extra` se descarta lo que no se puede escribir en JSON. `metricas.cargar` lee con `pinn_mems.almacen.leer`.
+- Cada módulo debe poder importarse sin efectos (nada de cálculos al importar), porque cada proceso lo importa de nuevo.
+
 ### Celdas del Avance 3
 
 Los tres métodos corren **las mismas celdas**, un subconjunto de la matriz:

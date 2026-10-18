@@ -227,3 +227,14 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Quién:** Manuel Alejandro Vázquez Meza.
 - **Estado:** registrado.
 
+## 2026-10-18 — Resultados de la inversión clásica en las celdas del Avance 3 (T22)
+
+- **Hallazgo:** la inversión clásica del Frente 2 (`pinn_mems.inversa.clasica`, config `36871bc4a46c`) corre las 220 celdas del Avance 3 con `scripts/correr_avance3.py` en ≈ 13 s, sin fallas. Almacén: `resultados/avance3/clasico_l0/36871bc4a46c/`.
+- **Evidencia:**
+  - M0 sin ruido: recupera E y σ₀ con error < 0.001 % (la malla de 100 elementos contra los 200 del generador evita el crimen inverso y aun así basta).
+  - Con ruido coincide con la PINN L0 en todas las celdas, con diferencias de 0.1–0.3 puntos en el sesgo de E (por ejemplo, M1 s5 con k = 3 y 3 modos: −16.34 % contra −16.66 %). Con k = 1 y 1 modo reproduce el sesgo calibrado (−1, −5 y −15 %).
+  - Dos implementaciones independientes de L0, con algoritmos distintos (mínimos cuadrados anidados y PINN), dan el mismo resultado: es una validación cruzada de ambas.
+- **Consecuencias:** el clásico cumple su parte de G4. Para el Avance 3 queda solo SEMI MS4 (T08, Frente 3).
+- **Quién:** Isabella Arango Restrepo (método); resultados generados por Manuel Alejandro Vázquez Meza.
+- **Estado:** registrado.
+

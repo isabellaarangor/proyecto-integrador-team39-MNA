@@ -10,7 +10,7 @@
 | G1 | Eigensolver < 0.1 % vs. analítico | ✅ Cerrada |
 | G2 | Identificabilidad de E, σ₀ y k_θ | ✅ Cerrada (2026-10-11): con k = 3 o 3 modos; κ_θ requiere 3 modos |
 | G3 | PINN < 1 % vs. referencia + tiempo medido | ✅ Cerrada (2026-10-11): ≈ 54 s por corrida, matriz sin recortes |
-| G4 | Baseline L0 + MCMC (R̂ < 1.01) | 🟡 En dos partes. Métodos L0: PINN ✅ (2026-10-18), clásico y SEMI MS4 pendientes. MCMC en la semana 6 |
+| G4 | Baseline L0 + MCMC (R̂ < 1.01) | 🟡 En dos partes. Métodos L0: PINN ✅ y clásico ✅ (2026-10-18), SEMI MS4 pendiente. MCMC en la semana 6 |
 | G5 | Escalera L0–L3 completa | Semana 7 |
 | G6 | Paro duro de experimentos | Semana 8 |
 

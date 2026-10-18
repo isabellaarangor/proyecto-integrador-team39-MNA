@@ -127,5 +127,5 @@ def resumen(tabla: pd.DataFrame, por=("metodo", "caso", "k", "n_modos")) -> pd.D
 
 - **El notebook integrado suma las tres secciones.** Meta: cada sección en menos de 5 min y el integrado en menos de 15. `tests/test_notebooks.py` corta cualquier celda de más de 10 min, y la regla de la entrega es correrlo completo antes de enviarlo: hay que dejar tiempo para correrlo al menos dos veces.
 - Si alguna sección entrena en vivo más de una corrida de ejemplo, pedir que la pase al almacén.
-- **Las corridas tienen que estar en el almacén antes de integrar.** Las de la PINN tardan ≈ 1–1.5 h de reloj en la máquina de Manuel; las del clásico y SEMI MS4, minutos. Si el almacén no está completo, el notebook no se puede cerrar.
+- **Las corridas tienen que estar en el almacén antes de integrar.** Las de la PINN tardan ≈ 2–3 h de reloj en la máquina de Manuel; las del clásico y SEMI MS4, minutos. Si el almacén no está completo, el notebook no se puede cerrar.
 - **El almacén se versiona:** los JSON son pequeños (≈ 700 archivos), así que van en el repo. Así el notebook corre en cualquier máquina sin repetir el cómputo.

@@ -65,7 +65,7 @@ Los tres métodos corren **las mismas celdas**, un subconjunto de la matriz:
 | Principal | M0, M1 s1, s3 y s5 (con ruido) | 15 | 1, 3 | 1, 3 | 10 | Métrica, desempeño y cómo crece el sesgo con la severidad |
 | Curva de aprendizaje | M0 (con ruido) | 5, 15, 40 | 1 | 1 | 10 | Sub/sobreajuste |
 
-Son unas 220 corridas por método. Con la PINN, a ≈ 54 s por corrida, son ≈ 3.3 h de un núcleo, ≈ 1 h con 4 procesos. Los métodos clásico y SEMI MS4 tardan segundos.
+Son unas 220 corridas por método. Con la PINN son ≈ 2–3 h de reloj con 4 procesos (medido el 2026-10-18; ver la tabla de abajo). Los métodos clásico y SEMI MS4 tardan segundos.
 
 ### Almacén de resultados
 
@@ -79,7 +79,7 @@ Medido en la laptop de Manuel (i7-1165G7, 1 hilo por proceso; bitácora, 2026-10
 
 | Qué | Costo unitario | Avance 3 | Dónde corre |
 |---|---|---|---|
-| PINN L0 | ≈ 17 s por red (redes = estructuras × modos): 18 s con k = 1 y 1 modo, 110 s con k = 3 y 3 modos | ≈ 240 corridas con el barrido de λ_PDE: **≈ 3.6 h-núcleo, ≈ 1–1.5 h con 4 procesos** | Una noche o una tarde dedicada |
+| PINN L0 | ≈ 17 s por red (redes = estructuras × modos): 18 s con k = 1 y 1 modo, 110 s con k = 3 y 3 modos | ≈ 240 corridas con el barrido de λ_PDE: **≈ 2–3 h de reloj con 4 procesos** (la laptop se calienta: 4 procesos rinden ≈ 2.75 veces uno, no 4; bitácora, 2026-10-18) | Una noche o una tarde dedicada |
 | Inversión clásica | ≈ 5.6 ms por llamada al eigensolver con 100 elementos (21 ms con 200); ≈ 0.2–1 s por ajuste | 220 corridas: **≈ 2–4 min** | Cualquier máquina |
 | Superficies de desajuste | Una evaluación por punto de la malla: 60 × 60 ≈ 20–40 s por superficie | 4 superficies: **≈ 2 min** | Se precalculan y se guardan |
 | SEMI MS4 | Instantáneo; lo que cuesta es generar la corrida (0.04 s con k = 1, 0.1 s con k = 3) | 220 corridas: **≈ 15 s** | Cualquier máquina |

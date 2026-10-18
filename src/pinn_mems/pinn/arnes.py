@@ -5,9 +5,12 @@ de modos medidos (1 o 3, el eje "modos" del plan) se convierte en mediciones,
 se entrena la PINN y se devuelve un `Resultado` con los valores verdaderos en
 `extra` para calcular errores.
 
-Todas las corridas parten de `matriz.THETA0`, la estimación inicial común a
-todos los métodos. Con `sin_ruido=True` se usan las formas y frecuencias sin
-ruido que trae cada `Conjunto`, para verificar M0 sin ruido (G4).
+La config por defecto es `CONFIG_L0`, la del método L0: la física pesa lo
+mismo que los datos (λ_PDE = 1) y L-BFGS tiene 2000 iteraciones (barrido del
+2026-10-18 en `resultados/lambda-pde/`; bitácora). Todas las corridas parten de
+`matriz.THETA0`, la estimación inicial común a todos los métodos. Con
+`sin_ruido=True` se usan las formas y frecuencias sin ruido que trae cada
+`Conjunto`, para verificar M0 sin ruido (G4).
 
 `Resultado.hash_config` identifica la config del método, no la corrida: se
 calcula sin los campos que `correr_pinn` ajusta en cada corrida (la semilla y
@@ -24,10 +27,25 @@ from pinn_mems.matriz import THETA0, Corrida, generar_corrida, verdaderos
 from pinn_mems.pinn.forma_mixta import ConfigPINN, Medicion, entrenar, mediciones_desde_conjunto
 from pinn_mems.resultado import Resultado, hash_config
 
-__all__ = ["MODOS_MEDIDOS", "THETA0", "correr_pinn", "hash_metodo", "mediciones_de_corrida", "verdaderos"]
+__all__ = [
+    "CONFIG_L0",
+    "MODOS_MEDIDOS",
+    "THETA0",
+    "correr_pinn",
+    "hash_metodo",
+    "mediciones_de_corrida",
+    "verdaderos",
+]
 
 MODOS_MEDIDOS = {1: [0], 3: [0, 1, 2]}  # índices base 0 de los modos que se usan
 CAMPOS_POR_CORRIDA = ("semilla", "invertir_n")  # los fija correr_pinn en cada corrida
+
+LAMBDA_PDE_L0 = 1.0
+CONFIG_L0 = ConfigPINN(
+    theta0=THETA0,
+    pesos={"datos": 1.0, "r1": LAMBDA_PDE_L0, "r2": LAMBDA_PDE_L0, "cf": LAMBDA_PDE_L0},
+    iter_lbfgs=2000,
+)
 
 
 def hash_metodo(config: ConfigPINN) -> str:
@@ -61,13 +79,13 @@ def correr_pinn(
 ) -> Resultado:
     """Corre la PINN sobre una corrida de la matriz.
 
-    Si `config` es None se usa `ConfigPINN(theta0=THETA0)`. La semilla de la red
-    es la de la corrida, y σ₀ se entrena solo si hay biempotrada (k = 3). En
-    `extra` quedan, además de lo de `entrenar`, el id de la corrida, `n_modos`,
+    Si `config` es None se usa `CONFIG_L0`. La semilla de la red es la de la
+    corrida, y σ₀ se entrena solo si hay biempotrada (k = 3). En `extra`
+    quedan, además de lo de `entrenar`, el id de la corrida, `n_modos`,
     `sin_ruido` y los valores verdaderos.
     """
     conjuntos = generar_corrida(corrida, matriz)
-    base = config or ConfigPINN(theta0=THETA0)
+    base = config or CONFIG_L0
     config = replace(base, semilla=corrida.semilla, invertir_n="biempotrada" in conjuntos)
     resultado = entrenar(mediciones_de_corrida(conjuntos, n_modos, sin_ruido=sin_ruido), config)
     resultado.metodo = metodo

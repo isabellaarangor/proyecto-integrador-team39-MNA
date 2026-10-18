@@ -21,6 +21,11 @@ RAIZ = Path(__file__).resolve().parents[2]
 CONFIGS = RAIZ / "datos" / "sinteticos" / "configs"
 MATRIZ = RAIZ / "datos" / "sinteticos" / "matriz.yaml"
 
+# Estimación inicial común a todos los métodos de inversión: θ = E/E_ref = 0.8.
+# En los datos sintéticos el E nominal (70 GPa) es el verdadero, así que empezar
+# en él regalaría la respuesta (bitácora, 2026-10-11, aceptada el 2026-10-16).
+THETA0 = 0.8
+
 
 @dataclass(frozen=True)
 class Corrida:
@@ -91,6 +96,14 @@ def configs_de_corrida(corrida: Corrida, matriz: dict | None = None) -> dict[str
 
 def generar_corrida(corrida: Corrida, matriz: dict | None = None) -> dict[str, Conjunto]:
     return {rol: generar(cfg) for rol, cfg in configs_de_corrida(corrida, matriz).items()}
+
+
+def verdaderos(conjuntos: dict[str, Conjunto]) -> dict[str, float]:
+    """Parámetros verdaderos de una corrida: E y, si hay biempotrada, σ₀ (Pa)."""
+    resultado = {"E": conjuntos["voladizo"].params["E"]}
+    if "biempotrada" in conjuntos:
+        resultado["sigma0"] = conjuntos["biempotrada"].params["sigma0"]
+    return resultado
 
 
 def generar_matriz(salida: Path, matriz: dict | None = None) -> Path:

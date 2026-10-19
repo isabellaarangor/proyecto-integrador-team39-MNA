@@ -238,3 +238,14 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Quién:** Isabella Arango Restrepo (método); resultados generados por Manuel Alejandro Vázquez Meza.
 - **Estado:** registrado.
 
+## 2026-10-18 — SEMI MS4 en las celdas del Avance 3 y criterio de desempeño mínimo (T08)
+
+- **Hallazgo:** SEMI MS4 (`pinn_mems.nist.semi_ms4`, config `db80caa786a2`) corre las 220 celdas sin fallas. Reproduce la hoja YM.1 de Marshall (E = 65.34 GPa; u_c(E) = 3.14 contra 3.2 GPa publicados). Con los tres métodos L0 en el almacén, el notebook `Avance3.39` compara su desempeño.
+- **Evidencia:**
+  - Sin ruido: SEMI MS4 tiene un sesgo fijo de +0.02 %, que viene de que la norma redondea la constante 48π²/λ₁⁴ = 38.321 a 38.330.
+  - SEMI MS4 solo usa ω₁, así que da lo mismo con 1 y 3 modos y no estima σ₀. Con k = 3 promedia los voladizos de 300 y 200 µm y llega a −18 % en s5, porque el voladizo corto es más sensible al anclaje.
+  - Con anclaje que cede, la inversión clásica y la PINN quedan a no más de 0.3 puntos del |sesgo| de SEMI MS4 y lo reducen hasta 1.6 puntos con 3 modos.
+- **Decisión:** el criterio de desempeño mínimo de un baseline tiene dos partes. En M0 debe tener |sesgo| < 0.1 %, dispersión < 0.1 % y 100 % de éxito en todas las celdas. En M1, su |sesgo| no debe exceder en más de 0.5 puntos al de SEMI MS4 (unas cinco veces la mayor dispersión observada). Los tres métodos lo cumplen.
+- **Consecuencias:** los métodos L0 de G4 quedan completos. SEMI MS4 es el piso: L1–L3 deben reducir el sesgo bajo M1 en E y en σ₀, que llega a +25 % en s5.
+- **Quién:** Isaí Ambrocio (método y resultados); sección de métrica y desempeño por Manuel Alejandro Vázquez Meza.
+- **Estado:** registrado.

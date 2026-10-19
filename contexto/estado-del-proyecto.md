@@ -10,7 +10,7 @@
 | G1 | Eigensolver < 0.1 % vs. analítico | ✅ Cerrada |
 | G2 | Identificabilidad de E, σ₀ y k_θ | ✅ Cerrada (2026-10-11): con k = 3 o 3 modos; κ_θ requiere 3 modos |
 | G3 | PINN < 1 % vs. referencia + tiempo medido | ✅ Cerrada (2026-10-11): ≈ 54 s por corrida, matriz sin recortes |
-| G4 | Baseline L0 + MCMC (R̂ < 1.01) | 🟡 En dos partes. Métodos L0: PINN ✅ y clásico ✅ (2026-10-18), SEMI MS4 pendiente. MCMC en la semana 6 |
+| G4 | Baseline L0 + MCMC (R̂ < 1.01) | 🟡 En dos partes. Métodos L0: PINN ✅, clásico ✅ y SEMI MS4 ✅ (2026-10-18). MCMC en la semana 6 |
 | G5 | Escalera L0–L3 completa | Semana 7 |
 | G6 | Paro duro de experimentos | Semana 8 |
 
@@ -25,6 +25,8 @@
 - **PINN (T16, T18–T20):** forma mixta en PyTorch puro, CF duras, validada contra el eigensolver (E ≤ 0.006 % sin ruido) y cronometrada. Se llama desde la matriz con `correr_pinn(corrida, n_modos)` (`src/pinn_mems/pinn/arnes.py`) y devuelve un `Resultado` (`src/pinn_mems/resultado.py`).
 - **Decisiones aceptadas (2026-10-16):** ruido del Brazo 2 (T51) y estimación inicial común θ₀ = 0.8 para todos los métodos.
 - **PINN L0 (T26):** λ_PDE = 1 y 2000 iteraciones de L-BFGS (bitácora, 2026-10-18). 220 corridas del Avance 3 sin falla; en M0 el error en E es ≤ 0.02 % (mediana) y en M1 el sesgo crece con la severidad como se espera de L0. Sección del Avance 3 en `entregables/avance3/secciones/frente-1-pinn-l0.ipynb`.
+- **Inversión clásica (T22) y SEMI MS4 (T08):** 220 corridas cada una en el almacén, sin fallas; coinciden con la PINN en todas las celdas (bitácora, 2026-10-18).
+- **Notebook `Avance3.39`:** integrado en tres partes (PINN, inversión clásica, SEMI MS4 con métrica y desempeño); corre completo en ≈ 1.5 min.
 - **Piezas comunes del Avance 3:** ciclo de semillas (`scripts/correr_avance3.py`), almacén (`pinn_mems.almacen`) y métricas (`pinn_mems.metricas`).
 - **Avance 2 (T17, T21):** entregado el 2026-10-11 (`entregables/avance2/Avance2.39.ipynb`), con escalamiento (Frente 1), selección con Fisher y PCA (Frente 2) y análisis estadístico del NIST (Frente 3).
 
@@ -35,7 +37,7 @@
 - **Características importantes:** sensibilidades y ablación de puntos y modos sobre el modelo ajustado, y las superficies de desajuste de T14 (Frente 2, después de T22).
 - **Sub/sobreajuste:** puntos y modos retenidos, error contra N = 5/15/40 y residuos (χ² reducido).
 - **Métrica y desempeño:** error relativo en E (sesgo y dispersión en 10 semillas, tasa de éxito); mínimo histórico = incertidumbre de SEMI MS4 y dispersión del round robin; mínimo técnico = < 1 % en M0 sin ruido.
-- Integrar el notebook, correrlo de principio a fin y entregarlo (Frente 3).
+- ✅ Todo lo anterior está en `entregables/avance3/Avance3.39.ipynb`. Falta entregarlo.
 
 **Para cerrar G4 (semana 6, bitácora 2026-10-16):** T23 (arnés completo con W&B y el eje de modos en `matriz.corridas()`), T24 y T25 (MCMC P_simple y P_rich), T27 (borrador de métodos y los dos abstracts).
 
@@ -47,8 +49,6 @@
 
 ## Riesgos
 
-- **El Avance 3 arrancó tarde** (sin commits de la semana 5 hasta el 2026-10-16). Al 2026-10-18 el Frente 1 tiene la PINN L0, el ciclo, el almacén, las métricas y su sección; T22 (Frente 2) sigue siendo la ruta crítica: alimenta los criterios de características importantes y sub/sobreajuste.
-- **Las piezas comunes están en ramas, no en `main`:** entran en orden `avance3-contrato-pinn` → `avance3-pinn-l0` → `avance3-metricas` → `avance3-seccion-pinn`. Mientras no entren, los otros frentes tienen que partir de esas ramas.
-- **T08 y la integración del notebook recaen en el Frente 3.** Si T08 se atora, el notebook sale con la inversión clásica como baseline y T08 en curso, lo que debilita el argumento de que L0 no es un baseline débil (plan, A3).
+- **La semana 6 arranca con todo G4 por delante salvo los métodos L0:** MCMC (T24, T25), el arnés completo (T23) y los abstracts (T27).
 - **El Brazo 1 solo tiene ω₁** y no distingue giro de desplazamiento del anclaje; L3 estima una sola flexibilidad efectiva (ΔL).
 - **El notebook entregado del Avance 2 clona la rama `PINNs-semana-4`** (está hecho para Colab): esa rama no se borra.

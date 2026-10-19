@@ -1,0 +1,489 @@
+{
+ "metodo": "clasico_l0",
+ "parametros": {
+  "E": 70082937329.54422
+ },
+ "convergio": true,
+ "tiempo_s": 0.059052165001048706,
+ "semilla": 3,
+ "incertidumbre": {
+  "E": 32981625.868339136
+ },
+ "residuales": {
+  "cost": 12.304019712458093,
+  "norma_2": 4.960649093104267,
+  "chi2_reducido": 0.6152009856229046
+ },
+ "n_resoluciones": 11,
+ "hash_config": "36871bc4a46c",
+ "razon_falla": null,
+ "extra": {
+  "theta": 1.0011848189934889,
+  "x_ajustado": [
+   0.0011841176493876794
+  ],
+  "chi2_reducido": 0.6152009856229046,
+  "n_residuales": 41,
+  "observaciones": [
+   {
+    "estructura": "voladizo",
+    "tipo": "frecuencia",
+    "modo": 1
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 0,
+    "xi": 0.0
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 1,
+    "xi": 0.02564102564102564
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 2,
+    "xi": 0.05128205128205128
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 3,
+    "xi": 0.07692307692307693
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 4,
+    "xi": 0.10256410256410256
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 5,
+    "xi": 0.1282051282051282
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 6,
+    "xi": 0.15384615384615385
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 7,
+    "xi": 0.1794871794871795
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 8,
+    "xi": 0.20512820512820512
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 9,
+    "xi": 0.23076923076923075
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 10,
+    "xi": 0.2564102564102564
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 11,
+    "xi": 0.28205128205128205
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 12,
+    "xi": 0.3076923076923077
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 13,
+    "xi": 0.3333333333333333
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 14,
+    "xi": 0.358974358974359
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 15,
+    "xi": 0.3846153846153846
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 16,
+    "xi": 0.41025641025641024
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 17,
+    "xi": 0.4358974358974359
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 18,
+    "xi": 0.4615384615384615
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 19,
+    "xi": 0.48717948717948717
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 20,
+    "xi": 0.5128205128205128
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 21,
+    "xi": 0.5384615384615384
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 22,
+    "xi": 0.5641025641025641
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 23,
+    "xi": 0.5897435897435898
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 24,
+    "xi": 0.6153846153846154
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 25,
+    "xi": 0.641025641025641
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 26,
+    "xi": 0.6666666666666666
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 27,
+    "xi": 0.6923076923076923
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 28,
+    "xi": 0.717948717948718
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 29,
+    "xi": 0.7435897435897436
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 30,
+    "xi": 0.7692307692307692
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 31,
+    "xi": 0.7948717948717948
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 32,
+    "xi": 0.8205128205128205
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 33,
+    "xi": 0.8461538461538461
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 34,
+    "xi": 0.8717948717948718
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 35,
+    "xi": 0.8974358974358974
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 36,
+    "xi": 0.923076923076923
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 37,
+    "xi": 0.9487179487179487
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 38,
+    "xi": 0.9743589743589743
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 39,
+    "xi": 1.0
+   }
+  ],
+  "jacobiano": [
+   [
+    -1666.6666534397937
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ]
+  ],
+  "residuales_vector": [
+   9.445818149609942e-12,
+   0.4389028347639528,
+   -0.651302092011043,
+   -0.5890403665136139,
+   -0.9303289603224802,
+   -0.7349500353512562,
+   0.3890034618568577,
+   -0.5907919313252328,
+   -0.06977185872983176,
+   0.44639956797098146,
+   -0.6045165593210013,
+   -0.8773260347593764,
+   1.1692591770947371,
+   0.4812919630517831,
+   0.32878319632917985,
+   -0.9989231114231584,
+   1.480737550647404,
+   -0.666617009079104,
+   0.011147398665631303,
+   0.8807395176920862,
+   0.09960247058462546,
+   0.9932445520765831,
+   0.1399090614646048,
+   -2.0529381498371966,
+   0.39787080001211506,
+   -0.4431908671712004,
+   1.6440289906224814,
+   0.17265203531921514,
+   0.2624272763299851,
+   0.9193843696105153,
+   0.07854887828810386,
+   -0.8183549993262318,
+   -0.6130089615380141,
+   0.9641187023842868,
+   0.5851337488356978,
+   -0.8006769138966419,
+   -1.063360348219955,
+   -0.4835904541289626,
+   -0.26755233635233355,
+   0.7593602211487194,
+   -0.2680700340682962
+  ],
+  "corrida": "m0_k1_N40_seed3",
+  "n_modos": 1,
+  "sin_ruido": false,
+  "verdaderos": {
+   "E": 70000000000.0
+  }
+ }
+}

@@ -1,0 +1,104 @@
+{
+ "metodo": "clasico_l0",
+ "parametros": {
+  "E": 70078025652.48735
+ },
+ "convergio": true,
+ "tiempo_s": 0.03665947200352093,
+ "semilla": 2,
+ "incertidumbre": {
+  "E": 30554658.33759541
+ },
+ "residuales": {
+  "cost": 1.3201663383647975,
+  "norma_2": 1.6249100518889021,
+  "chi2_reducido": 0.528066535345919
+ },
+ "n_resoluciones": 11,
+ "hash_config": "36871bc4a46c",
+ "razon_falla": null,
+ "extra": {
+  "theta": 1.0011146521783907,
+  "x_ajustado": [
+   0.0011140314148987177
+  ],
+  "chi2_reducido": 0.528066535345919,
+  "n_residuales": 6,
+  "observaciones": [
+   {
+    "estructura": "voladizo",
+    "tipo": "frecuencia",
+    "modo": 1
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 0,
+    "xi": 0.0
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 1,
+    "xi": 0.25
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 2,
+    "xi": 0.5
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 3,
+    "xi": 0.75
+   },
+   {
+    "estructura": "voladizo",
+    "tipo": "forma",
+    "modo": 1,
+    "punto": 4,
+    "xi": 1.0
+   }
+  ],
+  "jacobiano": [
+   [
+    -1666.6666644079837
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ],
+   [
+    0.0
+   ]
+  ],
+  "residuales_vector": [
+   5.00090249981792e-12,
+   1.3436257538946947,
+   0.8810771379952953,
+   -0.12969564785386134,
+   0.14935551594316143,
+   -0.1399198194954765
+  ],
+  "corrida": "m0_k1_N5_seed2",
+  "n_modos": 1,
+  "sin_ruido": false,
+  "verdaderos": {
+   "E": 70000000000.0
+  }
+ }
+}

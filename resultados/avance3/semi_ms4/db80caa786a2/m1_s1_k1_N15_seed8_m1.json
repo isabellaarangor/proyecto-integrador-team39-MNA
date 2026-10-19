@@ -1,0 +1,22 @@
+{
+ "metodo": "semi_ms4",
+ "parametros": {
+  "E": 69344687533.76631
+ },
+ "convergio": true,
+ "tiempo_s": 0.13721979599995393,
+ "semilla": 8,
+ "incertidumbre": {},
+ "residuales": {},
+ "n_resoluciones": null,
+ "hash_config": "db80caa786a2",
+ "razon_falla": null,
+ "extra": {
+  "corrida": "m1_s1_k1_N15_seed8",
+  "n_modos": 1,
+  "sin_ruido": false,
+  "verdaderos": {
+   "E": 70000000000.0
+  }
+ }
+}

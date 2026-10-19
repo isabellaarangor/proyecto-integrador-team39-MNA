@@ -25,7 +25,7 @@
 - **PINN (T16, T18–T20):** forma mixta en PyTorch puro, CF duras, validada contra el eigensolver (E ≤ 0.006 % sin ruido) y cronometrada. Se llama desde la matriz con `correr_pinn(corrida, n_modos)` (`src/pinn_mems/pinn/arnes.py`) y devuelve un `Resultado` (`src/pinn_mems/resultado.py`).
 - **Decisiones aceptadas (2026-10-16):** ruido del Brazo 2 (T51) y estimación inicial común θ₀ = 0.8 para todos los métodos.
 - **PINN L0 (T26):** λ_PDE = 1 y 2000 iteraciones de L-BFGS (bitácora, 2026-10-18). 220 corridas del Avance 3 sin falla; en M0 el error en E es ≤ 0.02 % (mediana) y en M1 el sesgo crece con la severidad como se espera de L0. Sección del Avance 3 en `entregables/avance3/secciones/frente-1-pinn-l0.ipynb`.
-- **Inversión clásica (T22) y SEMI MS4 (T08):** 220 corridas cada una en el almacén, sin fallas; coinciden con la PINN en todas las celdas (bitácora, 2026-10-18).
+- **Inversión clásica (T22) y SEMI MS4 (T08, plan B: fórmula cerrada y hoja YM.1 de Marshall reproducida):** 220 corridas cada una en el almacén, sin fallas; coinciden con la PINN en todas las celdas (bitácora, 2026-10-18).
 - **Notebook `Avance3.39`:** integrado en tres partes (PINN, inversión clásica, SEMI MS4 con métrica y desempeño); corre completo en ≈ 1.5 min.
 - **Piezas comunes del Avance 3:** ciclo de semillas (`scripts/correr_avance3.py`), almacén (`pinn_mems.almacen`) y métricas (`pinn_mems.metricas`).
 - **Avance 2 (T17, T21):** entregado el 2026-10-11 (`entregables/avance2/Avance2.39.ipynb`), con escalamiento (Frente 1), selección con Fisher y PCA (Frente 2) y análisis estadístico del NIST (Frente 3).
@@ -39,7 +39,7 @@
 - **Métrica y desempeño:** error relativo en E (sesgo y dispersión en 10 semillas, tasa de éxito); mínimo histórico = incertidumbre de SEMI MS4 y dispersión del round robin; mínimo técnico = < 1 % en M0 sin ruido.
 - ✅ Todo lo anterior está en `entregables/avance3/Avance3.39.ipynb`. Falta entregarlo.
 
-**Para cerrar G4 (semana 6, bitácora 2026-10-16):** T23 (arnés completo con W&B y el eje de modos en `matriz.corridas()`), T24 y T25 (MCMC P_simple y P_rich), T27 (borrador de métodos y los dos abstracts).
+**Para cerrar G4 (semana 6, bitácora 2026-10-16):** `semi_ms4_brazo1()` sobre los datos reales; T23 (arnés completo con W&B y el eje de modos en `matriz.corridas()`), T24 y T25 (MCMC P_simple y P_rich), T27 (borrador de métodos y los dos abstracts).
 
 **Opcional o diferido**
 - T48: correos a los autores del NIST y de Ochoa et al.

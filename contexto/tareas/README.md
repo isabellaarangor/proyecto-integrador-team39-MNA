@@ -15,7 +15,7 @@ Tablero de tareas derivado de `contexto/plan-tesis-pinn-mems.md`. Los conceptos,
 ## Semana 2 — Avance 0 + verificación (G0, G1)
 - [x] [T06 G0 Brazo 1: verificación de datos de frecuencia](T06-g0-brazo1-datos-frecuencia.md) — todos
 - [x] [T07 G0 Brazo 2: verificación de trazas de forma](T07-g0-brazo2-datos-forma.md) — todos
-- [ ] [T08 Reproducir una hoja del MEMS Calculator (Método 1)](T08-reproduccion-mems-calculator.md) — C
+- [x] [T08 Reproducir una hoja del MEMS Calculator (Método 1)](T08-reproduccion-mems-calculator.md) — C
 - [x] [T09 Eigensolver de referencia](T09-eigensolver-de-referencia.md) — A
 - [x] [T10 Validación del eigensolver + pytest (G1)](T10-validacion-eigensolver-g1.md) — A
 - [x] [T11 Registro de decisión G0](T11-registro-decision-g0.md) — todos

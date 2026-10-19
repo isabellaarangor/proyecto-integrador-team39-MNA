@@ -244,8 +244,9 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Evidencia:**
   - Sin ruido: SEMI MS4 tiene un sesgo fijo de +0.02 %, que viene de que la norma redondea la constante 48π²/λ₁⁴ = 38.321 a 38.330.
   - SEMI MS4 solo usa ω₁, así que da lo mismo con 1 y 3 modos y no estima σ₀. Con k = 3 promedia los voladizos de 300 y 200 µm y llega a −18 % en s5, porque el voladizo corto es más sensible al anclaje.
-  - Con anclaje que cede, la inversión clásica y la PINN quedan a no más de 0.3 puntos del |sesgo| de SEMI MS4 y lo reducen hasta 1.6 puntos con 3 modos.
-- **Decisión:** el criterio de desempeño mínimo de un baseline tiene dos partes. En M0 debe tener |sesgo| < 0.1 %, dispersión < 0.1 % y 100 % de éxito en todas las celdas. En M1, su |sesgo| no debe exceder en más de 0.5 puntos al de SEMI MS4 (unas cinco veces la mayor dispersión observada). Los tres métodos lo cumplen.
+  - Con anclaje que cede, la inversión clásica y la PINN nunca superan el |sesgo| de SEMI MS4 en más de 0.3 puntos, y con 3 modos lo reducen hasta 1.6 puntos.
+  - Con s5 el sesgo de los tres métodos (−15 % a −18 %) iguala o supera la dispersión entre laboratorios del round robin.
+- **Decisión:** el desempeño mínimo de un baseline es el del plan del Avance 3, fijado antes de correr los métodos. Mínimo técnico: error en E < 1 % en M0 sin ruido y 100 % de éxito. Mínimo histórico: en M1, la diferencia de sesgo contra SEMI MS4 en la misma celda debe ser menor que la incertidumbre de la propia norma, u_c(E)/E ≈ 4.8 %. Es más estricto que la dispersión del round robin (64.2 ± 9.3 GPa, ≈ 14 %). Los tres métodos lo cumplen: el error sin ruido es ≤ 0.05 % y la diferencia máxima con SEMI MS4 es de 1.6 puntos. Esa diferencia favorece a los métodos que usan tres modos. Se descartó un umbral de 0.5 puntos que se había propuesto después de ver los resultados.
 - **Consecuencias:** los métodos L0 de G4 quedan completos. SEMI MS4 es el piso: L1–L3 deben reducir el sesgo bajo M1 en E y en σ₀, que llega a +25 % en s5.
 - **Quién:** Isaí Ambrocio (método y resultados); sección de métrica y desempeño por Manuel Alejandro Vázquez Meza.
 - **Estado:** registrado.

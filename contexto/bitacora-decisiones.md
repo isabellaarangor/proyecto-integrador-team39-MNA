@@ -238,3 +238,15 @@ Registro de las decisiones del proyecto en el momento en que se toman: qué se d
 - **Quién:** Isabella Arango Restrepo (método); resultados generados por Manuel Alejandro Vázquez Meza.
 - **Estado:** registrado.
 
+## 2026-10-18 — SEMI MS4 en las celdas del Avance 3 y criterio de desempeño mínimo (T08)
+
+- **Hallazgo:** SEMI MS4 (`pinn_mems.nist.semi_ms4`, config `db80caa786a2`) corre las 220 celdas sin fallas. Reproduce la hoja YM.1 de Marshall (E = 65.34 GPa; u_c(E) = 3.14 contra 3.2 GPa publicados). Con los tres métodos L0 en el almacén, el notebook `Avance3.39` compara su desempeño.
+- **Evidencia:**
+  - Sin ruido: SEMI MS4 tiene un sesgo fijo de +0.02 %, que viene de que la norma redondea la constante 48π²/λ₁⁴ = 38.321 a 38.330.
+  - SEMI MS4 solo usa ω₁, así que da lo mismo con 1 y 3 modos y no estima σ₀. Con k = 3 promedia los voladizos de 300 y 200 µm y llega a −18 % en s5, porque el voladizo corto es más sensible al anclaje.
+  - Con anclaje que cede, la inversión clásica y la PINN nunca superan el |sesgo| de SEMI MS4 en más de 0.3 puntos, y con 3 modos lo reducen hasta 1.6 puntos.
+  - Con s5 el sesgo de los tres métodos (−15 % a −18 %) iguala o supera la dispersión entre laboratorios del round robin.
+- **Decisión:** el desempeño mínimo de un baseline es el del plan del Avance 3, fijado antes de correr los métodos. Mínimo técnico: error en E < 1 % en M0 sin ruido y 100 % de éxito. Mínimo histórico: en M1, la diferencia de sesgo contra SEMI MS4 en la misma celda debe ser menor que la incertidumbre de la propia norma, u_c(E)/E ≈ 4.8 %. Es más estricto que la dispersión del round robin (64.2 ± 9.3 GPa, ≈ 14 %). Los tres métodos lo cumplen: el error sin ruido es ≤ 0.05 % y la diferencia máxima con SEMI MS4 es de 1.6 puntos. Esa diferencia favorece a los métodos que usan tres modos. Se descartó un umbral de 0.5 puntos que se había propuesto después de ver los resultados.
+- **Consecuencias:** los métodos L0 de G4 quedan completos. SEMI MS4 es el piso: L1–L3 deben reducir el sesgo bajo M1 en E y en σ₀, que llega a +25 % en s5.
+- **Quién:** Isaí Ambrocio (método y resultados); sección de métrica y desempeño por Manuel Alejandro Vázquez Meza.
+- **Estado:** registrado.
